@@ -8,7 +8,7 @@
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:gravity="center_horizontal"
-    android:background="@drawable/backgroundrepeat" >
+    android:background="@drawable/backgroundrepeat">
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -29,26 +31,34 @@ public class LO52Messaging extends Activity {
 	private Button connexionBtn;
 	private TextView usernameErrorTv;
 
-	
-	
+
+
 	/*
 	 * Méthodes
 	 */
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		// Récupération des préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(null);
-		
+
 		// Initialisation des boutons, textviews...
 		connexionBtn 	= (Button) findViewById(R.id.launcher_connection_btn);
 		usernameErrorTv	= (TextView) findViewById(R.id.username_error_tv);
-		
+
 		Log.d(TAG, "Lecture préférences : nom=" + preferences.getString("prefs_userName", "valeur_defaut") + " - connexion auto=" + preferences.getBoolean("prefs_autoLogin", false));
+
+		// Ajout d'un onClickListener sur le bouton de connexion
+		connexionBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startLobbyActivity();
+			}
+		});
 		
 		// Si le username n'est pas setté, on désactive le bouton de connexion et on affiche le message
 		if (preferences.getString("prefs_userName", "").equals("")) {
@@ -57,8 +67,11 @@ public class LO52Messaging extends Activity {
 			connexionBtn.setEnabled(false);
 		} else {
 			usernameErrorTv.setText("");
-			
-			// TODO : lire la valeur de prefs_autoLogin et éventuellement effectuer la connexion si true.
+
+			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby
+			if (preferences.getBoolean("prefs_autoLogin", false)) {
+				startLobbyActivity();
+			}
 		}
 	}
 
@@ -74,8 +87,11 @@ public class LO52Messaging extends Activity {
 		} else {
 			usernameErrorTv.setText("");
 			connexionBtn.setEnabled(true);
-			
-			// TODO : lire la valeur de prefs_autoLogin et éventuellement effectuer la connexion si true.
+
+			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby
+			/*if (preferences.getBoolean("prefs_autoLogin", false)) {
+				startLobbyActivity();
+			}*/
 		}
 	}
 
@@ -106,5 +122,13 @@ public class LO52Messaging extends Activity {
 			break;
 		}
 		return true;
+	}
+
+
+	/**
+	 * Lance l'activité "Lobby"
+	 */
+	private void startLobbyActivity() {
+		startActivity(new Intent(this, Lobby.class));
 	}
 }

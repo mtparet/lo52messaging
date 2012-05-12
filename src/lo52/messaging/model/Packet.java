@@ -1,6 +1,7 @@
 package lo52.messaging.model;
 
 import java.net.InetAddress;
+import java.util.Random;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -27,13 +28,26 @@ public class Packet implements Parcelable{
 	
 	@SerializedName("type")
 	public int type;
+	
+	@SerializedName("ramdom_identifiant")
+	private int ramdom_identifiant;
 
+
+	public Packet(int type, int ramdom_identifiant) {
+		super();
+		this.type = type;
+		this.setRamdom_identifiant(ramdom_identifiant);
+	}
+	
 	public Packet(Content content, User user, int client_id, int type) {
 		super();
 		this.content = content;
 		this.user = user;
 		this.client_id = client_id;
 		this.type = type;
+		
+		Random rand = new Random();
+		this.setRamdom_identifiant(rand.nextInt());
 	}
 
 	public Packet(Parcel in) {
@@ -79,6 +93,14 @@ public class Packet implements Parcelable{
 	public int describeContents() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public int getRamdom_identifiant() {
+		return ramdom_identifiant;
+	}
+
+	public void setRamdom_identifiant(int ramdom_identifiant) {
+		this.ramdom_identifiant = ramdom_identifiant;
 	}
 
 	public static final Parcelable.Creator<Packet> CREATOR= new Parcelable.Creator<Packet>() {

@@ -10,7 +10,7 @@ public class Content implements Parcelable{
 	
 	@SerializedName("conversaton_id")
 	private int conversation_id;
-
+	
 	public int getConversation_id() {
 		return conversation_id;
 	}

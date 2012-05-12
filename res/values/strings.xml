@@ -2,15 +2,21 @@
 <resources>
 
     <string name="hello">Hello World, LO52Messaging!</string>
-    <string name="app_name">LO52 Messaging</string>
+    <string name="app_name">Another Android Instant Messenger</string>
     
     
     <!-- TRIER ACTIVITE PAR ACTIVITE -->
     
-    
     <!-- LAUNCHER (LO52Messaging) -->
     <string name="launcher_connexion_btn">Connexion</string>
     <string name="launcher_username_error_tv">Vous devez indiquer un nom d\'utilisateur dans les préférences avant de pouvoir vous connecter.</string>
+    
+    <!-- LOBBY -->
+    <string name="lobby_tab_users">Utilisateurs</string>
+    <string name="lobby_tab_conversations">Conversations</string>
+    
+    <!-- USER LIST -->
+    <string name="userlist_refresh_option">Rafraichir</string>
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>

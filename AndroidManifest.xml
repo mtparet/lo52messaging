@@ -26,6 +26,7 @@
         <activity android:name=".activities.PreferencesActivity"></activity>
         <activity android:name=".activities.LobbyActivity" android:theme="@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".activities.TestActivity"></activity>
+        <activity android:name=".activities.UserListActivity"></activity>
         <service android:name=".NetworkService"/>
     </application>
 

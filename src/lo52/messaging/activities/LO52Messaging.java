@@ -102,7 +102,7 @@ public class LO52Messaging extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.preferencesmenu, menu);
+		inflater.inflate(R.menu.preferences_menu, menu);
 		return true;
 	}
 

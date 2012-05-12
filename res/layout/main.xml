@@ -8,7 +8,7 @@
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:gravity="center_horizontal"
-    android:background="@drawable/backgroundrepeat">
+    android:background="@drawable/view">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@string/app_name"
             android:layout_marginBottom="15dp"
+            android:gravity="center_horizontal"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
@@ -59,7 +60,7 @@
             android:id="@+id/a_enlever_logo"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:text="Logo"
+            android:text="@string/app_name"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         

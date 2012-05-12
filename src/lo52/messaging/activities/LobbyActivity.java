@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
 
+/**
+ *	Activité regroupant plusieurs sous-activités au sein de différents onglets 
+ */
 public class LobbyActivity extends TabActivity {
 
 	private static final String TAG = "LobbyActivity";
@@ -17,38 +20,25 @@ public class LobbyActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
 		
-		//lancement du service
+		// Lancement du service
 		startService(new Intent(LobbyActivity.this, NetworkService.class));
-
+		
 		Log.d(TAG, "Lancement activité lobby");
+		
+		// Récupération du TabHost
+		TabHost tabHost = getTabHost();
+		TabHost.TabSpec spec; 
+		Intent intent;
 
+		// Créer un intent (réutilisable) pour indiquer quelles activité lancer dans les différents tabs
+		intent = new Intent().setClass(this, UserListActivity.class);
 
-		TabHost tabHost = getTabHost();  // The activity TabHost
-		TabHost.TabSpec spec;  // Resusable TabSpec for each tab
-		Intent intent;  // Reusable Intent for each tab
-
-		// Create an Intent to launch an Activity for the tab (to be reused)
-		intent = new Intent().setClass(this, TestActivity.class);
-
-		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec = tabHost.newTabSpec("tab1").setIndicator("Tab1 bla bla", null).setContent(intent);
+		// Initialiser un tabSpec pour chaque tab en donnant l'intent correspondant
+		spec = tabHost.newTabSpec("tab1").setIndicator(getString(R.string.lobby_tab_users), getResources().getDrawable(R.drawable.icon_group)).setContent(intent);
 		tabHost.addTab(spec);
 		
-		spec = tabHost.newTabSpec("tab2").setIndicator("Tab2 bla bla", null).setContent(intent);
+		intent.setClass(this, TestActivity.class);
+		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);
-		
-		spec = tabHost.newTabSpec("tab3").setIndicator("Tab3 bla bla", null).setContent(intent);
-		tabHost.addTab(spec);
-		
-		spec = tabHost.newTabSpec("tab4").setIndicator("Tab4 bla bla", null).setContent(intent);
-		tabHost.addTab(spec);
-		
-		spec = tabHost.newTabSpec("tab5").setIndicator("Tab5 bla bla", null).setContent(intent);
-		tabHost.addTab(spec);
-		
-		spec = tabHost.newTabSpec("tab6").setIndicator("Tab6 bla bla", null).setContent(intent);
-		tabHost.addTab(spec);
-
-
 	}
 }

@@ -11,12 +11,12 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import com.google.gson.Gson;
 
 import lo52.messaging.model.Content;
-import lo52.messaging.model.ContentMessage;
 import lo52.messaging.model.Packet;
 import lo52.messaging.model.User;
 
@@ -74,17 +74,23 @@ public class NetworkService extends Service {
 		 */
 		Intent broadcastIntent = new Intent("ReceiveMessage");
 		Bundle bundle = new Bundle();
-
-        ContentMessage message = new ContentMessage(1234,"bonjou");
+        
+        ArrayList<User> userlist = new ArrayList<User>();
         User user = new User(253634, "cestmoi");
-        Packet packet = new Packet(message,user, user.getId(), Packet.MESSAGE);
+        userlist.add(user);
+        userlist.add(user);
+        
+        Content message = new Content(3535,"bonjour",userlist);
+        Packet packet = new Packet(message,user, user.getId(), Packet.CREATION_GROUP);
+        
+        bundle.putParcelable("packet", packet);
         
         Gson gson = new Gson();
         String json = gson.toJson(packet);
         
         Packet packet2 = gson.fromJson(json, packet.getClass());
-        ContentMessage mess = (ContentMessage) packet2.getMessage();
         
+        Packet packet3 = bundle.getParcelable("packet");
 		ListenSocket r1 = new ListenSocket();
 		r1.execute(null);
 		

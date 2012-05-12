@@ -39,13 +39,8 @@ public class Packet implements Parcelable{
 		type = in.readInt();
 		client_id = in.readInt();
 		user = in.readParcelable(User.class.getClassLoader());
+		content = in.readParcelable(Content.class.getClassLoader());
 
-		switch (type){
-		case MESSAGE : content = in.readParcelable(ContentMessage.class.getClassLoader());
-		break;
-		case CREATION_GROUP : content = in.readParcelable(ContentGroupCreation.class.getClassLoader());
-		break;
-		}
 	}
 
 	@Override

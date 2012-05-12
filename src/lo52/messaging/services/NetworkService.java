@@ -66,7 +66,7 @@ public class NetworkService extends Service {
 		/*
 		 * Exemple pour transmettre un message récupéré à l'activity
 		 */
-		Intent broadcastIntent = new Intent("ReceiveMessage");
+		Intent broadcastIntent = new Intent("SendMessage");
 		Bundle bundle = new Bundle();
         
         ArrayList<User> userlist = new ArrayList<User>();
@@ -79,20 +79,15 @@ public class NetworkService extends Service {
         Content message = new Content(3535,"bonjour",userlist);
         Packet packet = new Packet(message,user, user.getId(), Packet.CREATION_GROUP);
         
-        bundle.putParcelable("packet", packet);
-        
         Gson gson = new Gson();
         String json = gson.toJson(packet);
         
-        Packet packet2 = gson.fromJson(json, packet.getClass());
+        broadcastIntent.putExtra("json", json);
         
-        Packet packet3 = bundle.getParcelable("packet");
+        sendBroadcast(broadcastIntent);
+        
 		ListenSocket r1 = new ListenSocket();
 		r1.execute(null);
-		
-
-				
-        this.sendBroadcast(broadcastIntent);
     
 	}
 	
@@ -103,10 +98,10 @@ public class NetworkService extends Service {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Bundle bundle = intent.getExtras();
+			String json = intent.getStringExtra("json");
 			
-			//on reçoit le packet émit par l'activity
-			Packet packet = bundle.getParcelable("Packet");
+			Gson gson = new Gson();
+			Packet packet = gson.fromJson(json, Packet.class);
 			
 			//Création de l'asyncTask pour envoyer le packet
 			SendSocket sendSocket = new SendSocket();
@@ -191,12 +186,14 @@ public class NetworkService extends Service {
 			try {
 				datagramSocket = new DatagramSocket(5005);
 		    	 byte[] buffer2 = new byte[30000];
-		    	 DatagramPacket packet2 = new DatagramPacket(buffer2, buffer2.length);
+		    	 DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 
 		    	 try {
-					datagramSocket.receive(packet2);
-					String json = new String(packet2.getData(), 0, packet2.getLength());  
-					 Log.d("receive_receiver", json);
+					datagramSocket.receive(dataPacket);
+					String json = new String(dataPacket.getData(), 0, dataPacket.getLength());  
+					Log.d("NetWorkService", json);
+					Gson gson = new Gson();
+					Packet packet = gson.fromJson(json, Packet.class);
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

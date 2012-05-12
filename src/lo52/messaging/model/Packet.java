@@ -1,28 +1,116 @@
 package lo52.messaging.model;
 
 import java.net.InetAddress;
+import java.util.Random;
 
-public class Packet {
-	private Message message;
+import com.google.gson.annotations.SerializedName;
+
+import android.os.BadParcelableException;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+
+public class Packet implements Parcelable{
+	final static public int MESSAGE = 1;
+	final static public int CREATION_GROUP = 2;
+	final static public int HELLO = 3;
+	final static public int ACK = 4;
+	final static public int DISCONNECTED = 5;
+	
+	@SerializedName("content")
+	private Content content;
+
+	@SerializedName("user")
 	private User user;
 	
+	@SerializedName("client_id")
+	private int client_id;
 	
-	public Packet(Message message, User user) {
+	@SerializedName("type")
+	public int type;
+	
+	@SerializedName("ramdom_identifiant")
+	private int ramdom_identifiant;
+
+
+	public Packet(int type, int ramdom_identifiant) {
 		super();
-		this.message = message;
-		this.user = user;
+		this.type = type;
+		this.setRamdom_identifiant(ramdom_identifiant);
 	}
+	
+	public Packet(Content content, User user, int client_id, int type) {
+		super();
+		this.content = content;
+		this.user = user;
+		this.client_id = client_id;
+		this.type = type;
+		
+		Random rand = new Random();
+		this.setRamdom_identifiant(rand.nextInt());
+	}
+
+	public Packet(Parcel in) {
+		try{
+			type = in.readInt();
+			client_id = in.readInt();
+			user = in.readParcelable(User.class.getClassLoader());
+			content = in.readParcelable(Content.class.getClassLoader());
+		}catch(BadParcelableException e){
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(type);
+		dest.writeInt(client_id);
+		dest.writeValue(user);
+		dest.writeValue(content);
+
+	}
+
 	public User getUser() {
 		return user;
 	}
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Message getMessage() {
-		return message;
+	public Content getMessage() {
+		return content;
 	}
-	public void setMessage(Message message) {
-		this.message = message;
+	public void setMessage(Content message) {
+		this.content = message;
 	}
+	public int getClient_id() {
+		return client_id;
+	}
+	public void setClient_id(int client_id) {
+		this.client_id = client_id;
+	}
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getRamdom_identifiant() {
+		return ramdom_identifiant;
+	}
+
+	public void setRamdom_identifiant(int ramdom_identifiant) {
+		this.ramdom_identifiant = ramdom_identifiant;
+	}
+
+	public static final Parcelable.Creator<Packet> CREATOR= new Parcelable.Creator<Packet>() {
+		public Packet createFromParcel(Parcel in) {
+			return new Packet(in);
+		}
+
+		public Packet[] newArray(int size) {
+			return new Packet[size];
+		}
+	};
 
 }

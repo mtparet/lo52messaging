@@ -143,9 +143,8 @@ public class NetworkService extends Service {
 	 private class SendSocket extends AsyncTask <Packet, Integer, Long> {
 	     protected Long doInBackground(Packet... packets) {
 	    	 
-	    	 //Message message = packets[0].getMessage();
-	    	 //User user = packets[0].getUser();
-	    	 //InetAddress inetAddres = hashtableUser.get(user);
+	    	 Packet packet = packets[0];
+	    	 InetSocketAddress inetAddres = packet.getUser().getInetSocketAddress();
 	    	 
 	         /*TODO initier la socket correspondant à l'utilisateur et envoyer un packet */
 	    	 
@@ -157,23 +156,16 @@ public class NetworkService extends Service {
 					e1.printStackTrace();
 				}
 
-				byte[] buffer = "Bonjour".getBytes();
-				InetSocketAddress inetaddres = new InetSocketAddress("127.0.0.1", 5005);
+		        Gson gson = new Gson();
+		        String json = gson.toJson(packet);
+		        
+				byte[] buffer = json.getBytes();
 				
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, inetaddres.getAddress(), 5005);
+				DatagramPacket dataPacket = null;
 				try {
-					datagramSocket.send(packet);
-					byte[] buffer2 = new byte[30000];
-					DatagramPacket packet2 = new DatagramPacket(buffer2,30000);
+					dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
+					datagramSocket.send(dataPacket);
 					
-					datagramSocket.receive(packet2);
-					
-					String json = new String(packet2.getData(), 0, packet2.getLength());
-
-					    Log.d("receive", json);
-					Log.d("remote_adress", packet2.getAddress().getCanonicalHostName());
-					Log.d("remote_adress", String.valueOf(packet2.getPort()));
-					Log.d("local_adress", String.valueOf(datagramSocket.getLocalAddress().toString()));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

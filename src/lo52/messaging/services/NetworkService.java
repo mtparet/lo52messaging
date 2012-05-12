@@ -38,7 +38,7 @@ public class NetworkService extends Service {
 	 * InetAddress est un objet pour contenir l'adresse ip de l'utilisateur, utile pour toute connexion hors bluetooth
 	 */
 
-	private ArrayList<Packet> packetListACK = new ArrayList<Packet>();
+	private HashMap<Integer,Packet> packetListACK = new HashMap<Integer,Packet>();
 
 	public NetworkService() {
 
@@ -164,7 +164,7 @@ public class NetworkService extends Service {
 				datagramSocket.send(dataPacket);
 				
 				//on l'ajoute dans la liste des paquets envoyé
-				packetListACK.add(packet);
+				packetListACK.put( packet.getRamdom_identifiant(), packet);
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -253,6 +253,8 @@ public class NetworkService extends Service {
 			//Exécution de l'asyncTask
 			sendSocket.execute(packets);
 			
+		}else{
+			packetListACK.remove(packetReceive.getRamdom_identifiant());
 		}
 
 	}

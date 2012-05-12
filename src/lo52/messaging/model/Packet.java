@@ -4,6 +4,7 @@ import java.net.InetAddress;
 
 import com.google.gson.annotations.SerializedName;
 
+import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -36,10 +37,14 @@ public class Packet implements Parcelable{
 	}
 
 	public Packet(Parcel in) {
-		type = in.readInt();
-		client_id = in.readInt();
-		user = in.readParcelable(User.class.getClassLoader());
-		content = in.readParcelable(Content.class.getClassLoader());
+		try{
+			type = in.readInt();
+			client_id = in.readInt();
+			user = in.readParcelable(User.class.getClassLoader());
+			content = in.readParcelable(Content.class.getClassLoader());
+		}catch(BadParcelableException e){
+			e.printStackTrace();
+		}
 
 	}
 

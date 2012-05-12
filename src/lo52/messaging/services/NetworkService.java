@@ -13,7 +13,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Hashtable;
 
-import lo52.messaging.model.Message;
+import com.google.gson.Gson;
+
+import lo52.messaging.model.Content;
+import lo52.messaging.model.ContentMessage;
 import lo52.messaging.model.Packet;
 import lo52.messaging.model.User;
 
@@ -65,17 +68,23 @@ public class NetworkService extends Service {
         IntentFilter filter2 = new IntentFilter();
         filter.addAction("ReceiveInfoActivity");
         registerReceiver(InfoFromActivity, filter2);
-        
+
 		/*
 		 * Exemple pour transmettre un message récupéré à l'activity
 		 */
 		Intent broadcastIntent = new Intent("ReceiveMessage");
 		Bundle bundle = new Bundle();
-		Message message = new Message(2233,"blabla");
-		bundle.putParcelable("Message", message);
-		broadcastIntent.putExtras(bundle);
-		
-		
+
+        ContentMessage message = new ContentMessage(1234,"bonjou");
+        User user = new User(253634, "cestmoi");
+        Packet packet = new Packet(message,user, user.getId(), Packet.MESSAGE);
+        
+        Gson gson = new Gson();
+        String json = gson.toJson(packet);
+        
+        Packet packet2 = gson.fromJson(json, packet.getClass());
+        ContentMessage mess = (ContentMessage) packet2.getMessage();
+        
 		ListenSocket r1 = new ListenSocket();
 		r1.execute(null);
 		
@@ -94,9 +103,8 @@ public class NetworkService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getExtras();
-			Message message = bundle.getParcelable("Message");
+			Content message = bundle.getParcelable("Message");
 			User user = bundle.getParcelable("User");
-			Packet packet = new Packet(message,user);
 			// TODO envoyer le message avec le réseau avec une asynctask			
 		}
     	

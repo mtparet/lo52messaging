@@ -104,15 +104,30 @@ public class NetworkService extends Service {
 			Gson gson = new Gson();
 			Packet packet = gson.fromJson(json, Packet.class);
 
-			//Création de l'asyncTask pour envoyer le packet
-			SendSocket sendSocket = new SendSocket();
-			Packet[] packets = new Packet[1];
-			packets[0] = packet;
+			/**
+			 * Dans le cas de l'annonciation de l'arrivée dans le réseau (broadcast)
+			 */
+			if(packet.type == Packet.HELLO){
+				//Création de l'asyncTask pour envoyer le packet
+				BroadcastSocket sendSocket = new BroadcastSocket();
+				Packet[] packets = new Packet[1];
+				packets[0] = packet;
 
-			//Exécution de l'asyncTask
-			sendSocket.execute(packets);
+				//Exécution de l'asyncTask
+				sendSocket.execute(packets);
+			}else{
+				/**
+				 * Dans le cas de l'envoit d'un message
+				 */
+				//Création de l'asyncTask pour envoyer le packet
+				SendSocket sendSocket = new SendSocket();
+				Packet[] packets = new Packet[1];
+				packets[0] = packet;
 
-			// TODO envoyer le message avec le réseau avec une asynctask			
+				//Exécution de l'asyncTask
+				sendSocket.execute(packets);
+			}
+			
 		}
 
 	};
@@ -137,6 +152,56 @@ public class NetworkService extends Service {
 	 * Dans ce paquet il prend le client, regarde dans table son adresse ip et lui envoit
 	 */
 	private class SendSocket extends AsyncTask <Packet, Integer, Long> {
+		protected Long doInBackground(Packet... packets) {
+
+			Packet packet = packets[0];
+			InetSocketAddress inetAddres = packet.getUser().getInetSocketAddress();
+
+
+
+			/*TODO remplacer l'User du packet par soi-même */
+
+			DatagramSocket datagramSocket = null;
+			try {
+				datagramSocket = new DatagramSocket();
+			} catch (SocketException e1) {
+				e1.printStackTrace();
+			}
+
+			Gson gson = new Gson();
+			String json = gson.toJson(packet);
+
+			byte[] buffer = json.getBytes();
+
+			DatagramPacket dataPacket = null;
+			try {
+				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
+				datagramSocket.send(dataPacket);
+				
+				//on l'ajoute dans la liste des paquets envoyé
+				packetListACK.put( packet.getRamdom_identifiant(), packet);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+			return null;
+		}
+
+		protected void onPostExecute(Long result) {
+			// TODO  
+		}
+	}
+	
+
+	/*
+	 * AsyncTask pour envoyer un message broadcast à tout le réseau
+	 * Socket qui reçoit un paquet déjà tout emballé
+	 * TODO a faire, et tester si le wifi dispo, sinon à ne pas faire
+	 */
+	private class BroadcastSocket extends AsyncTask <Packet, Integer, Long> {
 		protected Long doInBackground(Packet... packets) {
 
 			Packet packet = packets[0];

@@ -129,7 +129,6 @@ public class LO52Messaging extends Activity {
 	 * Lance l'activité "Lobby"
 	 */
 	private void startLobbyActivity() {
-		return;
-		//startActivity(new Intent(this, Lobby.class));
+		startActivity(new Intent(this, LobbyActivity.class));
 	}
 }

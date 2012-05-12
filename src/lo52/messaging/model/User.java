@@ -1,20 +1,25 @@
 package lo52.messaging.model;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements  Parcelable{
 	
+	private InetSocketAddress inetSocketAddress;
 	private String name;
 	private int id;
 
-    public User(int id, String name) {
+    public User(int id, String name, InetSocketAddress inetAddress) {
         this.name = name;
         this.id = id;
+        this.inetSocketAddress = inetAddress;
     }
 
 	public User(Parcel in) {
-        this(in.readInt(),in.readString());
+        this(in.readInt(),in.readString(),(InetSocketAddress) in.readValue(InetSocketAddress.class.getClassLoader()));
     }
 	
 	public static final Parcelable.Creator<User> CREATOR= new Parcelable.Creator<User>() {
@@ -46,7 +51,16 @@ public class User implements  Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeInt(id);
+		dest.writeValue(inetSocketAddress);
 		
+	}
+
+	public InetSocketAddress getInetSocketAddress() {
+		return inetSocketAddress;
+	}
+
+	public void setInetSocketAddress(InetSocketAddress inetAddress) {
+		this.inetSocketAddress = inetAddress;
 	}
 	
 

@@ -62,12 +62,6 @@ public class NetworkService extends Service {
         filter.addAction("SendMessage");
         registerReceiver(SendMessage, filter);
         
-    	/*
-    	 * enregistrer l'intent permettant de recevoir les infos de connexions
-    	 */
-        IntentFilter filter2 = new IntentFilter();
-        filter.addAction("ReceiveInfoActivity");
-        registerReceiver(InfoFromActivity, filter2);
 
 		/*
 		 * Exemple pour transmettre un message récupéré à l'activity
@@ -76,7 +70,9 @@ public class NetworkService extends Service {
 		Bundle bundle = new Bundle();
         
         ArrayList<User> userlist = new ArrayList<User>();
-        User user = new User(253634, "cestmoi");
+        InetSocketAddress inetAddres = new InetSocketAddress("127.0.0.1",5005);
+        
+        User user = new User(253634, "cestmoi",inetAddres);
         userlist.add(user);
         userlist.add(user);
         
@@ -94,8 +90,7 @@ public class NetworkService extends Service {
 		ListenSocket r1 = new ListenSocket();
 		r1.execute(null);
 		
-		SendSocket s1 = new SendSocket();
-		s1.execute(null);
+
 				
         this.sendBroadcast(broadcastIntent);
     
@@ -109,27 +104,23 @@ public class NetworkService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getExtras();
-			Content message = bundle.getParcelable("Message");
-			User user = bundle.getParcelable("User");
+			
+			//on reçoit le packet émit par l'activity
+			Packet packet = bundle.getParcelable("Packet");
+			
+			//Création de l'asyncTask pour envoyer le packet
+			SendSocket sendSocket = new SendSocket();
+			Packet[] packets = new Packet[1];
+			packets[0] = packet;
+			
+			//Exécution de l'asyncTask
+			sendSocket.execute(packets);
+			
 			// TODO envoyer le message avec le réseau avec une asynctask			
 		}
     	
     };
     
-    /*
-     * Permet de recevoir les messages depuis le service
-     * 
-     */
-    private BroadcastReceiver InfoFromActivity = new BroadcastReceiver(){
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Bundle bundle = intent.getExtras();
-			String action = bundle.getString("action").toString();
-			String what = bundle.getString("what").toString();
-		}
-    	
-    };
 
 
 	@Override

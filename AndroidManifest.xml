@@ -25,6 +25,7 @@
         
         <activity android:name=".activities.PreferencesActivity"></activity>
         <activity android:name=".activities.LobbyActivity" android:theme="@android:style/Theme.NoTitleBar"></activity>
+        <activity android:name=".activities.TestActivity"></activity>
         
     </application>
 

@@ -2,8 +2,11 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import lo52.messaging.R;
+import lo52.messaging.model.User;
+import lo52.messaging.services.NetworkService;
 import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
@@ -28,6 +31,9 @@ public class UserListActivity extends ListActivity {
 	private static final String TAG = "UserListActivity";
 	// Adapter utilisé pour mapper les données au layout de la liste
 	UserListArrayAdapter adapter;
+	
+	//liste des users
+	HashMap<Integer, User> userList;
 	ArrayList<String> values;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,32 @@ public class UserListActivity extends ListActivity {
 		// Ajout/suppression d'items dans la liste
 		addUser("test connard");
 	}
+	
+
+	
+
+	@Override
+	protected void onResume() {
+		
+		/**
+		 * TODO voir comment on réalise la synchronisation:
+		 * - soit manuelle : à chaque fois que l'on remet l'activity en premier plan et avec un bouton rafraichir
+		 * - soit automatique : implique de créer un nouveau type de paquet (avec action = REMOVE_USER et ADD_USER)
+		 */
+		//on récupère la liste des users
+		userList = NetworkService.getListUsers();
+		values.clear();
+		for( User user : userList.values()){
+			values.add(user.getName());
+			
+		}
+		adapter.notifyDataSetChanged();
+		
+		super.onResume();
+	}
+
+
+
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -131,4 +163,5 @@ public class UserListActivity extends ListActivity {
 			return rowView;
 		}
 	}
+	
 }

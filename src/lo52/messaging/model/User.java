@@ -1,25 +1,47 @@
 package lo52.messaging.model;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Random;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements  Parcelable{
 	
-	private InetSocketAddress inetSocketAddress;
+	private InetSocketAddress inetSocketAddressLocal;
+	public InetSocketAddress getInetSocketAddressLocal() {
+		return inetSocketAddressLocal;
+	}
+
+	public void setInetSocketAddressLocal(InetSocketAddress inetSocketAddressLocal) {
+		this.inetSocketAddressLocal = inetSocketAddressLocal;
+	}
+
+	private InetSocketAddress inetSocketAddressPublic;
 	private String name;
 	private int id;
 
-    public User(int id, String name, InetSocketAddress inetAddress) {
+	/**
+	 * 
+	 * @param id
+	 * @param name
+	 * @param inetAddress
+	 */
+    public User(String name, InetSocketAddress inetSocketAddressLocal) {
         this.name = name;
-        this.id = id;
-        this.inetSocketAddress = inetAddress;
+        
+        //on génère son id aléatoirement
+        Random rand = new Random();
+        this.id = rand.nextInt();
+        
+        this.inetSocketAddressLocal = inetSocketAddressLocal;
     }
 
 	public User(Parcel in) {
-        this(in.readInt(),in.readString(),(InetSocketAddress) in.readValue(InetSocketAddress.class.getClassLoader()));
+		this.name = in.readString();
+		this.id = in.readInt();
+		this.inetSocketAddressLocal = (InetSocketAddress) in.readValue(InetSocketAddress.class.getClassLoader());
+		this.inetSocketAddressPublic = (InetSocketAddress) in.readValue(InetSocketAddress.class.getClassLoader());
     }
 	
 	public static final Parcelable.Creator<User> CREATOR= new Parcelable.Creator<User>() {
@@ -51,16 +73,17 @@ public class User implements  Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeInt(id);
-		dest.writeValue(inetSocketAddress);
+		dest.writeValue(inetSocketAddressLocal);
+		dest.writeValue(inetSocketAddressPublic);
 		
 	}
 
-	public InetSocketAddress getInetSocketAddress() {
-		return inetSocketAddress;
+	public InetSocketAddress getInetSocketAddressPublic() {
+		return inetSocketAddressPublic;
 	}
 
-	public void setInetSocketAddress(InetSocketAddress inetAddress) {
-		this.inetSocketAddress = inetAddress;
+	public void setInetSocketAddressPublic(InetSocketAddress inetSocketAddressPublic) {
+		this.inetSocketAddressPublic = inetSocketAddressPublic;
 	}
 	
 

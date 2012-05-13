@@ -1,13 +1,12 @@
 package lo52.messaging.model;
 
-import java.net.InetAddress;
 import java.util.Random;
-
-import com.google.gson.annotations.SerializedName;
 
 import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.gson.annotations.SerializedName;
 
 
 public class Packet implements Parcelable{
@@ -20,30 +19,37 @@ public class Packet implements Parcelable{
 	@SerializedName("content")
 	private Content content;
 
-	@SerializedName("user")
-	private User user;
+	@SerializedName("user_envoyeur")
+	private User user_envoyeur;
 	
-	@SerializedName("client_id")
-	private int client_id;
+	@SerializedName("user_destinataire")
+	private User user_destinataire;
+	
+	public User getUser_destinataire() {
+		return user_destinataire;
+	}
+
+	public void setUser_destinataire(User user_destinataire) {
+		this.user_destinataire = user_destinataire;
+	}
 	
 	@SerializedName("type")
 	public int type;
 	
 	@SerializedName("ramdom_identifiant")
 	private int ramdom_identifiant;
-
-
-	public Packet(int type, int ramdom_identifiant) {
-		super();
-		this.type = type;
-		this.setRamdom_identifiant(ramdom_identifiant);
-	}
 	
-	public Packet(Content content, User user, int client_id, int type) {
+	/**
+	 * 
+	 * @param content
+	 * @param user_destinataire
+	 * @param client_id
+	 * @param type
+	 */
+	public Packet(Content content, User user_destinataire, int client_id, int type) {
 		super();
 		this.content = content;
-		this.user = user;
-		this.client_id = client_id;
+		this.user_destinataire = user_destinataire;
 		this.type = type;
 		
 		Random rand = new Random();
@@ -53,42 +59,41 @@ public class Packet implements Parcelable{
 	public Packet(Parcel in) {
 		try{
 			type = in.readInt();
-			client_id = in.readInt();
-			user = in.readParcelable(User.class.getClassLoader());
+			user_destinataire = in.readParcelable(User.class.getClassLoader());
 			content = in.readParcelable(Content.class.getClassLoader());
+			user_envoyeur = in.readParcelable(User.class.getClassLoader());
 		}catch(BadParcelableException e){
 			e.printStackTrace();
 		}
 
 	}
 
+	public Packet(int type, User user_envoyeur, User user_destinataire,
+			int ramdom_identifiant) {
+		super();
+		this.type = type;
+		this.user_destinataire = user_destinataire;
+		this.user_envoyeur = user_envoyeur;
+		this.setRamdom_identifiant(ramdom_identifiant);
+	}
+
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(type);
-		dest.writeInt(client_id);
-		dest.writeValue(user);
+		dest.writeValue(user_destinataire);
 		dest.writeValue(content);
+		dest.writeValue(user_envoyeur);
 
 	}
 
-	public User getUser() {
-		return user;
-	}
-	public void setUser(User user) {
-		this.user = user;
-	}
+
 	public Content getMessage() {
 		return content;
 	}
 	public void setMessage(Content message) {
 		this.content = message;
 	}
-	public int getClient_id() {
-		return client_id;
-	}
-	public void setClient_id(int client_id) {
-		this.client_id = client_id;
-	}
+
 	@Override
 	public int describeContents() {
 		// TODO Auto-generated method stub
@@ -101,6 +106,14 @@ public class Packet implements Parcelable{
 
 	public void setRamdom_identifiant(int ramdom_identifiant) {
 		this.ramdom_identifiant = ramdom_identifiant;
+	}
+
+	public User getUser_envoyeur() {
+		return user_envoyeur;
+	}
+
+	public void setUser_envoyeur(User user_envoyeur) {
+		this.user_envoyeur = user_envoyeur;
 	}
 
 	public static final Parcelable.Creator<Packet> CREATOR= new Parcelable.Creator<Packet>() {

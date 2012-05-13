@@ -7,6 +7,11 @@ public class Message implements Parcelable{
 	private String message;
 	private int client_id;
 
+	/**
+	 * 
+	 * @param client_id
+	 * @param message
+	 */
 	public Message(int client_id, String message) {
 		this.message = message;
 		this.client_id = client_id;

@@ -1,3 +1,9 @@
 TODO: ajouter un code d'erreur si le message reçu n'est pas compréhensible par le programme
 ajouter un code pour pouvoir demander les Users des autres
 ajouter un code pour envoyer ses Users
+
+
+Si on la temps : (lol)
+
+Implémenter génération d'un QRcode pour qu'un autre utilisateur puisse se connecter à nous. (surtout pour le cas d'une adresse publique)
+

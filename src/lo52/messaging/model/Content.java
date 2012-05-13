@@ -88,6 +88,12 @@ public class Content implements Parcelable{
 	@SerializedName("message")
 	private String message;
 	
+	
+	/**
+	 * 
+	 * @param conversation_id
+	 * @param message
+	 */
 	public Content(int conversation_id, String message) {
 		this.conversation_id = conversation_id;
 		this.message = message;

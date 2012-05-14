@@ -17,6 +17,7 @@ public class User implements  Parcelable{
 	
 
 	private InetSocketAddress inetSocketAddressPublic;
+	private boolean alive = false;
 	private String name;
 	private int id;
 
@@ -90,6 +91,14 @@ public class User implements  Parcelable{
 
 	public void setInetSocketAddressLocal(InetSocketAddress inetSocketAddressLocal) {
 		this.inetSocketAddressLocal = inetSocketAddressLocal;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public void setAlive(boolean alive) {
+		this.alive = alive;
 	}
 
 }

@@ -1,6 +1,8 @@
-package lo52.messaging.model;
+package lo52.messaging.model.network;
 
 import java.util.ArrayList;
+
+import lo52.messaging.model.User;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,7 +16,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Matthieu Paret
  *
  */
-public class Content implements Parcelable{
+public class ContentNetwork implements Parcelable{
 	
 	@SerializedName("conversaton_id")
 	private int conversation_id;
@@ -36,13 +38,13 @@ public class Content implements Parcelable{
 	 * @param conversation_id
 	 * @param message
 	 */
-	public Content(int conversation_id, String message) {
+	public ContentNetwork(int conversation_id, String message) {
 		this.conversation_id = conversation_id;
 		this.message = message;
 		// TODO Auto-generated constructor stub
 	}
 
-	public Content( int conversation_id) {
+	public ContentNetwork( int conversation_id) {
 		this.conversation_id = conversation_id;
 	}
 	
@@ -52,13 +54,13 @@ public class Content implements Parcelable{
 	 * @param name
 	 * @param userList
 	 */
-	public Content(int conversation_id, String name, ArrayList<User> userList) {
+	public ContentNetwork(int conversation_id, String name, ArrayList<User> userList) {
 		this.conversation_id = conversation_id;
 		this.conversation_name = name;
 		this.userList = userList;
 	}
 	
-	public Content(Parcel in) {
+	public ContentNetwork(Parcel in) {
 		this.conversation_id = in.readInt();
 		this.conversation_name = in.readString();
 		userList = new ArrayList<User>();
@@ -66,13 +68,13 @@ public class Content implements Parcelable{
 		this.message = in.readString();
 	}
 
-	public static final Parcelable.Creator<Content> CREATOR= new Parcelable.Creator<Content>() {
-		public Content createFromParcel(Parcel in) {
-			return new Content(in);
+	public static final Parcelable.Creator<ContentNetwork> CREATOR= new Parcelable.Creator<ContentNetwork>() {
+		public ContentNetwork createFromParcel(Parcel in) {
+			return new ContentNetwork(in);
 		}
 
-		public Content[] newArray(int size) {
-			return new Content[size];
+		public ContentNetwork[] newArray(int size) {
+			return new ContentNetwork[size];
 		}
 	};
 	

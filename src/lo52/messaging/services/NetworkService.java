@@ -8,10 +8,12 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import lo52.messaging.model.Content;
 import lo52.messaging.model.Conversation;
-import lo52.messaging.model.Packet;
+import lo52.messaging.model.Message;
 import lo52.messaging.model.User;
+import lo52.messaging.model.broadcast.MessageBroacast;
+import lo52.messaging.model.network.ContentNetwork;
+import lo52.messaging.model.network.PacketNetwork;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,9 +27,31 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 /**
- * Service qui g�re les communcations r�seaux, stocke les diff�rentes donn�es,
- * re�oit des actions depuis les activity, leur ennvoit des messages/cr�ation de groupe,
- * met � disposition la liste des utilisateurs, conversations.
+ * Service qui g�re les communcations r�seaux, stocke les diff�rentes donn�es,
+ * re�oit des actions depuis les activity, leur ennvoit des messages/cr�ation de groupe,
+ * met � disposition la liste des utilisateurs, conversations.
+ * 
+ * Principe de base:
+ * 
+ * *L'activity envoit:
+ * 
+ * Hello
+ * Creation group
+ * Message
+ * Alive
+ * Disconnected
+ * 
+ * *Le service envoit:
+ * 
+ * Message d'une conversation
+ * 
+ * *L'activity r�cup�re:
+ * 
+ * La liste des utilisateurs
+ * La listes des conversations
+ * 
+ * 
+ * 
  * 
  * @author SYSTEMMOI
  *
@@ -41,7 +65,7 @@ public class NetworkService extends Service {
 	private static HashMap<Integer,Conversation> listConversations = new HashMap<Integer,Conversation>();
 
 	//liste des packets en attente d'ACK
-	private HashMap<Integer,Packet> packetListACK = new HashMap<Integer,Packet>();
+	private HashMap<Integer,PacketNetwork> packetListACK = new HashMap<Integer,PacketNetwork>();
 
 	private static User user_me;
 
@@ -84,8 +108,8 @@ public class NetworkService extends Service {
 
 		user_me = new User("cestmoi");
 
-		Content message = new Content(3535,"client1");
-		Packet packet = new Packet(message,user, Packet.HELLO);
+		ContentNetwork message = new ContentNetwork(3535,"client1");
+		PacketNetwork packet = new PacketNetwork(message,user, PacketNetwork.HELLO);
 
 		Gson gson = new Gson();
 		String json = gson.toJson(packet);
@@ -109,7 +133,13 @@ public class NetworkService extends Service {
 			String json = intent.getStringExtra("json");
 
 			Gson gson = new Gson();
-			Packet packet = gson.fromJson(json, Packet.class);
+			PacketNetwork packet = gson.fromJson(json, PacketNetwork.class);
+			
+			packet.setUser_envoyeur(user_me);
+			
+			//permet d'enregistrer dans le service ce qui se passe sur l'activity
+			analysePacket(packet);
+			
 			SendMessage(packet);
 
 		}
@@ -121,17 +151,15 @@ public class NetworkService extends Service {
 	 * Fonction qui finit la contruction du packet et l'envoit suivant son type
 	 * @param packet
 	 */
-	private void SendMessage(Packet packet){
-
-		packet.setUser_envoyeur(user_me);
+	private void SendMessage(PacketNetwork packet){
 		
 		/**
 		 * Dans le cas de l'annonciation de l'arrivée dans le réseau (broadcast)
 		 */
-		if(packet.type == Packet.HELLO && packet.getUser_destinataire() == null){
+		if(packet.type == PacketNetwork.HELLO && packet.getUser_destinataire() == null){
 			//Création de l'asyncTask pour envoyer le packet
 			BroadcastSocket broadcastSocket = new BroadcastSocket();
-			Packet[] packets = new Packet[1];
+			PacketNetwork[] packets = new PacketNetwork[1];
 			packets[0] = packet;
 
 			//Exécution de l'asyncTask
@@ -143,7 +171,7 @@ public class NetworkService extends Service {
 			 */
 			//Création de l'asyncTask pour envoyer le packet
 			SendSocket sendSocket = new SendSocket();
-			Packet[] packets = new Packet[1];
+			PacketNetwork[] packets = new PacketNetwork[1];
 			packets[0] = packet;
 
 			//Exécution de l'asyncTask
@@ -170,16 +198,21 @@ public class NetworkService extends Service {
 	 * Socket qui reçoit un paquet déjà tout emballé
 	 * Dans ce paquet il prend le client, regarde dans table son adresse ip et lui envoit
 	 */
-	private class SendSocket extends AsyncTask <Packet, Integer, Long> {
-		protected Long doInBackground(Packet... packets) {
+	private class SendSocket extends AsyncTask <PacketNetwork, Integer, Long> {
+		protected Long doInBackground(PacketNetwork... packets) {
 
-			Packet packet = packets[0];
+			PacketNetwork packet = packets[0];
 
 			InetSocketAddress inetAddres = packet.getUser_destinataire().getInetSocketAddressLocal();
 
 			// au cas où la local addrese est nulle on utilise celle publique
 			if(inetAddres == null){
 				inetAddres = packet.getUser_destinataire().getInetSocketAddressPublic();
+			}
+			
+			if(inetAddres == null){
+				Log.e("NetworkService", "Error, user sans addrese" + packet.toString());
+				return null;
 			}
 
 
@@ -226,10 +259,10 @@ public class NetworkService extends Service {
 	 * Socket qui reçoit un paquet déjà tout emballé
 	 * TODO a faire, et tester si le wifi dispo, sinon à ne pas faire
 	 */
-	private class BroadcastSocket extends AsyncTask <Packet, Integer, Long> {
-		protected Long doInBackground(Packet... packets) {
+	private class BroadcastSocket extends AsyncTask <PacketNetwork, Integer, Long> {
+		protected Long doInBackground(PacketNetwork... packets) {
 
-			Packet packet = packets[0];
+			PacketNetwork packet = packets[0];
 			InetSocketAddress inetAddres = packet.getUser_destinataire().getInetSocketAddressLocal();
 
 
@@ -332,7 +365,7 @@ public class NetworkService extends Service {
 		Log.d("NetWorkService", json);
 
 		Gson gson = new Gson();
-		Packet packetReceive = gson.fromJson(json, Packet.class);
+		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
 
 		/*
 		 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on l'ajoute avec le port par défault de l'application
@@ -362,46 +395,78 @@ public class NetworkService extends Service {
 		/**
 		 * Si le packet n'est pas un ACK, on envoit un ACK
 		 */
-		if(packetReceive.type != Packet.ACK ){
+		if(packetReceive.type != PacketNetwork.ACK ){
 
 			 //On envoit un ACK
-			Packet packetSend = new Packet(packetReceive.getUser_envoyeur(),Packet.ACK, packetReceive.getRamdom_identifiant());
+			PacketNetwork packetSend = new PacketNetwork(packetReceive.getUser_envoyeur(), packetReceive.getRamdom_identifiant(),PacketNetwork.ACK);
+
+			packetSend.setUser_envoyeur(user_me);
 
 			SendMessage(packetSend);
 
 		}
 
 
+		analysePacket(packetReceive);
+
+	}
+	
+	/**
+	 *	 
+	 * Foncton déclenché pour chaque Paquet reçu,
+	 * 
+	 * A un switch sur les le type de paquet et va exécuter les fonctions nécessaires
+	 * 
+	 * @param packet, contient un packet
+	 */
+	private void analysePacket(PacketNetwork packet){
 		/*
 		 * on exécute les traitement à faire au niveau de la couche réseau
 		 */
-		switch (packetReceive.type){
-		case Packet.ACK : paquetACK(packetReceive);
+		switch (packet.type){
+		case PacketNetwork.ACK : paquetACK(packet);
 		break;
-		case Packet.CREATION_GROUP : paquetCreationGroup(packetReceive);
+		case PacketNetwork.CREATION_GROUP : paquetCreationGroup(packet);
 		break;
-		case Packet.DISCONNECTED : paquetDisconnecter(packetReceive);
+		case PacketNetwork.DISCONNECTED : paquetDisconnecter(packet);
 		break;
-		case Packet.HELLO : paquetHello(packetReceive);
+		case PacketNetwork.HELLO : paquetHello(packet);
 		break;
-		case Packet.MESSAGE : paquetMessage(packetReceive);
+		case PacketNetwork.MESSAGE : paquetMessage(packet);
+		break;
+		default: paquetInconnu(packet);
 		break;
 
 		}
-
-
 	}
+
 
 	/**
 	 * Traite un message reçu, le fait suivre à l'activity correspondant
 	 * Met l'état de l'utilisateur à "en ligne"
 	 * @param packetReceive
 	 */
-	private void paquetMessage(Packet packetReceive) {
+	private void paquetMessage(PacketNetwork packetReceive) {
 		// TODO Auto-generated method stub
 
+		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
+			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
+			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
+			
+			MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
+			
+			Gson gson = new Gson();
+			String json = gson.toJson(messageBroad);
+			
+			sendToActivity(json,"lo52.messaging.activities.");
+			
+		}else{
+			//TODO Error la conversation n'existe pas
+		}
+		
+		// on met le user � alive
+		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
-		sendToActivity(packetReceive,"lo52.messaging.activities.");
 	}
 
 	/**
@@ -410,7 +475,7 @@ public class NetworkService extends Service {
 	 * Met l'état de l'utilisateur à "en ligne"
 	 * @param packetReceive
 	 */
-	private void paquetHello(Packet packetReceive) {
+	private void paquetHello(PacketNetwork packetReceive) {
 
 		// on teste si l'user est connu
 		if( listUsers.containsKey(packetReceive.getUser_envoyeur().getId()) ){
@@ -426,13 +491,10 @@ public class NetworkService extends Service {
 		}else{
 			//on l'ajoute à la liste
 			listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
-
-			//Et on lui envoit nous m�me un Hello 
-			Packet packet = new Packet(packetReceive.getUser_envoyeur(), Packet.HELLO);
-			
-			SendMessage(packet);
 		}
-
+		
+		// on le met à alive
+		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
 	}
 
@@ -442,11 +504,17 @@ public class NetworkService extends Service {
 	 * Met l'état de l'utilisateur à disconnected
 	 * @param packetReceive
 	 */
-	private void paquetDisconnecter(Packet packetReceive) {
+	private void paquetDisconnecter(PacketNetwork packetReceive) {
 		// TODO Auto-generated method stub
-
+		
+		// on teste si l'user est connu
+		if( listUsers.containsKey(packetReceive.getUser_envoyeur().getId()) ){
+			// on le met à no alive
+			listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(false);
+		}
+		
 		//on le fait le suivre à l'activity qui gère la liste des users (et peut être aussi à l'activity qui gère les conversations)
-		sendToActivity(packetReceive,"lo52.messaging.activities.UserListActivity");
+		//sendToActivity(packetReceive,"lo52.messaging.activities.UserListActivity");
 
 	}
 
@@ -456,10 +524,28 @@ public class NetworkService extends Service {
 	 * Vérifie que tout les users sont connus sinon on les rajoute dans notre liste
 	 * @param packetReceive
 	 */
-	private void paquetCreationGroup(Packet packetReceive) {
+	private void paquetCreationGroup(PacketNetwork packetReceive) {
 		// TODO Auto-generated method stub
+		
+		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
+			
+			//Si le nom a chang�, on le met � jour
+			if( !(listConversations.get(packetReceive.getContent().getConversation_id()).getConversation_name() ==  packetReceive.getContent().getConversation_name())){
+				Conversation conversation = listConversations.get(packetReceive.getContent().getConversation_id());
+				conversation.setConversation_name(packetReceive.getContent().getConversation_name());
+				
+				listConversations.remove(packetReceive.getContent().getConversation_id());
+				
+				listConversations.put(conversation.getConversation_id(), conversation);
+			}
+			
+		}else{
+			Conversation conversation = new Conversation(packetReceive.getContent().getConversation_id(), packetReceive.getContent().getConversation_name());
+			listConversations.put(conversation.getConversation_id(),conversation);
+			
+		}
 
-		sendToActivity(packetReceive,"lo52.messaging.activities.");
+		//sendToActivity(packetReceive,"lo52.messaging.activities.");
 
 	}
 
@@ -470,26 +556,36 @@ public class NetworkService extends Service {
 	 * 
 	 * @param packetReceive
 	 */
-	private void paquetACK(Packet packetReceive) {
+	private void paquetACK(PacketNetwork packetReceive) {
 
 		packetListACK.remove(packetReceive.getRamdom_identifiant());
-		sendToActivity(packetReceive,"lo52.messaging.activities.");
+		
+		//on considère un ACK comme un hello le cas échéant
+		paquetHello(packetReceive);
+		
+		//sendToActivity(packetReceive,"lo52.messaging.activities.");
 
+	}
+	
+	/**
+	 * Pour traiter un paquet d'un type inconnu
+	 * @param packet
+	 */
+	private void paquetInconnu(PacketNetwork packet) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
 	 * Envoit en broadcast le paquet pour être traité
-	 * @param packetReceive
+	 * @param json
 	 * @param action
 	 */
-	private void sendToActivity(Packet packetReceive, String action) {
+	private void sendToActivity(String json, String action) {
 		/*
 		 * Exemple pour transmettre un message récupéré à l'activity
 		 */
 		Intent broadcastIntent = new Intent(action);
-
-		Gson gson = new Gson();
-		String json = gson.toJson(packetReceive);
 
 		broadcastIntent.putExtra("json", json);
 

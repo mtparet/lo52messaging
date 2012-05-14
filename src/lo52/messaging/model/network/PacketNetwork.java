@@ -1,6 +1,8 @@
-package lo52.messaging.model;
+package lo52.messaging.model.network;
 
 import java.util.Random;
+
+import lo52.messaging.model.User;
 
 import android.os.BadParcelableException;
 import android.os.Parcel;
@@ -13,15 +15,16 @@ import com.google.gson.annotations.SerializedName;
  * @author Matthieu Paret
  *
  */
-public class Packet implements Parcelable{
+public class PacketNetwork implements Parcelable{
 	final static public int MESSAGE = 1;
 	final static public int CREATION_GROUP = 2;
 	final static public int HELLO = 3;
 	final static public int ACK = 4;
 	final static public int DISCONNECTED = 5;
+	final static public int ALIVE = 6;
 	
 	@SerializedName("content")
-	private Content content;
+	private ContentNetwork content;
 
 	@SerializedName("user_envoyeur")
 	private User user_envoyeur;
@@ -41,7 +44,7 @@ public class Packet implements Parcelable{
 	 * @param user_destinataire
 	 * @param type
 	 */
-	public Packet(Content content, User user_destinataire, int type) {
+	public PacketNetwork(ContentNetwork content, User user_destinataire, int type) {
 		super();
 		this.content = content;
 		this.user_destinataire = user_destinataire;
@@ -56,7 +59,7 @@ public class Packet implements Parcelable{
 	 * @param user_destinataire
 	 * @param type
 	 */
-	public Packet( User user_destinataire, int type) {
+	public PacketNetwork( User user_destinataire, int type) {
 		super();
 		this.user_destinataire = user_destinataire;
 		this.type = type;
@@ -65,11 +68,11 @@ public class Packet implements Parcelable{
 		this.setRamdom_identifiant(rand.nextInt());
 	}
 
-	public Packet(Parcel in) {
+	public PacketNetwork(Parcel in) {
 		try{
 			type = in.readInt();
 			user_destinataire = in.readParcelable(User.class.getClassLoader());
-			content = in.readParcelable(Content.class.getClassLoader());
+			content = in.readParcelable(ContentNetwork.class.getClassLoader());
 			user_envoyeur = in.readParcelable(User.class.getClassLoader());
 		}catch(BadParcelableException e){
 			e.printStackTrace();
@@ -83,7 +86,7 @@ public class Packet implements Parcelable{
 	 * @param user_destinataire
 	 * @param ramdom_identifiant
 	 */
-	public Packet(User user_destinataire,
+	public PacketNetwork(User user_destinataire,
 			int ramdom_identifiant, int type) {
 		super();
 		this.type = type;
@@ -100,10 +103,10 @@ public class Packet implements Parcelable{
 	}
 
 
-	public Content getMessage() {
+	public ContentNetwork getContent() {
 		return content;
 	}
-	public void setMessage(Content message) {
+	public void setContent(ContentNetwork message) {
 		this.content = message;
 	}
 
@@ -136,13 +139,13 @@ public class Packet implements Parcelable{
 		this.user_destinataire = user_destinataire;
 	}
 	
-	public static final Parcelable.Creator<Packet> CREATOR= new Parcelable.Creator<Packet>() {
-		public Packet createFromParcel(Parcel in) {
-			return new Packet(in);
+	public static final Parcelable.Creator<PacketNetwork> CREATOR= new Parcelable.Creator<PacketNetwork>() {
+		public PacketNetwork createFromParcel(Parcel in) {
+			return new PacketNetwork(in);
 		}
 
-		public Packet[] newArray(int size) {
-			return new Packet[size];
+		public PacketNetwork[] newArray(int size) {
+			return new PacketNetwork[size];
 		}
 	};
 

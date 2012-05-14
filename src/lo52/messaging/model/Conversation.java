@@ -12,7 +12,7 @@ public class Conversation {
 	
 	private int conversation_id;
 	
-	private String name;
+	private String conversation_name;
 	
 	private ArrayList<Message> listMessage = new ArrayList<Message>();
 	
@@ -23,16 +23,16 @@ public class Conversation {
 		Random rand = new Random();
 		conversation_id = rand.nextInt();
 		
-		this.name = name;
+		this.conversation_name = name;
 	}
 	
 	/**
 	 * Permet de récupérer localement un conversation déjà créé
 	 * @param conversation_id
 	 */
-	public Conversation(int conversation_id, String name){
+	public Conversation(int conversation_id, String conversation_name){
 		this.conversation_id = conversation_id;
-		this.setName(name);
+		this.setConversation_name(conversation_name);
 	}
 	
 	public int getConversation_id() {
@@ -48,12 +48,12 @@ public class Conversation {
 		this.listMessage = listMessage;
 	}
 
-	public String getName() {
-		return name;
+	public String getConversation_name() {
+		return conversation_name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setConversation_name(String conversation_name) {
+		this.conversation_name = conversation_name;
 	}
 	
 	/**

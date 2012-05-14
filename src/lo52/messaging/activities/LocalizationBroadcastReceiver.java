@@ -26,7 +26,7 @@ public class LocalizationBroadcastReceiver extends BroadcastReceiver {
         // We're gonna create a notification.
         
         // Construct the notification.
-        /*Notification notification = new Notification(R.drawable.notification, "Locaton updated " + locationInfo.getTimestampAgeInSeconds() + " seconds ago", System.currentTimeMillis());
+        Notification notification = new Notification(R.drawable.notification, "Locaton updated " + locationInfo.getTimestampAgeInSeconds() + " seconds ago", System.currentTimeMillis());
         
         Intent contentIntent = new Intent(context, TestActivity.class);
         PendingIntent contentPendingIntent = PendingIntent.getActivity(context, 0, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -35,7 +35,7 @@ public class LocalizationBroadcastReceiver extends BroadcastReceiver {
         
         // Trigger the notification.
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(1234, notification);
-        */
+        
 	}
 
 }

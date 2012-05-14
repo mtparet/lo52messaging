@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import com.littlefluffytoys.littlefluffylocationlibrary.*;
 
 
 /**
@@ -41,6 +42,9 @@ public class LO52Messaging extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// Première initialisation de la library de géolocalisation
+		LocationLibrary.initialiseLibrary(getBaseContext());
 
 		// Récupération des préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);

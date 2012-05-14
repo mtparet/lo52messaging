@@ -3,6 +3,7 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import lo52.messaging.R;
 import lo52.messaging.model.User;
@@ -33,7 +34,7 @@ public class UserListActivity extends ListActivity {
 	UserListArrayAdapter adapter;
 	
 	//liste des users
-	HashMap<Integer, User> userList;
+	Hashtable<Integer, User> userList;
 	ArrayList<String> values;
 
 	public void onCreate(Bundle savedInstanceState) {

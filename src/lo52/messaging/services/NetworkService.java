@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
@@ -59,13 +60,13 @@ import com.google.gson.Gson;
 public class NetworkService extends Service {
 
 	// Contient la liste des utilisateur
-	private static HashMap<Integer,User> listUsers = new HashMap<Integer,User>();
+	private static Hashtable<Integer,User> listUsers = new Hashtable<Integer,User>();
 
 	// contient la liste des conversations
-	private static HashMap<Integer,Conversation> listConversations = new HashMap<Integer,Conversation>();
+	private static Hashtable<Integer,Conversation> listConversations = new Hashtable<Integer,Conversation>();
 
 	//liste des packets en attente d'ACK
-	private HashMap<Integer,PacketNetwork> packetListACK = new HashMap<Integer,PacketNetwork>();
+	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
 
 	private static User user_me;
 
@@ -593,19 +594,19 @@ public class NetworkService extends Service {
 
 	}
 
-	public static HashMap<Integer, User> getListUsers() {
+	public static Hashtable<Integer, User> getListUsers() {
 		return listUsers;
 	}
 
-	public static void setListUsers(HashMap<Integer, User> listUsersE) {
+	public static void setListUsers(Hashtable<Integer, User> listUsersE) {
 		listUsers = listUsersE;
 	}
 
-	public static HashMap<Integer, Conversation> getListConversations() {
+	public static Hashtable<Integer, Conversation> getListConversations() {
 		return listConversations;
 	}
 
-	public static void setListConversations(HashMap<Integer, Conversation> listConversations) {
+	public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
 		NetworkService.listConversations = listConversations;
 	}
 

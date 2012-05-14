@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lo52.messaging.model.Content;
+import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Packet;
 import lo52.messaging.model.User;
 import android.app.Service;
@@ -25,22 +26,17 @@ import com.google.gson.Gson;
 
 public class NetworkService extends Service {
 
+	// Contient la liste des utilisateur
 	private static HashMap<Integer,User> listUsers = new HashMap<Integer,User>();
 	
-	// contient la liste des id d'users pour chaque conversation
-	private static HashMap<Integer,ArrayList<Integer>> listConversations = new HashMap<Integer,ArrayList<Integer>>();
+	// contient la liste des conversations
+	private static HashMap<Integer,Conversation> listConversations = new HashMap<Integer,Conversation>();
 	
+	//liste des packets en attente d'ACK
+	private HashMap<Integer,Packet> packetListACK = new HashMap<Integer,Packet>();
+
 	private static User user_me;
 
-	public static User getUser_me() {
-		return user_me;
-	}
-
-	public static void setUser_me(User user_me) {
-		NetworkService.user_me = user_me;
-	}
-
-	private HashMap<Integer,Packet> packetListACK = new HashMap<Integer,Packet>();
 
 	public NetworkService() {
 
@@ -491,13 +487,20 @@ public static void setListUsers(HashMap<Integer, User> listUsersE) {
 	listUsers = listUsersE;
 }
 
-public static HashMap<Integer,ArrayList<Integer>> getListConversations() {
+public static HashMap<Integer, Conversation> getListConversations() {
 	return listConversations;
 }
 
-public static void setListConversations(HashMap<Integer,ArrayList<Integer>> listConversations) {
+public static void setListConversations(HashMap<Integer, Conversation> listConversations) {
 	NetworkService.listConversations = listConversations;
 }
 
+public static User getUser_me() {
+	return user_me;
+}
+
+public static void setUser_me(User user_me) {
+	NetworkService.user_me = user_me;
+}
 
 }

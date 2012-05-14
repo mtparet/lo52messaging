@@ -56,6 +56,10 @@ public class Conversation {
 		this.name = name;
 	}
 	
+	/**
+	 * Permet d'ajouter un message à la conversation
+	 * @param message
+	 */
 	public void addMessage(Message message){
 		this.listMessage.add(message);
 	}

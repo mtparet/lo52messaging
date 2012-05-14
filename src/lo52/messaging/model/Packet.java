@@ -39,12 +39,25 @@ public class Packet implements Parcelable{
 	 * 
 	 * @param content
 	 * @param user_destinataire
-	 * @param client_id
 	 * @param type
 	 */
-	public Packet(Content content, User user_destinataire, int client_id, int type) {
+	public Packet(Content content, User user_destinataire, int type) {
 		super();
 		this.content = content;
+		this.user_destinataire = user_destinataire;
+		this.type = type;
+		
+		Random rand = new Random();
+		this.setRamdom_identifiant(rand.nextInt());
+	}
+	
+	/**
+	 * Pour un packet sans content
+	 * @param user_destinataire
+	 * @param type
+	 */
+	public Packet( User user_destinataire, int type) {
+		super();
 		this.user_destinataire = user_destinataire;
 		this.type = type;
 		
@@ -64,12 +77,17 @@ public class Packet implements Parcelable{
 
 	}
 
-	public Packet(int type, User user_envoyeur, User user_destinataire,
-			int ramdom_identifiant) {
+	/**
+	 * Utile pour l'enovoit d'un ACK
+	 * @param type
+	 * @param user_destinataire
+	 * @param ramdom_identifiant
+	 */
+	public Packet(User user_destinataire,
+			int ramdom_identifiant, int type) {
 		super();
 		this.type = type;
 		this.user_destinataire = user_destinataire;
-		this.user_envoyeur = user_envoyeur;
 		this.setRamdom_identifiant(ramdom_identifiant);
 	}
 

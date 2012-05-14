@@ -8,7 +8,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-
+/**
+ * Packet Réseau, contient l'envoyeur, le destinataire, le type de packet, et le content
+ * @author Matthieu Paret
+ *
+ */
 public class Packet implements Parcelable{
 	final static public int MESSAGE = 1;
 	final static public int CREATION_GROUP = 2;
@@ -24,14 +28,6 @@ public class Packet implements Parcelable{
 	
 	@SerializedName("user_destinataire")
 	private User user_destinataire;
-	
-	public User getUser_destinataire() {
-		return user_destinataire;
-	}
-
-	public void setUser_destinataire(User user_destinataire) {
-		this.user_destinataire = user_destinataire;
-	}
 	
 	@SerializedName("type")
 	public int type;
@@ -77,7 +73,6 @@ public class Packet implements Parcelable{
 		this.setRamdom_identifiant(ramdom_identifiant);
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(type);
 		dest.writeValue(user_destinataire);
@@ -94,7 +89,6 @@ public class Packet implements Parcelable{
 		this.content = message;
 	}
 
-	@Override
 	public int describeContents() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -116,6 +110,14 @@ public class Packet implements Parcelable{
 		this.user_envoyeur = user_envoyeur;
 	}
 
+	public User getUser_destinataire() {
+		return user_destinataire;
+	}
+
+	public void setUser_destinataire(User user_destinataire) {
+		this.user_destinataire = user_destinataire;
+	}
+	
 	public static final Parcelable.Creator<Packet> CREATOR= new Parcelable.Creator<Packet>() {
 		public Packet createFromParcel(Parcel in) {
 			return new Packet(in);

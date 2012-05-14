@@ -6,16 +6,15 @@ import java.util.Random;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Décrit un utilisateur. 
+ * De base contient seulement un nom et un id généré pseudo aléatoirement
+ * Son adresse ip local/public doit être mise à jour ensuite
+ * @author Matthieu Paret
+ *
+ */
 public class User implements  Parcelable{
 	
-	private InetSocketAddress inetSocketAddressLocal;
-	public InetSocketAddress getInetSocketAddressLocal() {
-		return inetSocketAddressLocal;
-	}
-
-	public void setInetSocketAddressLocal(InetSocketAddress inetSocketAddressLocal) {
-		this.inetSocketAddressLocal = inetSocketAddressLocal;
-	}
 
 	private InetSocketAddress inetSocketAddressPublic;
 	private String name;
@@ -27,14 +26,12 @@ public class User implements  Parcelable{
 	 * @param name
 	 * @param inetAddress
 	 */
-    public User(String name, InetSocketAddress inetSocketAddressLocal) {
+    public User(String name) {
         this.name = name;
         
         //on gÃ©nÃ¨re son id alÃ©atoirement
         Random rand = new Random();
         this.id = rand.nextInt();
-        
-        this.inetSocketAddressLocal = inetSocketAddressLocal;
     }
 
 	public User(Parcel in) {
@@ -86,5 +83,13 @@ public class User implements  Parcelable{
 		this.inetSocketAddressPublic = inetSocketAddressPublic;
 	}
 	
+	private InetSocketAddress inetSocketAddressLocal;
+	public InetSocketAddress getInetSocketAddressLocal() {
+		return inetSocketAddressLocal;
+	}
+
+	public void setInetSocketAddressLocal(InetSocketAddress inetSocketAddressLocal) {
+		this.inetSocketAddressLocal = inetSocketAddressLocal;
+	}
 
 }

@@ -58,7 +58,6 @@ public class LO52Messaging extends Activity {
 
 		// Ajout d'un onClickListener sur le bouton de connexion
 		connexionBtn.setOnClickListener(new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				startLobbyActivity();
 			}

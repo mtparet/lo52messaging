@@ -75,8 +75,10 @@ public class NetworkService extends Service {
 		InetSocketAddress inetAddres = new InetSocketAddress("127.0.0.1",5008);
 
 		
-		User user = new User("cesttoi",inetAddres);
-		user_me = new User("cestmoi",null);
+		User user = new User("cesttoi");
+		user.setInetSocketAddressLocal(inetAddres);
+		
+		user_me = new User("cestmoi");
 
 		Content message = new Content(3535,"client1");
 		Packet packet = new Packet(message,user, user.getId(), Packet.HELLO);

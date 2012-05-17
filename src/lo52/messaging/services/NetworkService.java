@@ -5,8 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import lo52.messaging.model.Conversation;
@@ -28,9 +26,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 /**
- * Service qui g�re les communcations r�seaux, stocke les diff�rentes donn�es,
- * re�oit des actions depuis les activity, leur ennvoit des messages/cr�ation de groupe,
- * met � disposition la liste des utilisateurs, conversations.
+ * Service qui gère les communcations réseau, stocke les différentes données,
+ * reçoit des actions depuis les activity, leur ennvoit des messages/création de groupe,
+ * met à disposition la liste des utilisateurs, conversations.
  * 
  * Principe de base:
  * 
@@ -46,11 +44,10 @@ import com.google.gson.Gson;
  * 
  * Message d'une conversation
  * 
- * *L'activity r�cup�re:
+ * *L'activity récupère:
  * 
  * La liste des utilisateurs
  * La listes des conversations
- * 
  * 
  * 
  * 
@@ -58,7 +55,7 @@ import com.google.gson.Gson;
  *
  */
 public class NetworkService extends Service {
-
+	
 	// Contient la liste des utilisateur
 	private static Hashtable<Integer,User> listUsers = new Hashtable<Integer,User>();
 
@@ -69,6 +66,8 @@ public class NetworkService extends Service {
 	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
 
 	private static User user_me;
+	
+	private static final String TAG = "NetworkService";
 
 
 	public NetworkService() {
@@ -77,7 +76,6 @@ public class NetworkService extends Service {
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -94,7 +92,6 @@ public class NetworkService extends Service {
 		filter.addAction("SendMessage");
 		registerReceiver(SendMessageBroadcast, filter);
 
-
 		/*
 		 * Exemple pour transmettre un message récupéré à l'activity
 		 */
@@ -102,7 +99,6 @@ public class NetworkService extends Service {
 		Bundle bundle = new Bundle();
 
 		InetSocketAddress inetAddres = new InetSocketAddress("127.0.0.1",5008);
-
 
 		User user = new User("cesttoi");
 		user.setInetSocketAddressLocal(inetAddres);
@@ -142,9 +138,7 @@ public class NetworkService extends Service {
 			analysePacket(packet);
 			
 			SendMessage(packet);
-
 		}
-
 	};
 
 
@@ -194,12 +188,13 @@ public class NetworkService extends Service {
 		super.onDestroy();
 	}
 
-	/*
-	 * AsyncTask pour envoyer un message à un utilisateur
+	/**
+	 * AsyncTask pour envoyer un message à un utilisateur.
 	 * Socket qui reçoit un paquet déjà tout emballé
 	 * Dans ce paquet il prend le client, regarde dans table son adresse ip et lui envoit
 	 */
 	private class SendSocket extends AsyncTask <PacketNetwork, Integer, Long> {
+
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
@@ -212,7 +207,7 @@ public class NetworkService extends Service {
 			}
 			
 			if(inetAddres == null){
-				Log.e("NetworkService", "Error, user sans addrese" + packet.toString());
+				Log.e(TAG, "Error, user sans addrese" + packet.toString());
 				return null;
 			}
 
@@ -235,13 +230,12 @@ public class NetworkService extends Service {
 			try {
 				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
 				datagramSocket.send(dataPacket);
-				Log.d("NetworkService", "envoyé:" + json + "a : " + inetAddres.toString());
+				Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
 
 				//on l'ajoute dans la liste des paquets envoyé
-				packetListACK.put( packet.getRamdom_identifiant(), packet);
+				packetListACK.put(packet.getRamdom_identifiant(), packet);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -291,7 +285,6 @@ public class NetworkService extends Service {
 				packetListACK.put( packet.getRamdom_identifiant(), packet);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -329,7 +322,6 @@ public class NetworkService extends Service {
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
@@ -337,13 +329,9 @@ public class NetworkService extends Service {
 
 
 			} catch (SocketException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return null;
-
-
-
 		}
 
 		protected void onPostExecute(Long result) {
@@ -363,7 +351,7 @@ public class NetworkService extends Service {
 	private void analysePacket(DatagramPacket dataPacket){
 
 		String json = new String(dataPacket.getData(), 0, dataPacket.getLength());  
-		Log.d("NetWorkService", json);
+		Log.d(TAG, "Analyse packet:" + json);
 
 		Gson gson = new Gson();
 		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
@@ -459,13 +447,14 @@ public class NetworkService extends Service {
 			Gson gson = new Gson();
 			String json = gson.toJson(messageBroad);
 			
-			sendToActivity(json,"lo52.messaging.activities.");
+			sendToActivity(json,"lo52.messaging.activities.LobbyActivity");
 			
 		}else{
 			//TODO Error la conversation n'existe pas
+			Log.e(TAG, "Conversation non existante");
 		}
 		
-		// on met le user � alive
+		// on met le user à alive
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
 	}
@@ -515,7 +504,7 @@ public class NetworkService extends Service {
 		}
 		
 		//on le fait le suivre à l'activity qui gère la liste des users (et peut être aussi à l'activity qui gère les conversations)
-		//sendToActivity(packetReceive,"lo52.messaging.activities.UserListActivity");
+		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 
@@ -526,11 +515,9 @@ public class NetworkService extends Service {
 	 * @param packetReceive
 	 */
 	private void paquetCreationGroup(PacketNetwork packetReceive) {
-		// TODO Auto-generated method stub
-		
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
 			
-			//Si le nom a chang�, on le met � jour
+			//Si le nom a changé, on le met à jour
 			if( !(listConversations.get(packetReceive.getContent().getConversation_id()).getConversation_name() ==  packetReceive.getContent().getConversation_name())){
 				Conversation conversation = listConversations.get(packetReceive.getContent().getConversation_id());
 				conversation.setConversation_name(packetReceive.getContent().getConversation_name());
@@ -546,7 +533,9 @@ public class NetworkService extends Service {
 			
 		}
 
+		Log.w(TAG, "Envoi d'un broadcast de création de groupe");
 		//sendToActivity(packetReceive,"lo52.messaging.activities.");
+		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 
@@ -564,7 +553,7 @@ public class NetworkService extends Service {
 		//on considère un ACK comme un hello le cas échéant
 		paquetHello(packetReceive);
 		
-		//sendToActivity(packetReceive,"lo52.messaging.activities.");
+		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 	
@@ -574,7 +563,7 @@ public class NetworkService extends Service {
 	 */
 	private void paquetInconnu(PacketNetwork packet) {
 		// TODO Auto-generated method stub
-		
+		Log.w(TAG, "Packet inconnu");
 	}
 
 	/**
@@ -591,9 +580,26 @@ public class NetworkService extends Service {
 		broadcastIntent.putExtra("json", json);
 
 		sendBroadcast(broadcastIntent);
+	}
+	
+	/**
+	 * Envoie en broadcast le PacketNetwork donné
+	 * @param packet
+	 * @param action
+	 */
+	private void sendToActivity(PacketNetwork packet, String action) {
+		/*
+		 * Exemple pour transmettre un message récupéré à l'activity
+		 */
+		Log.d(TAG, "Envoi packet broadcast " + packet.type);
+		Intent broadcastIntent = new Intent(action);
 
+		broadcastIntent.putExtra("packet", packet);
+
+		sendBroadcast(broadcastIntent);
 	}
 
+	
 	public static Hashtable<Integer, User> getListUsers() {
 		return listUsers;
 	}

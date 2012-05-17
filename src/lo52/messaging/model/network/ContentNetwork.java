@@ -9,7 +9,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Contient le contenu d'un paquet, à remplir suivant le type.
+ * Contient le contenu d'un paquet, Ã  remplir suivant le type.
  * type ACK, HELLO, DISCONNECTED, ALIVE => content == null
  * type MESSAGE : conversation_id + conversation_name + message
  * type CREATION_GROUP : conversation_id + conversation_name + userList

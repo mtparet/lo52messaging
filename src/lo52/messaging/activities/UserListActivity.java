@@ -2,7 +2,6 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import lo52.messaging.R;

@@ -11,7 +11,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Packet Réseau, contient l'envoyeur, le destinataire, le type de packet, et le content
+ * Packet RÃ©seau, contient l'envoyeur, le destinataire, le type de packet, et le content
  * @author Matthieu Paret
  *
  */

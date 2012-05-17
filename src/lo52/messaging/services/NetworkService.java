@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Hashtable;
 
+import lo52.messaging.activities.LobbyActivity;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.model.User;
@@ -18,6 +19,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiConfiguration.GroupCipher;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -114,6 +116,8 @@ public class NetworkService extends Service {
 		broadcastIntent.putExtra("json", json);
 
 		sendBroadcast(broadcastIntent);
+		
+		sendToActivity("bonjour", "NetWorkService.packet.message");
 
 		ListenSocket r1 = new ListenSocket();
 		r1.execute(null);
@@ -504,7 +508,7 @@ public class NetworkService extends Service {
 		}
 		
 		//on le fait le suivre à l'activity qui gère la liste des users (et peut être aussi à l'activity qui gère les conversations)
-		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
+		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 
@@ -534,8 +538,9 @@ public class NetworkService extends Service {
 		}
 
 		Log.w(TAG, "Envoi d'un broadcast de création de groupe");
+		
 		//sendToActivity(packetReceive,"lo52.messaging.activities.");
-		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
+		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 
@@ -552,8 +557,8 @@ public class NetworkService extends Service {
 		
 		//on considère un ACK comme un hello le cas échéant
 		paquetHello(packetReceive);
-		
-		sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
+
+		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 	
@@ -567,7 +572,7 @@ public class NetworkService extends Service {
 	}
 
 	/**
-	 * Envoit en broadcast le paquet pour être traité
+	 * Envoit en broadcast le paquet pour être traité par l'activity correspondant
 	 * @param json
 	 * @param action
 	 */
@@ -578,23 +583,6 @@ public class NetworkService extends Service {
 		Intent broadcastIntent = new Intent(action);
 
 		broadcastIntent.putExtra("json", json);
-
-		sendBroadcast(broadcastIntent);
-	}
-	
-	/**
-	 * Envoie en broadcast le PacketNetwork donné
-	 * @param packet
-	 * @param action
-	 */
-	private void sendToActivity(PacketNetwork packet, String action) {
-		/*
-		 * Exemple pour transmettre un message récupéré à l'activity
-		 */
-		Log.d(TAG, "Envoi packet broadcast " + packet.type);
-		Intent broadcastIntent = new Intent(action);
-
-		broadcastIntent.putExtra("packet", packet);
 
 		sendBroadcast(broadcastIntent);
 	}

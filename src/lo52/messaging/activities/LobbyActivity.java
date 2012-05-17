@@ -6,6 +6,7 @@ import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
@@ -17,14 +18,15 @@ public class LobbyActivity extends TabActivity {
 
 	private static final String TAG = "LobbyActivity";
 	
-	PacketReceiver packetReceiver;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
 		
-		packetReceiver = new PacketReceiver();
+		//Enregistrement de l'intent filter
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("NetWorkService.packet.message");
+		registerReceiver(messageReceiver, filter);
 		
 		// Lancement du service
 		startService(new Intent(LobbyActivity.this, NetworkService.class));
@@ -49,13 +51,15 @@ public class LobbyActivity extends TabActivity {
 	}
 	
 	
-	
-	public class PacketReceiver extends BroadcastReceiver {
+	/**
+	 * Here there was a wtf error : class instead of BroadcastReceiver
+	 */
+	private BroadcastReceiver messageReceiver = new  BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.i(TAG, "Réception broadcast");
 		}
 		
-	}
+	};
 }

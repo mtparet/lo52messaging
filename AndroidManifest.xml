@@ -39,8 +39,8 @@
       		 <action android:name="android.intent.action.BOOT_COMPLETED" />  
       	</intent-filter>  
     	</receiver>
+        
     	<receiver android:name="com.littlefluffytoys.littlefluffylocationlibrary.PassiveLocationChangedReceiver" android:exported="true" />
-    	<receiver android:name="lo52.messaging.activities.LobbyActivity.PacketReceiver" />
     </application>
 
 </manifest>

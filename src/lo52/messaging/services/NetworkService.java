@@ -154,7 +154,7 @@ public class NetworkService extends Service {
 	}
 
 	/**
-	 * Permet d'envoyer un broadcastHello
+	 * Permet d'envoyer un broadcast Hello
 	 */
 	private void sendBroadcastHelloNetwork() {
 		
@@ -193,7 +193,7 @@ public class NetworkService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getBundleExtra("message");
-			MessageBroacast message = bundle.getParcelable("message");
+			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			
 			
 			User user_destinataire = listUsers.get(message.getClient_id());
@@ -520,7 +520,7 @@ public class NetworkService extends Service {
 
 				MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
 				bundle.putParcelable("message", messageBroad);
-				broadcastIntent.putExtra("message", bundle);
+				broadcastIntent.putExtra(MessageBroacast.tag_parcelable, bundle);
 
 				sendBroadcast(broadcastIntent);
 			}

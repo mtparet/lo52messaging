@@ -78,7 +78,8 @@ public class LobbyActivity extends TabActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.i(TAG, "Réception broadcast");
-			
+			Bundle bundle = intent.getBundleExtra("message");
+			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			
 		}
 		

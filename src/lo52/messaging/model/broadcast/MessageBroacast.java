@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Contient un message dans un conversation, le client_id de l'émetteur, l'id de conversation, et le corps du message
+ * Contient un message dans un conversation, le client_id de l'ï¿½metteur, l'id de conversation, et le corps du message
  * @author SYSTEMMOI
  *
  */
@@ -15,6 +15,8 @@ public class MessageBroacast implements Parcelable{
 	private int client_id;
 	
 	private int conversation_id;
+	
+	public final static String tag_parcelable = "message";
 
 	/**
 	 * 

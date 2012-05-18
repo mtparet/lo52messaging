@@ -1,6 +1,7 @@
 package lo52.messaging.activities;
 
 import lo52.messaging.R;
+import lo52.messaging.services.NetworkService;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -132,6 +133,9 @@ public class LO52Messaging extends Activity {
 	 * Lance l'activité "Lobby"
 	 */
 	private void startLobbyActivity() {
+		//on lance avant le service
+		startService(new Intent(LO52Messaging.this, NetworkService.class));
+		
 		startActivity(new Intent(this, LobbyActivity.class));
 	}
 }

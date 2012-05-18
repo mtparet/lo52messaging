@@ -3,6 +3,7 @@ package lo52.messaging.services;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Hashtable;
@@ -14,15 +15,18 @@ import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.model.network.ContentNetwork;
 import lo52.messaging.model.network.PacketNetwork;
+import lo52.messaging.util.Network;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration.GroupCipher;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -70,7 +74,14 @@ public class NetworkService extends Service {
 	private static User user_me;
 	
 	private static final String TAG = "NetworkService";
+	
+	public static final String ReceivePacket = "NetworkService.receive.Packet";
+	
+	public static final String ReceiveMessage = "NetworkService.receive.Message";
 
+	public static final String SendMessage = "NetworkService.receive.Message";
+
+	private static final int PORT = 5008;
 
 	public NetworkService() {
 
@@ -91,41 +102,70 @@ public class NetworkService extends Service {
 		 * enregistrer l'intent permettant de recevoir les messages
 		 */
 		IntentFilter filter = new IntentFilter();
-		filter.addAction("SendMessage");
+		filter.addAction(ReceivePacket);
 		registerReceiver(SendMessageBroadcast, filter);
-
-		/*
-		 * Exemple pour transmettre un message récupéré à l'activity
-		 */
-		Intent broadcastIntent = new Intent("SendMessage");
-		Bundle bundle = new Bundle();
-
-		InetSocketAddress inetAddres = new InetSocketAddress("127.0.0.1",5008);
-
-		User user = new User("cesttoi");
-		user.setInetSocketAddressLocal(inetAddres);
-
-		user_me = new User("cestmoi");
-
-		ContentNetwork message = new ContentNetwork(3535,"client1");
-		PacketNetwork packet = new PacketNetwork(message,user, PacketNetwork.HELLO);
-
-		Gson gson = new Gson();
-		String json = gson.toJson(packet);
-
-		broadcastIntent.putExtra("json", json);
-
-		sendBroadcast(broadcastIntent);
 		
-		sendToActivity("bonjour", "NetWorkService.packet.message");
+		/*
+		 * enregistrer l'intent permettant de recevoir les messages
+		 */
+		IntentFilter filter2 = new IntentFilter();
+		filter2.addAction(ReceiveMessage);
+		registerReceiver(Message, filter2);
+		
+		/*
+		 * création de l'utilisateur actuel
+		 */
 
-		ListenSocket r1 = new ListenSocket();
-		r1.execute(null);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		String user_name = preferences.getString("prefs_userName", "default");
+		
+		user_me = new User(user_name);
+		
+		InetAddress addres = null;
+		try {
+			addres = Network.getWifiAddress(getApplicationContext());
+		} catch (IOException e) {
+			Log.e(TAG, "not possible to get wifi addresse");
+			e.printStackTrace();
+			return;
+		}
+		
+		/**
+		 * TODO : si le wifi est déconnecté reconnecté: intercepter les changement avec un broadcastreceiver
+		 * http://stackoverflow.com/questions/5165099/android-how-to-handle-change-in-network-from-gprs-to-wi-fi-and-vice-versa-whi
+		 */
+		
+		InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT);
+		
+		user_me.setInetSocketAddressLocal(inetAddres);
+		
+		/*
+		 * on lance la socket d'écoute sur le réseau 
+		 */
+		
+		ListenSocket listenSocket = new ListenSocket();
+		listenSocket.execute(null);
+		
+		/*
+		 * On s'annonce sur le réseau
+		 */
+		sendBroadcastHelloNetwork();		
+		
+	}
 
+	/**
+	 * Permet d'envoyer un broadcastHello
+	 */
+	private void sendBroadcastHelloNetwork() {
+		
+		PacketNetwork packet = new PacketNetwork(PacketNetwork.HELLO);
+		packet.setUser_envoyeur(user_me);		
+		SendPacket(packet);
+		
 	}
 
 	/*
-	 * Recoit un message à envoyer à un client depuis une activity
+	 * Recoit un autre type de packet
 	 */
 	private BroadcastReceiver SendMessageBroadcast = new BroadcastReceiver(){
 
@@ -141,7 +181,32 @@ public class NetworkService extends Service {
 			//permet d'enregistrer dans le service ce qui se passe sur l'activity
 			analysePacket(packet);
 			
-			SendMessage(packet);
+			SendPacket(packet);
+		}
+	};
+	
+	/*
+	 * Recoit un message à envoyer à un client depuis une activity
+	 */
+	private BroadcastReceiver Message = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getBundleExtra("message");
+			MessageBroacast message = bundle.getParcelable("message");
+			
+			
+			User user_destinataire = listUsers.get(message.getClient_id());
+			
+			ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
+			PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
+			
+			packet.setUser_envoyeur(user_me);
+			
+			//permet d'enregistrer dans le service ce qui se passe sur l'activity
+			analysePacket(packet);
+			
+			SendPacket(packet);
 		}
 	};
 
@@ -150,7 +215,7 @@ public class NetworkService extends Service {
 	 * Fonction qui finit la contruction du packet et l'envoit suivant son type
 	 * @param packet
 	 */
-	private void SendMessage(PacketNetwork packet){
+	private void SendPacket(PacketNetwork packet){
 		
 		/**
 		 * Dans le cas de l'annonciation de l'arrivée dans le réseau (broadcast)
@@ -202,6 +267,15 @@ public class NetworkService extends Service {
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
+			
+			/*
+			 * Vérification du paquet
+			 */
+			
+			if(packet.getUser_destinataire() == null || packet.getUser_envoyeur() == null ){
+				Log.e(TAG, "Error about user_dest or user_env inside packet");
+				Log.e(TAG,packet.toString());
+			}
 
 			InetSocketAddress inetAddres = packet.getUser_destinataire().getInetSocketAddressLocal();
 
@@ -262,9 +336,27 @@ public class NetworkService extends Service {
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
-			InetSocketAddress inetAddres = packet.getUser_destinataire().getInetSocketAddressLocal();
+			
+			/*
+			 * Vérification du paquet
+			 */
+			
+			if(packet.getUser_envoyeur() == null ){
+				Log.e(TAG, "Error about user_env inside packet");
+				Log.e(TAG,packet.toString());
+			}
+			
+			InetAddress addres = null;
+			try {
+				addres = Network.getBroadcastAddress(getApplicationContext());
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				Log.e(TAG, "Echec de la construction de l'adresse de broadcast");
+				e2.printStackTrace();
+				return (long) 0;
+			}
 
-
+			InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT);
 
 			/*TODO remplacer l'User du packet par soi-même */
 
@@ -310,15 +402,14 @@ public class NetworkService extends Service {
 	private class ListenSocket extends AsyncTask <Integer, Integer, Long> {
 		protected Long doInBackground(Integer... integers) {
 
-
 			/*
-			 * TODO initier et écouter sur la socket qui bind le port local et récupérer les données*/
+			 *  initier et écouter sur la socket qui bind le port local et récupérer les données*/
 			DatagramSocket datagramSocket;
 			try {
-				datagramSocket = new DatagramSocket(5008);
+				datagramSocket = new DatagramSocket(PORT);
 
 				do{
-					byte[] buffer2 = new byte[300000];
+					byte[] buffer2 = new byte[300000]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 
 					try {
@@ -360,29 +451,7 @@ public class NetworkService extends Service {
 		Gson gson = new Gson();
 		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
 
-		/*
-		 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on l'ajoute avec le port par défault de l'application
-		 */
-		if(packetReceive.getUser_envoyeur().getInetSocketAddressLocal() == null &&  dataPacket.getAddress().getHostName().matches("localhost")){
-			User user_envoyeur  = packetReceive.getUser_envoyeur();
-			user_envoyeur.setInetSocketAddressLocal(new InetSocketAddress(dataPacket.getAddress(), 5008));
-			packetReceive.setUser_envoyeur(user_envoyeur);
 
-			/*
-			 * si l'utilisateur n'a pas d'adresse public mais une local, on va d'ajouter à la public on vérifie que ce n'est déjà pas la local
-			 */
-
-		}else if(packetReceive.getUser_envoyeur().getInetSocketAddressPublic() == null ){
-			User user_envoyeur  = packetReceive.getUser_envoyeur();
-
-			InetSocketAddress inetSocket = new InetSocketAddress(dataPacket.getAddress(), dataPacket.getPort());
-
-			//si ce n'est pas la même adresse que son adresse local alors on l'ajoute dans public
-			if(inetSocket != user_envoyeur.getInetSocketAddressLocal()){
-				user_envoyeur.setInetSocketAddressPublic(inetSocket);
-				packetReceive.setUser_envoyeur(user_envoyeur);
-			}
-		}
 
 
 		/**
@@ -395,10 +464,9 @@ public class NetworkService extends Service {
 
 			packetSend.setUser_envoyeur(user_me);
 
-			SendMessage(packetSend);
+			SendPacket(packetSend);
 
 		}
-
 
 		analysePacket(packetReceive);
 
@@ -446,15 +514,19 @@ public class NetworkService extends Service {
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
 			
-			MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
-			
-			Gson gson = new Gson();
-			String json = gson.toJson(messageBroad);
-			
-			sendToActivity(json,"lo52.messaging.activities.LobbyActivity");
+			if(packetReceive.getUser_envoyeur() != user_me){
+				Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
+				Bundle bundle = new Bundle();
+
+				MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
+				bundle.putParcelable("message", messageBroad);
+				broadcastIntent.putExtra("message", bundle);
+
+				sendBroadcast(broadcastIntent);
+			}
+
 			
 		}else{
-			//TODO Error la conversation n'existe pas
 			Log.e(TAG, "Conversation non existante");
 		}
 		
@@ -471,6 +543,10 @@ public class NetworkService extends Service {
 	 */
 	private void paquetHello(PacketNetwork packetReceive) {
 
+		if(packetReceive.getUser_envoyeur().getId() == user_me.getId()){
+			return;
+		}
+		
 		// on teste si l'user est connu
 		if( listUsers.containsKey(packetReceive.getUser_envoyeur().getId()) ){
 
@@ -500,7 +576,9 @@ public class NetworkService extends Service {
 	 */
 	private void paquetDisconnecter(PacketNetwork packetReceive) {
 		// TODO Auto-generated method stub
-		
+		if(packetReceive.getUser_envoyeur().getId() == user_me.getId()){
+			return;
+		}
 		// on teste si l'user est connu
 		if( listUsers.containsKey(packetReceive.getUser_envoyeur().getId()) ){
 			// on le met à no alive
@@ -571,22 +649,6 @@ public class NetworkService extends Service {
 		Log.w(TAG, "Packet inconnu");
 	}
 
-	/**
-	 * Envoit en broadcast le paquet pour être traité par l'activity correspondant
-	 * @param json
-	 * @param action
-	 */
-	private void sendToActivity(String json, String action) {
-		/*
-		 * Exemple pour transmettre un message récupéré à l'activity
-		 */
-		Intent broadcastIntent = new Intent(action);
-
-		broadcastIntent.putExtra("json", json);
-
-		sendBroadcast(broadcastIntent);
-	}
-
 	
 	public static Hashtable<Integer, User> getListUsers() {
 		return listUsers;
@@ -610,6 +672,34 @@ public class NetworkService extends Service {
 
 	public static void setUser_me(User user_me) {
 		NetworkService.user_me = user_me;
+	}
+	
+	private void checkAddresseLocalPublic(DatagramPacket packetReceive){
+		/*
+		 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on ajoute son adrresse publique avec le port par défault de l'application
+		 *
+		if(packetReceive.getUser_envoyeur().getInetSocketAddressLocal() == null ){
+			
+			//TODO à suprimer, on suppose que l'envoyeur à toujours spécifier la bonne addresse local
+			//User user_envoyeur  = packetReceive.getUser_envoyeur();
+			//user_envoyeur.setInetSocketAddressLocal(new InetSocketAddress(dataPacket.getAddress(), PORT));
+			//packetReceive.setUser_envoyeur(user_envoyeur);
+
+			/*
+			 * si l'utilisateur n'a pas d'adresse public mais une local, on va l'ajouter à la public on vérifie que ce n'est déjà pas la local
+			 *
+
+		}else if(packetReceive.getUser_envoyeur().getInetSocketAddressPublic() == null ){
+			User user_envoyeur  = packetReceive.getUser_envoyeur();
+
+			InetSocketAddress inetSocket = new InetSocketAddress(dataPacket.getAddress(), dataPacket.getPort());
+
+			//si ce n'est pas la même adresse que son adresse local alors on l'ajoute dans public
+			if(inetSocket != user_envoyeur.getInetSocketAddressLocal()){
+				user_envoyeur.setInetSocketAddressPublic(inetSocket);
+				packetReceive.setUser_envoyeur(user_envoyeur);
+			}
+		}*/
 	}
 
 }

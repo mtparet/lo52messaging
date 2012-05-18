@@ -67,19 +67,19 @@ public class PacketNetwork implements Parcelable{
 		Random rand = new Random();
 		this.setRamdom_identifiant(rand.nextInt());
 	}
-
-	public PacketNetwork(Parcel in) {
-		try{
-			type = in.readInt();
-			user_destinataire = in.readParcelable(User.class.getClassLoader());
-			content = in.readParcelable(ContentNetwork.class.getClassLoader());
-			user_envoyeur = in.readParcelable(User.class.getClassLoader());
-		}catch(BadParcelableException e){
-			e.printStackTrace();
-		}
-
+	
+	/**
+	 * Pour un packet Hello
+	 * @param type
+	 */
+	public PacketNetwork( int type) {
+		super();
+		this.type = type;
+		
+		Random rand = new Random();
+		this.setRamdom_identifiant(rand.nextInt());
 	}
-
+	
 	/**
 	 * Utile pour l'enovoit d'un ACK
 	 * @param type
@@ -93,6 +93,19 @@ public class PacketNetwork implements Parcelable{
 		this.user_destinataire = user_destinataire;
 		this.setRamdom_identifiant(ramdom_identifiant);
 	}
+
+	public PacketNetwork(Parcel in) {
+		try{
+			type = in.readInt();
+			user_destinataire = in.readParcelable(User.class.getClassLoader());
+			content = in.readParcelable(ContentNetwork.class.getClassLoader());
+			user_envoyeur = in.readParcelable(User.class.getClassLoader());
+		}catch(BadParcelableException e){
+			e.printStackTrace();
+		}
+
+	}
+
 
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(type);

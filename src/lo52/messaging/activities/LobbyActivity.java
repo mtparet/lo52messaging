@@ -1,6 +1,14 @@
 package lo52.messaging.activities;
 
+import java.net.InetSocketAddress;
+
+import com.google.gson.Gson;
+
 import lo52.messaging.R;
+import lo52.messaging.model.User;
+import lo52.messaging.model.broadcast.MessageBroacast;
+import lo52.messaging.model.network.ContentNetwork;
+import lo52.messaging.model.network.PacketNetwork;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -22,14 +30,6 @@ public class LobbyActivity extends TabActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
-		
-		//Enregistrement de l'intent filter
-		IntentFilter filter = new IntentFilter();
-		filter.addAction("NetWorkService.packet.message");
-		registerReceiver(messageReceiver, filter);
-		
-		// Lancement du service
-		startService(new Intent(LobbyActivity.this, NetworkService.class));
 
 		Log.d(TAG, "Lancement activité lobby");
 		
@@ -51,6 +51,25 @@ public class LobbyActivity extends TabActivity {
 	}
 	
 	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		//Enregistrement de l'intent filter
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(NetworkService.SendMessage);
+		registerReceiver(messageReceiver, filter);
+	}
+
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		unregisterReceiver(messageReceiver);
+		super.onPause();
+	}
+
+
 	/**
 	 * Here there was a wtf error : class instead of BroadcastReceiver
 	 */
@@ -59,7 +78,20 @@ public class LobbyActivity extends TabActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.i(TAG, "Réception broadcast");
+			
+			
 		}
 		
 	};
+	
+	private void sendMessage(String message, int id_client, int id_conversation){
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
+		Bundle bundle = new Bundle();
+
+		MessageBroacast messageBroad = new MessageBroacast(id_client, message, id_conversation);
+		bundle.putParcelable("message", messageBroad);
+		broadcastIntent.putExtra("message", bundle);
+
+		sendBroadcast(broadcastIntent);
+	}
 }

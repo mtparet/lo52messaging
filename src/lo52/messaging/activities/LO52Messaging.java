@@ -1,7 +1,6 @@
 package lo52.messaging.activities;
 
 import lo52.messaging.R;
-import lo52.messaging.services.NetworkService;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +14,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import com.littlefluffytoys.littlefluffylocationlibrary.*;
+
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibrary;
 
 
 /**
@@ -133,9 +133,6 @@ public class LO52Messaging extends Activity {
 	 * Lance l'activité "Lobby"
 	 */
 	private void startLobbyActivity() {
-		//on lance avant le service
-		startService(new Intent(LO52Messaging.this, NetworkService.class));
-		
 		startActivity(new Intent(this, LobbyActivity.class));
 	}
 }

@@ -3,6 +3,7 @@
 
     <item
         android:id="@+id/item_refresh"
-        android:title="@string/userlist_refresh_option"/>
+        android:title="@string/userlist_refresh_option"
+        android:icon="@drawable/icon_refresh" />
 
 </menu>

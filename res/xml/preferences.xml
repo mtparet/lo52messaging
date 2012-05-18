@@ -14,5 +14,13 @@
 							android:key="prefs_autoLogin">
 		</CheckBoxPreference>
 	</PreferenceCategory>
+	
+	<PreferenceCategory
+	android:title="@string/preferencesServiceTitle">
+		<CheckBoxPreference android:title="@string/preferencesServiceNetwork"
+							android:summary="@string/preferencesServiceNetworkDesc"
+							android:key="prefs_networkServiceKeepAlive">
+		</CheckBoxPreference>
+	</PreferenceCategory>
     
 </PreferenceScreen>

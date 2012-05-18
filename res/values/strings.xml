@@ -24,6 +24,9 @@
     <string name="preferencesUsernameDesc">Votre nom tel qu\'il apparaîtra aux autres utilisateurs.</string>
     <string name="preferencesUserAutoLogin">Connexion auto.</string>
     <string name="preferencesUserAutoLoginDesc">Connexion automatique au démarrage de l\'application.</string>
+    <string name="preferencesServiceTitle">Services</string>
+    <string name="preferencesServiceNetwork">Service réseau toujours allumé</string>
+    <string name="preferencesServiceNetworkDesc">Garder le service réseau toujours allumé en quittant l\'appli.</string>
     
     <!-- MENUS -->
     <string name="preferencesTitle">Préférences</string>

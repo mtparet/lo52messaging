@@ -55,7 +55,7 @@ public class LobbyActivity extends TabActivity {
 		spec = tabHost.newTabSpec("tab1").setIndicator(getString(R.string.lobby_tab_users), getResources().getDrawable(R.drawable.icon_group)).setContent(intent);
 		tabHost.addTab(spec);
 
-		intent.setClass(this, TestActivity.class);
+		intent.setClass(this, ConversationPagerActivity.class);
 		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);
 	}

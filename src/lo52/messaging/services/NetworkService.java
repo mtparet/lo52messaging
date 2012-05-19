@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import lo52.messaging.activities.LobbyActivity;
@@ -81,7 +82,9 @@ public class NetworkService extends Service {
 
 	public static final String SendMessage = "NetworkService.receive.Message";
 
-	private static final int PORT = 5008;
+	private int PORT_DEST;
+	private int PORT_LOCAL;
+	private boolean isLocalhost;
 
 	public NetworkService() {
 
@@ -99,11 +102,20 @@ public class NetworkService extends Service {
 		super.onCreate();
 
 		/*
+		 *On récupère les prots définits dans les préférences
+		 */
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+		PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
+		PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
+
+		isLocalhost = preferences.getBoolean("dev_prefs_emulateur", false);
+		/*
 		 * enregistrer l'intent permettant de recevoir les messages
 		 */
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ReceivePacket);
-		registerReceiver(SendMessageBroadcast, filter);
+		registerReceiver(SendPacket, filter);
 		
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages
@@ -116,26 +128,26 @@ public class NetworkService extends Service {
 		 * création de l'utilisateur actuel
 		 */
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		String user_name = preferences.getString("prefs_userName", "default");
 		
 		user_me = new User(user_name);
 		
 		InetAddress addres = null;
 		try {
-			addres = Network.getWifiAddress(getApplicationContext());
+			addres = Network.getWifiAddress(getApplicationContext(),isLocalhost);
 		} catch (IOException e) {
 			Log.e(TAG, "not possible to get wifi addresse");
 			e.printStackTrace();
-			return;
 		}
+		
+		
 		
 		/**
 		 * TODO : si le wifi est déconnecté reconnecté: intercepter les changement avec un broadcastreceiver
 		 * http://stackoverflow.com/questions/5165099/android-how-to-handle-change-in-network-from-gprs-to-wi-fi-and-vice-versa-whi
 		 */
 		
-		InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT);
+		InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_LOCAL);
 		
 		user_me.setInetSocketAddressLocal(inetAddres);
 		
@@ -149,7 +161,13 @@ public class NetworkService extends Service {
 		/*
 		 * On s'annonce sur le réseau
 		 */
-		sendBroadcastHelloNetwork();		
+		sendBroadcastHelloNetwork();	
+		
+		/*
+		 * 
+		 * Test d'envoit d'un packet autre
+		 */
+		
 		
 	}
 
@@ -167,7 +185,7 @@ public class NetworkService extends Service {
 	/*
 	 * Recoit un autre type de packet
 	 */
-	private BroadcastReceiver SendMessageBroadcast = new BroadcastReceiver(){
+	private BroadcastReceiver SendPacket = new BroadcastReceiver(){
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -196,17 +214,23 @@ public class NetworkService extends Service {
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			
 			
-			User user_destinataire = listUsers.get(message.getClient_id());
+			Conversation conversation = listConversations.get(message.getConversation_id());
+			ArrayList<Integer> listIdUser = conversation.getListIdUser();
 			
-			ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
-			PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
-			
-			packet.setUser_envoyeur(user_me);
-			
-			//permet d'enregistrer dans le service ce qui se passe sur l'activity
-			analysePacket(packet);
-			
-			SendPacket(packet);
+			for(int id_user : listIdUser){
+				User user_destinataire = listUsers.get(id_user);
+				
+				ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
+				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
+				
+				packet.setUser_envoyeur(user_me);
+				
+				//permet d'enregistrer dans le service ce qui se passe sur l'activity
+				analysePacket(packet);
+				
+				SendPacket(packet);
+			}
+
 		}
 	};
 
@@ -348,7 +372,7 @@ public class NetworkService extends Service {
 			
 			InetAddress addres = null;
 			try {
-				addres = Network.getBroadcastAddress(getApplicationContext());
+				addres = Network.getBroadcastAddress(getApplicationContext(),isLocalhost);
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
 				Log.e(TAG, "Echec de la construction de l'adresse de broadcast");
@@ -356,8 +380,7 @@ public class NetworkService extends Service {
 				return (long) 0;
 			}
 
-			InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT);
-
+			InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_DEST);
 			/*TODO remplacer l'User du packet par soi-même */
 
 			DatagramSocket datagramSocket = null;
@@ -376,6 +399,7 @@ public class NetworkService extends Service {
 			try {
 				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
 				datagramSocket.send(dataPacket);
+				Log.d(TAG, "paquet broadcast envoyé à " + inetAddres.toString());
 
 				//on l'ajoute dans la liste des paquets envoyé
 				packetListACK.put( packet.getRamdom_identifiant(), packet);
@@ -406,14 +430,16 @@ public class NetworkService extends Service {
 			 *  initier et écouter sur la socket qui bind le port local et récupérer les données*/
 			DatagramSocket datagramSocket;
 			try {
-				datagramSocket = new DatagramSocket(PORT);
+				datagramSocket = new DatagramSocket(PORT_LOCAL);
+				Log.d(TAG, "socket d'écoute sur " + datagramSocket.getLocalPort());
+
 
 				do{
 					byte[] buffer2 = new byte[300000]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
-
 					try {
 						datagramSocket.receive(dataPacket);
+						Log.d(TAG, "Packet recu de" + datagramSocket.getInetAddress().toString());
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
@@ -590,7 +616,7 @@ public class NetworkService extends Service {
 
 	}
 
-	/**
+	/** TODO ajouter la possibilité de rajouter un user à la liste
 	 * Traite la la création d'un groupe
 	 * Ajoute un groupe avec sa liste de User
 	 * Vérifie que tout les users sont connus sinon on les rajoute dans notre liste
@@ -610,7 +636,14 @@ public class NetworkService extends Service {
 			}
 			
 		}else{
-			Conversation conversation = new Conversation(packetReceive.getContent().getConversation_id(), packetReceive.getContent().getConversation_name());
+			//TODO ajouter les user non connus à sa liste
+			ArrayList<Integer> listIdUser = new ArrayList<Integer>();
+			for(User user : packetReceive.getContent().getUserList()){
+				listIdUser.add(user.getId());
+			}
+			
+			Conversation conversation = new Conversation(packetReceive.getContent().getConversation_id(), packetReceive.getContent().getConversation_name(),listIdUser);
+			
 			listConversations.put(conversation.getConversation_id(),conversation);
 			
 		}

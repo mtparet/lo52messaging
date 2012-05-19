@@ -19,13 +19,24 @@ public class MessageBroacast implements Parcelable{
 	public final static String tag_parcelable = "message";
 
 	/**
-	 * 
-	 * @param client_id
-	 * @param message
+	 * Util pour la réception de message
+	 * @param client_id de qui l'on reçoit le message
+	 * @param message le message à envoyer
+	 * @param conversation_id l'id de la conversation
 	 */
 	public MessageBroacast(int client_id, String message, int conversation_id) {
 		this.message = message;
 		this.client_id = client_id;
+		this.setConversation_id(conversation_id);
+	}
+	
+	/**
+	 * Utile pour l'envoit d'un message
+	 * @param conversation_id à qui l'on envoit le message
+	 * @param message le message à envoyer
+	 */
+	public MessageBroacast(String message, int conversation_id) {
+		this.message = message;
 		this.setConversation_id(conversation_id);
 	}
 

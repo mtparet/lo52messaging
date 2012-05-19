@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Classe qui stocke une conversation: son id, name, et les diffÈrents Message
+ * Classe qui stocke une conversation: son id, name, et les diff√©rents Message
  * @author SYSTEMMOI
  *
  */
@@ -16,23 +16,38 @@ public class Conversation {
 	
 	private ArrayList<Message> listMessage = new ArrayList<Message>();
 	
+	private ArrayList<Integer> listIdUser = new ArrayList<Integer>();
+	
 	/**
-	 * Permet de crÈer une NOUVELLE conversation
+	 * Permet de cr√©er une NOUVELLE conversation avec un utilisateur
 	 */
-	public Conversation(String name){
+	public Conversation(String name, int idUser){
 		Random rand = new Random();
 		conversation_id = rand.nextInt();
 		
 		this.conversation_name = name;
+		this.listIdUser.add(idUser);
 	}
 	
 	/**
-	 * Permet de rÈcupÈrer localement un conversation dÈj‡ crÈÈ
+	 * Permet de cr√©er une NOUVELLE conversation avec de multiples utilisateurs
+	 */
+	public Conversation(String name, int idUser, ArrayList<Integer> listIdUser ){
+		Random rand = new Random();
+		conversation_id = rand.nextInt();
+		
+		this.conversation_name = name;
+		this.listIdUser = listIdUser;
+	}
+	
+	/**
+	 * Permet de r√©cup√©rer localement une conversation d√©j√† cr√©√©
 	 * @param conversation_id
 	 */
-	public Conversation(int conversation_id, String conversation_name){
+	public Conversation(int conversation_id, String conversation_name, ArrayList<Integer> listIdUser){
 		this.conversation_id = conversation_id;
 		this.setConversation_name(conversation_name);
+		this.listIdUser = listIdUser;
 	}
 	
 	public int getConversation_id() {
@@ -57,11 +72,19 @@ public class Conversation {
 	}
 	
 	/**
-	 * Permet d'ajouter un message ‡ la conversation
+	 * Permet d'ajouter un message √† la conversation
 	 * @param message
 	 */
 	public void addMessage(Message message){
 		this.listMessage.add(message);
+	}
+
+	public ArrayList<Integer> getListIdUser() {
+		return listIdUser;
+	}
+
+	public void setListIdUser(ArrayList<Integer> listIdUser) {
+		this.listIdUser = listIdUser;
 	}
 	
 	

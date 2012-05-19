@@ -110,11 +110,11 @@ public class LobbyActivity extends TabActivity {
 
 	};
 
-	private void sendMessage(String message, int id_client, int id_conversation){
+	private void sendMessage(String message, int id_conversation){
 		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
 		Bundle bundle = new Bundle();
 
-		MessageBroacast messageBroad = new MessageBroacast(id_client, message, id_conversation);
+		MessageBroacast messageBroad = new MessageBroacast(message, id_conversation);
 		bundle.putParcelable("message", messageBroad);
 		broadcastIntent.putExtra("message", bundle);
 

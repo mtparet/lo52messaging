@@ -14,7 +14,7 @@ public class Network {
 	public static InetAddress getBroadcastAddress(Context mContext, boolean isLocalhost) throws IOException {
 
 		if(isLocalhost){
-			return InetAddress.getByName("127.0.0.1");
+			return InetAddress.getByName("localhost");
 		}else{
 		    WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 		    DhcpInfo dhcp = wifi.getDhcpInfo();
@@ -31,7 +31,7 @@ public class Network {
 	
 	public static InetAddress getWifiAddress(Context mContext, boolean isLocalhost) throws IOException {
 		if(isLocalhost){
-			return InetAddress.getByName("127.0.0.1");
+			return InetAddress.getByName("localhost");
 		}else{
 			WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 		    DhcpInfo dhcp = wifi.getDhcpInfo();

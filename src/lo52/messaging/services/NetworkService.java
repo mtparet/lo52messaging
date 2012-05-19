@@ -109,13 +109,13 @@ public class NetworkService extends Service {
 		PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
 		PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
 
-		isLocalhost = preferences.getBoolean("isLocalhost", true);
+		isLocalhost = preferences.getBoolean("dev_prefs_emulateur", false);
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages
 		 */
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ReceivePacket);
-		registerReceiver(SendMessageBroadcast, filter);
+		registerReceiver(SendPacket, filter);
 		
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages
@@ -161,7 +161,13 @@ public class NetworkService extends Service {
 		/*
 		 * On s'annonce sur le réseau
 		 */
-		sendBroadcastHelloNetwork();		
+		sendBroadcastHelloNetwork();	
+		
+		/*
+		 * 
+		 * Test d'envoit d'un packet autre
+		 */
+		
 		
 	}
 
@@ -179,7 +185,7 @@ public class NetworkService extends Service {
 	/*
 	 * Recoit un autre type de packet
 	 */
-	private BroadcastReceiver SendMessageBroadcast = new BroadcastReceiver(){
+	private BroadcastReceiver SendPacket = new BroadcastReceiver(){
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -375,7 +381,6 @@ public class NetworkService extends Service {
 			}
 
 			InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_DEST);
-
 			/*TODO remplacer l'User du packet par soi-même */
 
 			DatagramSocket datagramSocket = null;

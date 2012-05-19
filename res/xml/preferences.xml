@@ -22,5 +22,18 @@
 							android:key="prefs_networkServiceKeepAlive">
 		</CheckBoxPreference>
 	</PreferenceCategory>
+	
+	
+	<PreferenceCategory
+	android:title="Options de dev">
+		<EditTextPreference android:title="Port entrant"
+							android:summary="(Dev) Port entrant"
+							android:key="dev_prefs_port_entrant">
+		</EditTextPreference>
+		<EditTextPreference android:title="Port sortant"
+							android:summary="(Dev) Port sortant"
+							android:key="dev_prefs_port_sortant">
+		</EditTextPreference>
+	</PreferenceCategory>
     
 </PreferenceScreen>

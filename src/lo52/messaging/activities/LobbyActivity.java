@@ -48,13 +48,16 @@ public class LobbyActivity extends TabActivity {
 		TabHost.TabSpec spec; 
 		Intent intent;
 
-		// Créer un intent (réutilisable) pour indiquer quelles activité lancer dans les différents tabs
+		/**
+		 * Création du tab de la liste des users (UserListActivity)
+		 **/
 		intent = new Intent().setClass(this, UserListActivity.class);
-
-		// Initialiser un tabSpec pour chaque tab en donnant l'intent correspondant
 		spec = tabHost.newTabSpec("tab1").setIndicator(getString(R.string.lobby_tab_users), getResources().getDrawable(R.drawable.icon_group)).setContent(intent);
 		tabHost.addTab(spec);
 
+		/**
+		 * Création du tab de la liste des conversations (ConversationPagerActivity)
+		 **/
 		intent.setClass(this, ConversationPagerActivity.class);
 		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);

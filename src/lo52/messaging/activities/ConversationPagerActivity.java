@@ -1,6 +1,5 @@
 package lo52.messaging.activities;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -13,6 +12,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
@@ -35,7 +37,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	// Hauteur des tabs de titre des conversation
 	private static final int TAB_HEIGHT = 40;
-	
+
+	private static final String TAG = "ConversationPagerActivity";
+
 	private TabHost mTabHost;
 	private ViewPager mViewPager;
 	private HashMap<String, TabInfo> mapTabInfo = new HashMap<String, ConversationPagerActivity.TabInfo>();
@@ -116,9 +120,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private void intialiseViewPager() {
 
 		List<Fragment> fragments = new Vector<Fragment>();
+		/*fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
 		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
-		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
-		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
+		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));*/
 		this.mPagerAdapter  = new PagerAdapter(super.getSupportFragmentManager(), fragments);
 		//
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
@@ -132,13 +136,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private void initialiseTabHost(Bundle args) {
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
 		mTabHost.setup();
-		TabInfo tabInfo = null;
+		/*TabInfo tabInfo = null;
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab1").setIndicator("Tab 1"), ( tabInfo = new TabInfo("Tab1", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Tab 2"), ( tabInfo = new TabInfo("Tab2", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab3").setIndicator("Tab 3"), ( tabInfo = new TabInfo("Tab3", ConversationFragment.class, args)));
-		this.mapTabInfo.put(tabInfo.tag, tabInfo);
+		this.mapTabInfo.put(tabInfo.tag, tabInfo);*/
 		// Default to first tab
 		//this.onTabChanged("Tab1");
 		//
@@ -158,7 +162,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		tabSpec.setContent(activity.new TabFactory(activity));
 		tabHost.addTab(tabSpec);
 		int totalTabs = tabHost.getTabWidget().getChildCount();
-		
+
 		// Fix : on fixe la hauteur des tabs en dur pour éviter qu'ils occupent trop de place verticalement
 		((RelativeLayout)tabHost.getTabWidget().getChildTabViewAt(totalTabs-1)).removeViewAt(0);
 		((TextView)((RelativeLayout)tabHost.getTabWidget().getChildTabViewAt(totalTabs-1)).getChildAt(0)).setHeight(30);
@@ -228,8 +232,75 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		public int getCount() {
 			return this.fragments.size();
 		}
+		
+		/**
+		 * Retourne la liste des fragments dans l'adapter
+		 * @return
+		 */
+		public List<Fragment> getFragmentsList() {
+			return fragments;
+		}
+		
+		/**
+		 * Ajoute un fragment dans l'adapter
+		 * @param f
+		 */
+		public void addFragment(Context ctx) {
+			fragments.add(Fragment.instantiate(ctx, ConversationFragment.class.getName()));			
+		}
 	}
 
+	
+	/**
+	 *	FIXME
+	 *
+	 * 	Ajout crado d'un menu en dur pour pouvoir tester l'ajout/suppression de fragments à l'intérieur de l'activité.
+	 * 
+	 * 	A supprimer une fois fonctionnel
+	 */
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(1, 1, 1, "Ajouter un tab");
+		menu.add(1, 2, 2, "Retirer un tab");
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (item.getItemId() == 1) {
+			// Ajout d'un tab
+			Log.d(TAG, "Nombre tabs : " + this.mPagerAdapter.getCount());
+			
+			TabInfo tabInfo = null;
+			ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
+			this.mapTabInfo.put(tabInfo.tag, tabInfo);
+			
+			mPagerAdapter.addFragment(this);
+			
+		} else if (item.getItemId() == 2) {
+			// Suppression
+			if (this.mPagerAdapter.getCount() > 1) {
+				
+				// Supprimer le fragment de l'adapter
+				mPagerAdapter.getFragmentsList().remove(mPagerAdapter.getCount()-1);
+				
+				if (this.mTabHost.getCurrentTab() == this.mPagerAdapter.getCount()) {
+					Log.d(TAG, "ok");
+					this.mViewPager.setCurrentItem(this.mTabHost.getCurrentTab()-1);
+				}
+				
+				// Supprimer le tab physiquement
+				mTabHost.getTabWidget().removeView(mTabHost.getTabWidget().getChildTabViewAt(this.mPagerAdapter.getCount()));
+
+			} else {
+				Log.e(TAG, "Impossible de supprimer le seul fragment restant !");
+			}
+		}
+		
+		return true;
+	}
 }
 
 

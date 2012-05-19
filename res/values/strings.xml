@@ -18,6 +18,10 @@
     <!-- USER LIST -->
     <string name="userlist_refresh_option">Rafraichir</string>
     
+    <!-- CONVERSATIONS -->
+    <string name="conversations_none">Vous n\'avez aucune conversation en cours</string>
+    <string name="conversations_close_current">Fermer la conversation courante</string>
+    
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>
     <string name="preferencesUsername">Nom d\'utilisateur</string>

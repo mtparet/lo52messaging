@@ -33,6 +33,17 @@
 			 	android:layout_height="0dp"
 			 	android:layout_weight="1"
 			  	/>
+
 	    </LinearLayout>
+	    
+	    <TextView
+	            android:id="@+id/no_conversation"
+	            android:layout_width="fill_parent"
+	            android:layout_height="fill_parent"
+	            android:text="@string/conversations_none"
+	            android:gravity="center"
+	            android:textColor="#AAAAAA"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+	    
 	</TabHost>
 </LinearLayout>

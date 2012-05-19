@@ -23,8 +23,10 @@ import android.widget.TextView;
 
 
 /**
- * Activité permettant de regrouper les conversations dans une vue en "fragments"
+ * Activité permettant de regrouper les conversations dans une vue en "fragments".
+ * Pour ajouter/supprimer des fragments merci d'utiliser addFragment() / removeFragmentAt()
  * 
+ * Basé sur:
  * @see http://thepseudocoder.wordpress.com/2011/10/13/android-tabs-viewpager-swipe-able-tabs-ftw/
  * @see https://github.com/JakeWharton/Android-ViewPagerIndicator
  * @see http://android-developers.blogspot.fr/2011/08/horizontal-view-swiping-with-viewpager.html?m=1
@@ -39,6 +41,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private static final int TAB_HEIGHT = 40;
 
 	private static final String TAG = "ConversationPagerActivity";
+
+	// Constantes des menus d'option (valeurs aléatoires mais uniques)
+	private static final int MENU_ITEM_CLOSE_CONV = 1001;
 
 	private TabHost mTabHost;
 	private ViewPager mViewPager;
@@ -104,6 +109,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 		// Intialise ViewPager
 		this.intialiseViewPager();
+		Log.d(TAG, "Lancement activité");
 	}
 
 	/** (non-Javadoc)
@@ -232,7 +238,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		public int getCount() {
 			return this.fragments.size();
 		}
-		
+
 		/**
 		 * Retourne la liste des fragments dans l'adapter
 		 * @return
@@ -240,7 +246,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		public List<Fragment> getFragmentsList() {
 			return fragments;
 		}
-		
+
 		/**
 		 * Ajoute un fragment dans l'adapter
 		 * @param f
@@ -250,56 +256,116 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 	}
 
-	
+
+
 	/**
-	 *	FIXME
-	 *
-	 * 	Ajout crado d'un menu en dur pour pouvoir tester l'ajout/suppression de fragments à l'intérieur de l'activité.
-	 * 
-	 * 	A supprimer une fois fonctionnel
+	 * Création du menu d'options. Crafté à la main ici et non pas selon un .xml car le menu varie selon le nombre de conversations ouvertes
 	 */
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(1, 1, 1, "Ajouter un tab");
-		menu.add(1, 2, 2, "Retirer un tab");
+		menu.add(1, 1, 1, "(Dev) Ajouter un tab");
+
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// Menu supprimer: ajouté quand il y a exactement 1 conversation (sinon il est créé plusieurs fois), ...
+		if (this.mPagerAdapter.getCount() == 1) {
+			// On vérifie que l'item n'est pas déjà dans le menu
+			if (menu.size() >= 1) {
+				boolean itemFound = false;
+				for(int i = 0; i < menu.size(); i++) {
+					if (menu.getItem(i).getItemId() == MENU_ITEM_CLOSE_CONV) itemFound = true;
+				}
+				if (!itemFound) {
+					// Fix: mettre un groupId différent, pour faciliter la suppression du menuitem 
+					menu.add(MENU_ITEM_CLOSE_CONV, MENU_ITEM_CLOSE_CONV, 2, getString(R.string.conversations_close_current));
+					menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
+				}
+			}
+		}
+		// ... supprimé quand il y en a 0 et que l'item est présent.
+		else if (this.mPagerAdapter.getCount() == 0 && menu.size() >= 1) {
+			for (int i = 0; i < menu.size(); i++) {
+				if (menu.getItem(i).getItemId() == MENU_ITEM_CLOSE_CONV) {
+					menu.removeGroup(MENU_ITEM_CLOSE_CONV);
+				}
+			}
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if (item.getItemId() == 1) {
-			// Ajout d'un tab
-			Log.d(TAG, "Nombre tabs : " + this.mPagerAdapter.getCount());
 			
+			/**
+			 * < FIXME Francois>
+			 * utiliser addFragment() à la place
+			 */
+			// Ajout d'un tab
 			TabInfo tabInfo = null;
 			ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
 			this.mapTabInfo.put(tabInfo.tag, tabInfo);
-			
-			mPagerAdapter.addFragment(this);
-			
-		} else if (item.getItemId() == 2) {
-			// Suppression
-			if (this.mPagerAdapter.getCount() > 1) {
-				
-				// Supprimer le fragment de l'adapter
-				mPagerAdapter.getFragmentsList().remove(mPagerAdapter.getCount()-1);
-				
-				if (this.mTabHost.getCurrentTab() == this.mPagerAdapter.getCount()) {
-					Log.d(TAG, "ok");
-					this.mViewPager.setCurrentItem(this.mTabHost.getCurrentTab()-1);
-				}
-				
-				// Supprimer le tab physiquement
-				mTabHost.getTabWidget().removeView(mTabHost.getTabWidget().getChildTabViewAt(this.mPagerAdapter.getCount()));
 
-			} else {
-				Log.e(TAG, "Impossible de supprimer le seul fragment restant !");
+			mPagerAdapter.addFragment(this);
+
+			// Cacher le TV
+			if (this.mPagerAdapter.getCount() == 1) {
+				TextView tv = (TextView) findViewById(R.id.no_conversation);
+				tv.setVisibility(View.GONE);
 			}
+			/**
+			 * 	</Fin_FIXME>
+			 */
+
+		} else if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
+			// Suppression
+			removeFragmentAt(this.mTabHost.getCurrentTab());
 		}
-		
 		return true;
+	}
+
+	
+	/**
+	 * TODO Francois
+	 * voir pour les paramètres nécessaires (nom du tab, contenu de base...)
+	 */
+	public void addFragment() {
+		
+	}
+
+	/**
+	 * Supprime le fragment à l'index donné
+	 * @param index
+	 */
+	public void removeFragmentAt(int index) {
+		
+		if (mPagerAdapter.getFragmentsList().size() == 0) return;
+
+		// Supprimer le fragment de l'adapter
+		mPagerAdapter.getFragmentsList().remove(index);
+
+		if (this.mTabHost.getCurrentTab() == index) {
+			// Si on est sur le tab 0 on va sur le suivant
+			if (index == 0)
+				this.mViewPager.setCurrentItem(this.mTabHost.getCurrentTab()+1);
+			// Sinon sur le précédent
+			else 
+				this.mViewPager.setCurrentItem(this.mTabHost.getCurrentTab()-1);
+		}
+
+		// Supprimer le tab physiquement
+		mTabHost.getTabWidget().removeView(mTabHost.getTabWidget().getChildTabViewAt(index));
+
+		// Afficher le textview "pas de conversation en cours bla bla"
+		if (this.mPagerAdapter.getCount() == 0) {
+			TextView tv = (TextView) findViewById(R.id.no_conversation);
+			tv.setVisibility(View.VISIBLE);
+		}
+
 	}
 }
 

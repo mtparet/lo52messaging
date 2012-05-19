@@ -9,14 +9,15 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 /**
- * Contenu d'un "tab" à l'intérieur de ConversationPagerActivity
+ * Contenu d'un "tab" (fragment) à l'intérieur de ConversationPagerActivity.
  */
 public class ConversationFragment extends Fragment {
-	/** (non-Javadoc)
-	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+	
+	/**
+	 * TODO : pour le moment il y a juste le layout test
 	 */
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (container == null) {
             // We have different layouts, and in one of them this
             // fragment's containing frame doesn't exist.  The fragment

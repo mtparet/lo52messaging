@@ -84,6 +84,7 @@ public class NetworkService extends Service {
 
 	private int PORT_DEST;
 	private int PORT_LOCAL;
+	private boolean isLocalhost;
 
 	public NetworkService() {
 
@@ -105,9 +106,10 @@ public class NetworkService extends Service {
 		 */
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		PORT_DEST = preferences.getInt("port_dest", 5008);
-		PORT_LOCAL = preferences.getInt("port_local", 5008);
-		
+		PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
+		PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
+
+		isLocalhost = preferences.getBoolean("isLocalhost", true);
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages
 		 */
@@ -132,7 +134,7 @@ public class NetworkService extends Service {
 		
 		InetAddress addres = null;
 		try {
-			addres = Network.getWifiAddress(getApplicationContext());
+			addres = Network.getWifiAddress(getApplicationContext(),isLocalhost);
 		} catch (IOException e) {
 			Log.e(TAG, "not possible to get wifi addresse");
 			e.printStackTrace();
@@ -364,7 +366,7 @@ public class NetworkService extends Service {
 			
 			InetAddress addres = null;
 			try {
-				addres = Network.getBroadcastAddress(getApplicationContext());
+				addres = Network.getBroadcastAddress(getApplicationContext(),isLocalhost);
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
 				Log.e(TAG, "Echec de la construction de l'adresse de broadcast");
@@ -392,6 +394,7 @@ public class NetworkService extends Service {
 			try {
 				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
 				datagramSocket.send(dataPacket);
+				Log.d(TAG, "paquet broadcast envoyé à " + inetAddres.toString());
 
 				//on l'ajoute dans la liste des paquets envoyé
 				packetListACK.put( packet.getRamdom_identifiant(), packet);
@@ -423,13 +426,15 @@ public class NetworkService extends Service {
 			DatagramSocket datagramSocket;
 			try {
 				datagramSocket = new DatagramSocket(PORT_LOCAL);
+				Log.d(TAG, "socket d'écoute sur " + datagramSocket.getLocalPort());
+
 
 				do{
 					byte[] buffer2 = new byte[300000]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
-
 					try {
 						datagramSocket.receive(dataPacket);
+						Log.d(TAG, "Packet recu de" + datagramSocket.getInetAddress().toString());
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {

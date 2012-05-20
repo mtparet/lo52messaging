@@ -439,7 +439,7 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
-						Log.d(TAG, "Packet recu de" + datagramSocket.getInetAddress().toString());
+						Log.d(TAG, "Packet recu de" + datagramSocket.getInetAddress());
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {

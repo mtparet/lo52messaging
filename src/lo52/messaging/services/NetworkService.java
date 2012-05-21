@@ -79,8 +79,11 @@ public class NetworkService extends Service {
 	public static final String ReceivePacket = "NetworkService.receive.Packet";
 	
 	public static final String ReceiveMessage = "NetworkService.receive.Message";
+	
+	public static final String ReceiveConversation = "NetworkService.receive.Conversation";
 
-	public static final String SendMessage = "NetworkService.receive.Message";
+
+	public static final String SendMessage = "NetworkService.send.Message";
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
@@ -119,11 +122,19 @@ public class NetworkService extends Service {
 		registerReceiver(SendPacket, filter);
 		
 		/*
-		 * enregistrer l'intent permettant de recevoir les messages
+		 * enregistrer l'intent permettant de recevoir les messages depuis un intent
 		 */
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(ReceiveMessage);
 		registerReceiver(Message, filter2);
+		
+		/*
+		 * enregistrer l'intent permettant de recevoir les conversation depuis un intent
+		 */
+		IntentFilter filter3 = new IntentFilter();
+		filter3.addAction(ReceiveConversation);
+		registerReceiver(Conversation, filter3);
+		
 		
 		/*
 		 * création de l'utilisateur actuel
@@ -223,6 +234,41 @@ public class NetworkService extends Service {
 				
 				ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
 				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
+				
+				packet.setUser_envoyeur(user_me);
+				
+				//permet d'enregistrer dans le service ce qui se passe sur l'activity
+				analysePacket(packet);
+				
+				SendPacket(packet);
+			}
+
+		}
+	};
+	
+	/*
+	 * Recoit un Conversation à créer depuis une activity
+	 */
+	private BroadcastReceiver Conversation = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getBundleExtra("conversation");
+			Conversation conversation = bundle.getParcelable("conversation");
+			
+			ArrayList<User> users = new ArrayList<User>();
+			for(int id_user : conversation.getListIdUser()){
+				users.add(listUsers.get(id_user));
+			}
+			
+
+			ContentNetwork content = new ContentNetwork(conversation.getConversation_id(), conversation.getConversation_name(), users);
+			
+
+
+			for(User user_destinataire : users){
+				
+				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
 				
 				packet.setUser_envoyeur(user_me);
 				

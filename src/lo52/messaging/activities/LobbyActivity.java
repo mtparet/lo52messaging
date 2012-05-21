@@ -3,8 +3,11 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 
 import lo52.messaging.R;
+import lo52.messaging.model.Conversation;
 import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
+import lo52.messaging.model.network.ContentNetwork;
+import lo52.messaging.model.network.PacketNetwork;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -137,7 +140,16 @@ public class LobbyActivity extends TabActivity {
 	 * @param conversation_name
 	 * @param userList
 	 */
-	private void createConversation(String conversation_name, ArrayList<User> userList){
+	private void createConversation(String conversation_name, ArrayList<Integer> userListId){
+		Conversation conversation = new Conversation(conversation_name, userListId);
+		
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
+		Bundle bundle = new Bundle();
+
+		bundle.putParcelable("conversation", conversation);
+		broadcastIntent.putExtra("conversation", bundle);
+		
+		sendBroadcast(broadcastIntent);
 
 	}
 }

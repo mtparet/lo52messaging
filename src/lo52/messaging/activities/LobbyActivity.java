@@ -40,11 +40,6 @@ public class LobbyActivity extends TabActivity {
 		networkService = new Intent(LobbyActivity.this, NetworkService.class);
 		startService(networkService);
 
-		//Enregistrement de l'intent filter
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(NetworkService.SendMessage);
-		registerReceiver(messageReceiver, filter);
-
 		// Initialisation préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(null);
@@ -81,6 +76,7 @@ public class LobbyActivity extends TabActivity {
 			try {
 				// Unregister du broadcastReceiver & arret du service
 				unregisterReceiver(messageReceiver);
+				unregisterReceiver(conversationReceiver);
 				stopService(networkService);
 			} catch (Exception e) {}
 		}
@@ -94,12 +90,18 @@ public class LobbyActivity extends TabActivity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
 		registerReceiver(messageReceiver, filter);
+		
+		//Enregistrement de l'intent filter
+		IntentFilter filter2 = new IntentFilter();
+		filter2.addAction(NetworkService.SendConversation);
+		registerReceiver(conversationReceiver, filter2);
 	}
 
 
 	@Override
 	protected void onPause() {
 		unregisterReceiver(messageReceiver);
+		unregisterReceiver(conversationReceiver);
 		super.onPause();
 	}
 
@@ -114,6 +116,21 @@ public class LobbyActivity extends TabActivity {
 			Log.i(TAG, "Réception broadcast");
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
+
+		}
+
+	};
+
+	/**
+	 * Recoit les nouvelles conversation
+	 */
+	private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i(TAG, "Réception broadcast");
+			Bundle bundle = intent.getBundleExtra("conversation");
+			Conversation conversation = bundle.getParcelable("conversation");
 
 		}
 

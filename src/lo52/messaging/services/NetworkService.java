@@ -84,6 +84,8 @@ public class NetworkService extends Service {
 
 
 	public static final String SendMessage = "NetworkService.send.Message";
+	
+	public static final String SendConversation = "NetworkService.send.Conversation";
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
@@ -693,12 +695,19 @@ public class NetworkService extends Service {
 			
 			listConversations.put(conversation.getConversation_id(),conversation);
 			
+			if(packetReceive.getUser_envoyeur() != user_me){
+				Intent broadcastIntent = new Intent(NetworkService.SendConversation);
+				Bundle bundle = new Bundle();
+
+				bundle.putParcelable("conversation", conversation);
+				broadcastIntent.putExtra("conversation", bundle);
+
+				Log.w(TAG, "Envoi d'un broadcast de création de conversation");
+				sendBroadcast(broadcastIntent);
+			}
+			
 		}
 
-		Log.w(TAG, "Envoi d'un broadcast de création de groupe");
-		
-		//sendToActivity(packetReceive,"lo52.messaging.activities.");
-		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
 

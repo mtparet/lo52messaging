@@ -1,6 +1,9 @@
 package lo52.messaging.activities;
 
+import java.util.ArrayList;
+
 import lo52.messaging.R;
+import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
@@ -113,6 +116,11 @@ public class LobbyActivity extends TabActivity {
 
 	};
 
+	/**
+	 * Envoyer un message dans une conversation
+	 * @param message
+	 * @param id_conversation
+	 */
 	private void sendMessage(String message, int id_conversation){
 		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
 		Bundle bundle = new Bundle();
@@ -122,5 +130,14 @@ public class LobbyActivity extends TabActivity {
 		broadcastIntent.putExtra("message", bundle);
 
 		sendBroadcast(broadcastIntent);
+	}
+	
+	/**
+	 * Crééer une conversation
+	 * @param conversation_name
+	 * @param userList
+	 */
+	private void createConversation(String conversation_name, ArrayList<User> userList){
+
 	}
 }

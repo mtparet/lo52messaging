@@ -82,10 +82,8 @@ public class NetworkService extends Service {
 
 	public static final String SendMessage = "NetworkService.receive.Message";
 
-	private int PORT_DEST;
-	private int PORT_LOCAL;
-	private boolean isLocalhost;
-
+	private int PORT_DEST = 5008;
+	private int PORT_LOCAL = 5008;
 	public NetworkService() {
 
 	}
@@ -105,11 +103,14 @@ public class NetworkService extends Service {
 		 *On récupère les prots définits dans les préférences
 		 */
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean isDev = preferences.getBoolean("dev_prefs_emulateur", false);
+		
+		if(isDev){
+			PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
+			PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
+		}
 
-		PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
-		PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
 
-		isLocalhost = preferences.getBoolean("dev_prefs_emulateur", false);
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages
 		 */
@@ -134,7 +135,7 @@ public class NetworkService extends Service {
 		
 		InetAddress addres = null;
 		try {
-			addres = Network.getWifiAddress(getApplicationContext(),isLocalhost);
+			addres = Network.getWifiAddress(getApplicationContext());
 		} catch (IOException e) {
 			Log.e(TAG, "not possible to get wifi addresse");
 			e.printStackTrace();
@@ -372,7 +373,7 @@ public class NetworkService extends Service {
 			
 			InetAddress addres = null;
 			try {
-				addres = Network.getBroadcastAddress(getApplicationContext(),isLocalhost);
+				addres = Network.getBroadcastAddress(getApplicationContext());
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
 				Log.e(TAG, "Echec de la construction de l'adresse de broadcast");

@@ -187,7 +187,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	/* (non-Javadoc)
 	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageScrolled(int, float, int)
 	 */
-	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
 	}
@@ -195,7 +194,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	/* (non-Javadoc)
 	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageSelected(int)
 	 */
-	@Override
 	public void onPageSelected(int position) {
 		this.mTabHost.setCurrentTab(position);
 	}
@@ -203,7 +201,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	/* (non-Javadoc)
 	 * @see android.support.v4.view.ViewPager.OnPageChangeListener#onPageScrollStateChanged(int)
 	 */
-	@Override
 	public void onPageScrollStateChanged(int state) {
 	}
 

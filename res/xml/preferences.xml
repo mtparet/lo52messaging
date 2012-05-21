@@ -26,20 +26,22 @@
 	
 	<PreferenceCategory
 	android:title="Options de dev">
+		<CheckBoxPreference android:title="Emulateur"
+							android:summary="Activer mode dev"
+							android:key="dev_prefs_emulateur">
+		</CheckBoxPreference>
+		
 		<EditTextPreference android:title="Port entrant"
 		    				android:numeric="integer"
 							android:summary="(Dev) Port entrant"
 							android:key="dev_prefs_port_entrant">
 		</EditTextPreference>
-		<EditTextPreference android:title="Port sortant"
+		<EditTextPreference android:title="Port distant"
 		    				android:numeric="integer"
-							android:summary="(Dev) Port sortant"
-							android:key="dev_prefs_port_sortant">
+							android:summary="(Dev) Port distant"
+							android:key="dev_prefs_port_distant">
 		</EditTextPreference>
-		<CheckBoxPreference android:title="Emulateur"
-							android:summary="Utiliser 127.0.0.1"
-							android:key="dev_prefs_emulateur">
-		</CheckBoxPreference>
+
 	</PreferenceCategory>
     
 </PreferenceScreen>

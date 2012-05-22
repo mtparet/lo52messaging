@@ -36,6 +36,7 @@
         
         <activity android:name=".activities.ConversationPagerActivity"></activity>
         <activity android:name=".activities.ConversationFragment"></activity>
+        <activity android:name=".activities.FragmentTabsPager"></activity>
         
         
         <service android:name=".services.NetworkService"/>

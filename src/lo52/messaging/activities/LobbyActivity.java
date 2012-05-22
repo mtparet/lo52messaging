@@ -4,10 +4,7 @@ import java.util.ArrayList;
 
 import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
-import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
-import lo52.messaging.model.network.ContentNetwork;
-import lo52.messaging.model.network.PacketNetwork;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -59,8 +56,12 @@ public class LobbyActivity extends TabActivity {
 		/**
 		 * Création du tab de la liste des conversations (ConversationPagerActivity)
 		 **/
-		intent.setClass(this, ConversationPagerActivity.class);
-		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
+		/*intent.setClass(this, ConversationPagerActivity.class);
+		spec = tabHost.newTabSpec("tab86").setIndicator("Old conv", getResources().getDrawable(R.drawable.icon_refresh)).setContent(intent);
+		tabHost.addTab(spec);*/
+		
+		Intent fragmentsIntent = new Intent().setClass(this, FragmentTabsPager.class);
+		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(fragmentsIntent);
 		tabHost.addTab(spec);
 	}
 

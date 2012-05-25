@@ -85,30 +85,29 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			v.setMinimumHeight(0);
 			return v;
 		}
-
 	}
-	
+
 	/** (non-Javadoc)
 	 * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
 	 */
 	protected void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
-		
+
 		// Inflate the layout
 		setContentView(R.layout.conversations_viewpager);
-		
+
 		// Initialise the TabHost
 		this.initialiseTabHost(savedInstanceState);
-		
+
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
-		
+
 		// Intialision du ViewPager
 		this.intialiseViewPager();
 	}
-	
+
 	/** (non-Javadoc)
 	 * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
 	 */
@@ -124,29 +123,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		List<Fragment> fragments = new Vector<Fragment>();
 
-		//Log.d(TAG, "Instanciation fragment");
 		ConversationFragment f = (ConversationFragment) Fragment.instantiate(this, ConversationFragment.class.getName());
-		//Log.d(TAG, "Ajout fragment");
 		fragments.add(f);
-		//Log.d(TAG, "Appel fuckingshit");
-		f.fuckingShit();
-		//Log.d(TAG, "Vieww : " + f.getView());
-		//Log.d(TAG, "Vieww : " + f.getFragmentView());
 
-		/*fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
-		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));*/
 		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
-		//
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
 		this.mViewPager.setAdapter(this.mPagerAdapter);
 		this.mViewPager.setOnPageChangeListener(this);
-
-		Log.d(TAG, "===============================");
-		Log.d(TAG, "INIT," + mViewPager.getAdapter());
-		Log.d(TAG, "INIT," + mPagerAdapter);
-
-
-
 	}
 
 	/**
@@ -156,15 +139,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
 		mTabHost.setup();
 		TabInfo tabInfo = null;
-		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab1").setIndicator("Tab 1"), ( tabInfo = new TabInfo("Tab1", ConversationFragment.class, args)));
+		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("tab0").setIndicator(getString(R.string.conversations_tab_name)), (tabInfo = new TabInfo("tab0", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
-		/*ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Tab 2"), ( tabInfo = new TabInfo("Tab2", ConversationFragment.class, args)));
-		this.mapTabInfo.put(tabInfo.tag, tabInfo);
-		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab3").setIndicator("Tab 3"), ( tabInfo = new TabInfo("Tab3", ConversationFragment.class, args)));
-		this.mapTabInfo.put(tabInfo.tag, tabInfo);*/
-		// Default to first tab
-		//this.onTabChanged("Tab1");
-		//
 		mTabHost.setOnTabChangedListener(this);
 	}
 
@@ -176,6 +152,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param clss
 	 * @param args
 	 */
+
 	private static void AddTab(ConversationPagerActivity activity, TabHost tabHost, TabHost.TabSpec tabSpec, TabInfo tabInfo) {
 		// Attach a Tab view factory to the spec
 		tabSpec.setContent(activity.new TabFactory(activity));
@@ -220,11 +197,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	/**
 	 * The <code>PagerAdapter</code> serves the fragments when paging.
-	 * @author mwho
 	 */
 	public class MPagerAdapter extends FragmentPagerAdapter {
 
 		private List<Fragment> fragments;
+
 		/**
 		 * @param fm
 		 * @param fragments
@@ -233,6 +210,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			super(fm);
 			this.fragments = fragments;
 		}
+
 		/* (non-Javadoc)
 		 * @see android.support.v4.app.FragmentPagerAdapter#getItem(int)
 		 */
@@ -253,7 +231,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			return POSITION_NONE;
 		}
 
-
 		/**
 		 * Retourne la liste des fragments dans l'adapter
 		 * @return
@@ -267,26 +244,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		 * @param f
 		 */
 		public void addFragment(Context ctx) {
-
 			ConversationFragment f = (ConversationFragment) Fragment.instantiate(ctx, ConversationFragment.class.getName());
-
-			Log.d(TAG, "Ajout fragment par add");
 			fragments.add(f);
-			/*Log.d(TAG, "Appel fuckingshit");
-			f.fuckingShit();
-			FragmentManager fm1 = f.getFragmentManager();
-			Log.d(TAG, "get fm2");
-			FragmentManager fm2 = getSupportFragmentManager();
-			Log.d(TAG, "fm1 " + fm1);
-			Log.d(TAG, "fm2 " + fm2);
-			fm2.beginTransaction();
-			Log.d(TAG, "Vieww : " + f.getView());
-			Log.d(TAG, "Vieww : " + f.getFragmentView());
-			f.fuckingShit();
-			Log.d(TAG, "Getthis: " + f.getThisFrag());
-			//Log.d(TAG, "Getthis2: " + f.getThisFrag().getView());
-			//Log.d(TAG, "Getthis3: " + f.getThisFrag().getFragmentView());*/
-
 		}
 
 		/**
@@ -300,22 +259,22 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 	}
 
-
-
 	/**
 	 * Création du menu d'options. Crafté à la main ici et non pas selon un .xml car le menu varie selon le nombre de conversations ouvertes
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, 1, 1, "(Dev) Ajouter un tab");
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// Menu supprimer: ajouté quand il y a exactement 1 conversation (sinon il est créé plusieurs fois), ...
-		if (this.mPagerAdapter.getCount() == 1) {
+		
+		// TODO refactoriser ce code pour prendre en compte le tab 0 (liste)
+		
+		/*// Menu supprimer: ajouté quand il y a exactement 1 conversation (sinon il est créé plusieurs fois), ...
+		if (this.mPagerAdapter.getCount() == 2) {
 			// On vérifie que l'item n'est pas déjà dans le menu
 			if (menu.size() >= 1) {
 				boolean itemFound = false;
@@ -336,7 +295,22 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 					menu.removeGroup(MENU_ITEM_CLOSE_CONV);
 				}
 			}
+		}*/
+		
+		// On supprime aussi l'option "Fermer la conversation courante" quand on est sur la liste des convers (premier tab)
+		if (mTabHost.getCurrentTab() == 0) {
+			menu.removeGroup(MENU_ITEM_CLOSE_CONV);
+		} else {
+			boolean itemFound = false;
+			for(int i = 0; i < menu.size(); i++) {
+				if (menu.getItem(i).getItemId() == MENU_ITEM_CLOSE_CONV) itemFound = true;
+			}
+			if (!itemFound) {
+				menu.add(MENU_ITEM_CLOSE_CONV, MENU_ITEM_CLOSE_CONV, 2, getString(R.string.conversations_close_current));
+				menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
+			}
 		}
+		
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -345,39 +319,14 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		if (item.getItemId() == 1) {
 
-
-
+			addFragment();
 
 			/**
-			 * < FIXME Francois>
-			 * utiliser addFragment() à la place
+			 * MODIF D'UN FRAGMENT
 			 */
-			// Ajout d'un tab
-			TabInfo tabInfo = null;
-			ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
-			this.mapTabInfo.put(tabInfo.tag, tabInfo);
-
-			mPagerAdapter.addFragment(this);
-
-			// Cacher le TV
-			if (this.mPagerAdapter.getCount() == 1) {
-				TextView tv = (TextView) findViewById(R.id.no_conversation);
-				tv.setVisibility(View.GONE);
-			}
-			/**
-			 * 	</Fin_FIXME>
-			 */
-
-
-
-			Log.d(TAG, "===============================");
-			Log.d(TAG, "Tentative accès adapter");
 			MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
-			Log.d(TAG, "Adapter: " + mp);
 			ConversationFragment f0 = (ConversationFragment) mp.getFragmentsList().get(0);
-			Log.d(TAG, "F0: " + mp);
-			f0.fuckingShit();
-			f0.setFuckingShit();
+			f0.setTextViewText("modif du fragment 0");
 
 
 		} else if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
@@ -394,11 +343,25 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 */
 	public void addFragment() {
 
+		// Ajout d'un tab
+		TabInfo tabInfo = null;
+		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
+		this.mapTabInfo.put(tabInfo.tag, tabInfo);
+
+		mPagerAdapter.addFragment(this);
+
+		// Cacher le TV
+		if (this.mPagerAdapter.getCount() == 2) {
+			TextView tv = (TextView) findViewById(R.id.no_conversation);
+			tv.setVisibility(View.GONE);
+		}
 	}
 
 	/**
 	 * Supprime le fragment à l'index donné
 	 * @param index
+	 *
+	 *	FIXME semble être buggé quand on supprime plusieurs fragments et qu'au lieu de swiper, on clique sur leur titre (peut générer un force close)
 	 */
 	public void removeFragmentAt(int index) {
 
@@ -420,12 +383,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		mTabHost.getTabWidget().removeView(mTabHost.getTabWidget().getChildTabViewAt(index));
 
 		// Afficher le textview "pas de conversation en cours bla bla"
-		if (this.mPagerAdapter.getCount() == 0) {
+		if (this.mPagerAdapter.getCount() == 1) {
 			TextView tv = (TextView) findViewById(R.id.no_conversation);
 			tv.setVisibility(View.VISIBLE);
 		}
-
 	}
 }
-
-

@@ -57,17 +57,9 @@ public class LobbyActivity extends TabActivity {
 		 * Création du tab de la liste des conversations (ConversationPagerActivity)
 		 **/
 		intent.setClass(this, ConversationPagerActivity.class);
-		spec = tabHost.newTabSpec("tab86").setIndicator("Old conv", getResources().getDrawable(R.drawable.icon_refresh)).setContent(intent);
+		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.conversations_tab_name), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);
 
-		Intent fragmentsIntent = new Intent().setClass(this, FragmentTabsPager.class);
-		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(fragmentsIntent);
-		tabHost.addTab(spec);
-		
-		/*Intent fragmentsIntent2 = new Intent().setClass(this, FragmentsSliderActivity.class);
-		spec = tabHost.newTabSpec("tab65").setIndicator("Dafuq", getResources().getDrawable(R.drawable.icon_chat)).setContent(fragmentsIntent2);
-		tabHost.addTab(spec);*/
-		
 	}
 
 

@@ -33,12 +33,8 @@
         <activity android:name=".activities.LobbyActivity" android:theme="@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.UserListActivity"></activity>
-        
-        <activity android:name=".activities.AwesomePagerActivity"></activity>
         <activity android:name=".activities.ConversationPagerActivity"></activity>
         <activity android:name=".activities.ConversationFragment"></activity>
-        <activity android:name=".activities.FragmentTabsPager"></activity>
-        
         
         <service android:name=".services.NetworkService"/>
         <service android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationBroadcastService" />

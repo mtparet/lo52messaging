@@ -3,9 +3,13 @@ package lo52.messaging.activities;
 import lo52.messaging.R;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 /**
@@ -13,15 +17,23 @@ import android.widget.TextView;
  */
 public class ConversationFragment extends Fragment {
 
-	@SuppressWarnings("unused")
 	private static final String TAG = "ConversationFragment";
 	final ConversationFragment thisFrag = this;
 	
 	/**
 	 * TODO : pour le moment il y a juste le layout test
 	 */
-	TextView tvTest;
+	TextView conversName_tv;
+	EditText conversText_edit;
+	EditText conversUserText_edit;
+	Button conversMedia_btn;
+	Button conversSend_btn;
 	View v;
+	
+	OnClickListener mediaButtonClickListener;
+	OnClickListener sendButtonClickListener;
+	
+	ConversationPagerActivity procreator;
 
 	@Override
 	public void onResume() {
@@ -29,21 +41,41 @@ public class ConversationFragment extends Fragment {
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		/*if (container == null) {
-			tvTest = null;
-            return null;
-        }*/
+		
+		// Inflate le layout depuis le xml
+		v = inflater.inflate(R.layout.conversation, container, false);
+		
+		// Initialise les différents éléments du layout
+		conversName_tv 			= (TextView) v.findViewById(R.id.conversation_name);
+		conversText_edit		= (EditText) v.findViewById(R.id.conversation_content);
+		conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
+		conversMedia_btn 		= (Button) v.findViewById(R.id.conversation_media_button);
+		conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
+		
+		// Création et assignation des onClickListerners
+		mediaButtonClickListener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "Click bouton media");
+			}
+		};
+		
+		sendButtonClickListener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "Click bouton envoi");
+				procreator.onFragmentSendButtonClick();
+			}
+		};
+		
+		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
+		conversSend_btn.setOnClickListener(sendButtonClickListener);
 
-		v = inflater.inflate(R.layout.test, container, false);
+		procreator = (ConversationPagerActivity) getActivity();
+		
 		return v;
 	}
 
-	public void setTextViewText(String s) {
-		// FIXME vérifier pour pouvoir directement utiliser un TV setté dans onCreateView
-		TextView tv1 = (TextView) v.findViewById(R.id.test_textView1);
-		tv1.setText(s);
-	}
-	
 	public View getFragmentView() {
 		return v;
 	}

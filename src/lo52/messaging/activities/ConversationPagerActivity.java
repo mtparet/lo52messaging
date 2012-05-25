@@ -123,7 +123,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		List<Fragment> fragments = new Vector<Fragment>();
 
-		ConversationFragment f = (ConversationFragment) Fragment.instantiate(this, ConversationFragment.class.getName());
+		ConversationListFragment f = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
 		fragments.add(f);
 
 		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
@@ -139,7 +139,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
 		mTabHost.setup();
 		TabInfo tabInfo = null;
-		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("tab0").setIndicator(getString(R.string.conversations_tab_name)), (tabInfo = new TabInfo("tab0", ConversationFragment.class, args)));
+		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("tab0").setIndicator(getString(R.string.conversations_tab_name)), (tabInfo = new TabInfo("tab0", ConversationListFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 		mTabHost.setOnTabChangedListener(this);
 	}
@@ -319,14 +319,16 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		if (item.getItemId() == 1) {
 
+			Log.d(TAG, "Ajout fragment");
 			addFragment();
+			Log.d(TAG, "Frag ajouté");
 
 			/**
 			 * MODIF D'UN FRAGMENT
 			 */
-			MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
-			ConversationFragment f0 = (ConversationFragment) mp.getFragmentsList().get(0);
-			f0.setTextViewText("modif du fragment 0");
+			//MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
+			//ConversationFragment f0 = (ConversationFragment) mp.getFragmentsList().get(0);
+			//f0.setTextViewText("modif du fragment 0");
 
 
 		} else if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
@@ -347,7 +349,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		TabInfo tabInfo = null;
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
-
+		
 		mPagerAdapter.addFragment(this);
 
 		// Cacher le TV
@@ -387,5 +389,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			TextView tv = (TextView) findViewById(R.id.no_conversation);
 			tv.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	
+	
+	public void onFragmentSendButtonClick() {
+		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 	}
 }

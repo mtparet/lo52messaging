@@ -22,6 +22,9 @@
     <string name="conversations_tab_name">Conversations</string>
     <string name="conversations_none">Vous n\'avez aucune conversation en cours</string>
     <string name="conversations_close_current">Fermer la conversation courante</string>
+    <string name="conversations_name">::Nom de la conversation::</string>
+    <string name="conversations_media_btn">Choisir un média</string>
+    <string name="conversations_send_btn">Envoyer</string>
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>

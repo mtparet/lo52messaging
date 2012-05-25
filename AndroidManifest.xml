@@ -34,6 +34,7 @@
         <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.UserListActivity"></activity>
         
+        <activity android:name=".activities.AwesomePagerActivity"></activity>
         <activity android:name=".activities.ConversationPagerActivity"></activity>
         <activity android:name=".activities.ConversationFragment"></activity>
         <activity android:name=".activities.FragmentTabsPager"></activity>

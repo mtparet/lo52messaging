@@ -56,13 +56,18 @@ public class LobbyActivity extends TabActivity {
 		/**
 		 * Création du tab de la liste des conversations (ConversationPagerActivity)
 		 **/
-		/*intent.setClass(this, ConversationPagerActivity.class);
+		intent.setClass(this, ConversationPagerActivity.class);
 		spec = tabHost.newTabSpec("tab86").setIndicator("Old conv", getResources().getDrawable(R.drawable.icon_refresh)).setContent(intent);
-		tabHost.addTab(spec);*/
-		
+		tabHost.addTab(spec);
+
 		Intent fragmentsIntent = new Intent().setClass(this, FragmentTabsPager.class);
 		spec = tabHost.newTabSpec("tab2").setIndicator(getString(R.string.lobby_tab_conversations), getResources().getDrawable(R.drawable.icon_chat)).setContent(fragmentsIntent);
 		tabHost.addTab(spec);
+		
+		/*Intent fragmentsIntent2 = new Intent().setClass(this, FragmentsSliderActivity.class);
+		spec = tabHost.newTabSpec("tab65").setIndicator("Dafuq", getResources().getDrawable(R.drawable.icon_chat)).setContent(fragmentsIntent2);
+		tabHost.addTab(spec);*/
+		
 	}
 
 
@@ -91,7 +96,7 @@ public class LobbyActivity extends TabActivity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
 		registerReceiver(messageReceiver, filter);
-		
+
 		//Enregistrement de l'intent filter
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
@@ -152,7 +157,7 @@ public class LobbyActivity extends TabActivity {
 
 		sendBroadcast(broadcastIntent);
 	}
-	
+
 	/**
 	 * Crééer une conversation
 	 * @param conversation_name
@@ -160,13 +165,13 @@ public class LobbyActivity extends TabActivity {
 	 */
 	private void createConversation(String conversation_name, ArrayList<Integer> userListId){
 		Conversation conversation = new Conversation(conversation_name, userListId);
-		
+
 		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
 		Bundle bundle = new Bundle();
 
 		bundle.putParcelable("conversation", conversation);
 		broadcastIntent.putExtra("conversation", bundle);
-		
+
 		sendBroadcast(broadcastIntent);
 
 	}

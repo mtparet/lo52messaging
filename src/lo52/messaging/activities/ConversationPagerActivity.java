@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
@@ -25,14 +26,6 @@ import android.widget.TextView;
 /**
  * Activité permettant de regrouper les conversations dans une vue en "fragments".
  * Pour ajouter/supprimer des fragments merci d'utiliser addFragment() / removeFragmentAt()
- * 
- * Basé sur:
- * @see http://thepseudocoder.wordpress.com/2011/10/13/android-tabs-viewpager-swipe-able-tabs-ftw/
- * @see https://github.com/JakeWharton/Android-ViewPagerIndicator
- * @see http://android-developers.blogspot.fr/2011/08/horizontal-view-swiping-with-viewpager.html?m=1
- * <br/>==========<br/>
- * The <code>ConversationPagerActivity</code> class implements the Fragment activity that maintains a TabHost using a ViewPager.
- * @author mwho
  * 
  */
 public class ConversationPagerActivity extends FragmentActivity implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
@@ -48,10 +41,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private TabHost mTabHost;
 	private ViewPager mViewPager;
 	private HashMap<String, TabInfo> mapTabInfo = new HashMap<String, ConversationPagerActivity.TabInfo>();
-	private PagerAdapter mPagerAdapter;
+	private MPagerAdapter mPagerAdapter;
+
 	/**
-	 *
-	 * @author mwho
 	 * Maintains extrinsic info of a tab's construct
 	 */
 	private class TabInfo {
@@ -67,8 +59,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			this.clss = clazz;
 			this.args = args;
 		}
-
 	}
+
 	/**
 	 * A simple factory that returns dummy views to the Tabhost
 	 * @author mwho
@@ -95,23 +87,28 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 
 	}
+	
 	/** (non-Javadoc)
 	 * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
 	 */
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
+		
 		// Inflate the layout
 		setContentView(R.layout.conversations_viewpager);
+		
 		// Initialise the TabHost
 		this.initialiseTabHost(savedInstanceState);
+		
 		if (savedInstanceState != null) {
-			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab")); //set the tab as per the saved state
+			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
-		// Intialise ViewPager
+		
+		// Intialision du ViewPager
 		this.intialiseViewPager();
-		Log.d(TAG, "Lancement activité");
 	}
-
+	
 	/** (non-Javadoc)
 	 * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
 	 */
@@ -126,14 +123,30 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private void intialiseViewPager() {
 
 		List<Fragment> fragments = new Vector<Fragment>();
+
+		//Log.d(TAG, "Instanciation fragment");
+		ConversationFragment f = (ConversationFragment) Fragment.instantiate(this, ConversationFragment.class.getName());
+		//Log.d(TAG, "Ajout fragment");
+		fragments.add(f);
+		//Log.d(TAG, "Appel fuckingshit");
+		f.fuckingShit();
+		//Log.d(TAG, "Vieww : " + f.getView());
+		//Log.d(TAG, "Vieww : " + f.getFragmentView());
+
 		/*fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
-		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));
 		fragments.add(Fragment.instantiate(this, ConversationFragment.class.getName()));*/
-		this.mPagerAdapter  = new PagerAdapter(super.getSupportFragmentManager(), fragments);
+		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
 		//
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
 		this.mViewPager.setAdapter(this.mPagerAdapter);
 		this.mViewPager.setOnPageChangeListener(this);
+
+		Log.d(TAG, "===============================");
+		Log.d(TAG, "INIT," + mViewPager.getAdapter());
+		Log.d(TAG, "INIT," + mPagerAdapter);
+
+
+
 	}
 
 	/**
@@ -142,10 +155,10 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private void initialiseTabHost(Bundle args) {
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
 		mTabHost.setup();
-		/*TabInfo tabInfo = null;
+		TabInfo tabInfo = null;
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab1").setIndicator("Tab 1"), ( tabInfo = new TabInfo("Tab1", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
-		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Tab 2"), ( tabInfo = new TabInfo("Tab2", ConversationFragment.class, args)));
+		/*ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Tab 2"), ( tabInfo = new TabInfo("Tab2", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab3").setIndicator("Tab 3"), ( tabInfo = new TabInfo("Tab3", ConversationFragment.class, args)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);*/
@@ -209,14 +222,14 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * The <code>PagerAdapter</code> serves the fragments when paging.
 	 * @author mwho
 	 */
-	public class PagerAdapter extends FragmentPagerAdapter {
+	public class MPagerAdapter extends FragmentPagerAdapter {
 
 		private List<Fragment> fragments;
 		/**
 		 * @param fm
 		 * @param fragments
 		 */
-		public PagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+		public MPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
 			super(fm);
 			this.fragments = fragments;
 		}
@@ -236,6 +249,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			return this.fragments.size();
 		}
 
+		public int getItemPosition(Object object) {
+			return POSITION_NONE;
+		}
+
+
 		/**
 		 * Retourne la liste des fragments dans l'adapter
 		 * @return
@@ -249,7 +267,36 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		 * @param f
 		 */
 		public void addFragment(Context ctx) {
-			fragments.add(Fragment.instantiate(ctx, ConversationFragment.class.getName()));			
+
+			ConversationFragment f = (ConversationFragment) Fragment.instantiate(ctx, ConversationFragment.class.getName());
+
+			Log.d(TAG, "Ajout fragment par add");
+			fragments.add(f);
+			/*Log.d(TAG, "Appel fuckingshit");
+			f.fuckingShit();
+			FragmentManager fm1 = f.getFragmentManager();
+			Log.d(TAG, "get fm2");
+			FragmentManager fm2 = getSupportFragmentManager();
+			Log.d(TAG, "fm1 " + fm1);
+			Log.d(TAG, "fm2 " + fm2);
+			fm2.beginTransaction();
+			Log.d(TAG, "Vieww : " + f.getView());
+			Log.d(TAG, "Vieww : " + f.getFragmentView());
+			f.fuckingShit();
+			Log.d(TAG, "Getthis: " + f.getThisFrag());
+			//Log.d(TAG, "Getthis2: " + f.getThisFrag().getView());
+			//Log.d(TAG, "Getthis3: " + f.getThisFrag().getFragmentView());*/
+
+		}
+
+		/**
+		 * Surcharge de destroyItem, dans laquelle on n'appelle pas la méthode super, sinon les fragments
+		 * sont resettés à leur View par défaut par le GC.
+		 */
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			//super.destroyItem(container, position, object);
+			Log.d(TAG, "NOT destroying item " + position);
 		}
 	}
 
@@ -297,7 +344,10 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if (item.getItemId() == 1) {
-			
+
+
+
+
 			/**
 			 * < FIXME Francois>
 			 * utiliser addFragment() à la place
@@ -318,6 +368,18 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			 * 	</Fin_FIXME>
 			 */
 
+
+
+			Log.d(TAG, "===============================");
+			Log.d(TAG, "Tentative accès adapter");
+			MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
+			Log.d(TAG, "Adapter: " + mp);
+			ConversationFragment f0 = (ConversationFragment) mp.getFragmentsList().get(0);
+			Log.d(TAG, "F0: " + mp);
+			f0.fuckingShit();
+			f0.setFuckingShit();
+
+
 		} else if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
 			// Suppression
 			removeFragmentAt(this.mTabHost.getCurrentTab());
@@ -325,13 +387,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		return true;
 	}
 
-	
+
 	/**
 	 * TODO Francois
 	 * voir pour les paramètres nécessaires (nom du tab, contenu de base...)
 	 */
 	public void addFragment() {
-		
+
 	}
 
 	/**
@@ -339,7 +401,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param index
 	 */
 	public void removeFragmentAt(int index) {
-		
+
 		if (mPagerAdapter.getFragmentsList().size() == 0) return;
 
 		// Supprimer le fragment de l'adapter

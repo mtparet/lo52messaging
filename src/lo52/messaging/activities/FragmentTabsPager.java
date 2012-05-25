@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -179,15 +180,28 @@ public class FragmentTabsPager extends FragmentActivity {
 
 			Log.d(TAG, "Tab ajouté " + mTabsAdapter.getCount());
 			
+			// Récupération du fragment X
+			ConversationFragment f = (ConversationFragment) this.getItem(0);
+			FragmentManager fm1 = f.getFragmentManager();
+			FragmentManager fm2 = getSupportFragmentManager();
+			fm2.beginTransaction();
+			Log.d(TAG, "Frags " + fm1 + " - " + fm2);
+			Log.d(TAG, "Récupération frag " + f);
+			Log.d(TAG, "View : " + f.getView());
+			Log.d(TAG, "F'in ");
+			f.fuckingShit();
+			Log.d(TAG, "vieww: " + f.getFragmentView());
 			// On récupère le fragment
-			ConversationFragment f = (ConversationFragment)mTabsAdapter.getItem(nbTabs);
+			//ConversationFragment f1 = (ConversationFragment)mTabsAdapter.getItem(0);
+
+			//f.getView();
 			/**
 			 * XXX
 			 * simple test pour accéder aux éléments du layout du fragment et pouvoir les modifier
 			 * 
 			 * @see http://stackoverflow.com/questions/6495898/findviewbyid-in-fragment-android 
 			 */
-			f.fuckingShit();
+			//f.fuckingShit();
 			
 		}
 	}

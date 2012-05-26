@@ -32,6 +32,7 @@ public class ConversationFragment extends Fragment {
 	View v;
 	
 	String conversationName_str = "";
+	String conversationText_str = "";
 	
 	OnClickListener mediaButtonClickListener;
 	OnClickListener sendButtonClickListener;
@@ -55,6 +56,7 @@ public class ConversationFragment extends Fragment {
 		conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
 		
 		conversName_tv.setText(conversationName_str);
+		conversText_edit.setText(conversationText_str);
 		
 		parentActivity = (ConversationPagerActivity) getActivity();
 		
@@ -115,7 +117,8 @@ public class ConversationFragment extends Fragment {
 	 * @see appendConversationText()
 	 */
 	public void setConversText(String conversText) {
-		this.conversText_edit.setText(conversText);
+		//this.conversText_edit.setText(conversText);
+		this.conversationText_str = conversText;
 	}
 
 	public String getConversUserText() {
@@ -136,7 +139,8 @@ public class ConversationFragment extends Fragment {
 	 * @param text
 	 */
 	public void appendConversationText(String text) {
-		this.setConversText(this.getConversText() + " " + text);
+		//this.setConversText(this.getConversText() + " " + text);
+		this.conversationText_str += " " + text;
 	}
 
 	

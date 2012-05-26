@@ -11,7 +11,6 @@ import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import lo52.messaging.activities.LobbyActivity;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.model.User;
@@ -26,7 +25,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.wifi.WifiConfiguration.GroupCipher;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -194,8 +192,10 @@ public class NetworkService extends Service {
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
 		 Timer timer = new Timer();
-		 timer.schedule(new SendBroadcatsimeTask(),10000);	
+		 timer.schedule(new SendBroadcatsimeTask(), 500);	
 		
+		// Timer timer2 = new Timer();
+		 //timer2.schedule(new SendExempleMessage(), 10000);
 		
 	}
 
@@ -208,10 +208,19 @@ public class NetworkService extends Service {
 		public void run() {
 			sendBroadcastHelloNetwork();
 			 sendSample();
-			
 		}
-		
 	}
+	class SendExempleMessage extends TimerTask {
+
+		@Override
+		public void run() {
+			//sendBroadcastHelloNetwork();
+			 sendSampleMessage();
+		}
+	}
+	
+	
+	
 	private void sendBroadcastHelloNetwork() {
 		
 		PacketNetwork packet = new PacketNetwork(PacketNetwork.HELLO);
@@ -450,7 +459,6 @@ public class NetworkService extends Service {
 			try {
 				addres = Network.getBroadcastAddress(getApplicationContext());
 			} catch (IOException e2) {
-				// TODO Auto-generated catch block
 				Log.e(TAG, "Echec de la construction de l'adresse de broadcast");
 				e2.printStackTrace();
 				return (long) 0;
@@ -609,7 +617,6 @@ public class NetworkService extends Service {
 	 * @param packetReceive
 	 */
 	private void paquetMessage(PacketNetwork packetReceive) {
-		// TODO Auto-generated method stub
 
 		Log.d(TAG, "message reçu dans le NetworkService");
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
@@ -798,12 +805,28 @@ public class NetworkService extends Service {
 		listIdUser.add(user_me.getId());
 		
 		Conversation conversation = new Conversation(37647346, "conversation 1", listIdUser);
+		listConversations.put(conversation.getConversation_id(), conversation);
 		bundle.putParcelable("conversation", conversation);
 		broadcastIntent.putExtra("conversation", bundle);
 
 		Log.d(TAG, "Envoi d'un broadcast de création de conversation");
 		sendBroadcast(broadcastIntent);
 	}
+	
+	private void sendSampleMessage(){
+		Intent broadcastIntent = new Intent(NetworkService.SendMessage);
+		Bundle bundle = new Bundle();
+
+		
+		MessageBroacast message = new MessageBroacast(user_me.getId(), "Je m'apelle françois et je suis un connard", 37647346);
+
+		bundle.putParcelable(MessageBroacast.tag_parcelable, message);
+		broadcastIntent.putExtra("message", bundle);
+
+		Log.d(TAG, "Envoi d'un broadcast de message");
+		sendBroadcast(broadcastIntent);
+	}
+	
 	
 	private void checkAddresseLocalPublic(DatagramPacket packetReceive){
 		/*

@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import lo52.messaging.R;
+import lo52.messaging.model.Conversation;
 import lo52.messaging.model.User;
 import lo52.messaging.services.NetworkService;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,23 +66,32 @@ public class UserListActivity extends ListActivity {
 		 */
 		//on récupère la liste des users
 		userList = NetworkService.getListUsers();
-		values.clear();
+		/*values.clear();
 		for( User user : userList.values()){
 			values.add(user.getName());
 			
 		}
-		adapter.notifyDataSetChanged();
+		adapter.notifyDataSetChanged();*/
 		
 		super.onResume();
 	}
-
-
 
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		String item = (String) getListAdapter().getItem(position);
 		Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
+		
+		// FIXME utiliser les vrais paramètres
+		/*ArrayList<Integer> list = new ArrayList<Integer>();
+		list.add(37647346);
+		createConversation("conversation test", list);
+		*/
+
+		// Rend le tab des conversations actif
+		LobbyActivity parent = (LobbyActivity) getParent();
+		parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+		
 	}
 
 	/**
@@ -126,7 +137,7 @@ public class UserListActivity extends ListActivity {
 		int menuItemId = item.getItemId();
 		if (menuItemId == R.id.item_refresh) {
 			// TODO : refresh liste
-			Toast.makeText(this, "Refresh list", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Refresh list to do", Toast.LENGTH_SHORT).show();
 		}
 		else {
 			Log.e(TAG, "Item non pris en charge");
@@ -162,6 +173,28 @@ public class UserListActivity extends ListActivity {
 			imageView.setImageResource(R.drawable.ic_launcher);
 			return rowView;
 		}
+	}
+	
+	
+	/**
+	 * Crééer une conversation
+	 * @param conversation_name
+	 * @param userList
+	 * @return le numéro de la conversation créé
+	 */
+	private int createConversation(String conversation_name, ArrayList<Integer> userListId){
+		Conversation conversation = new Conversation(conversation_name, userListId);
+
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
+		Bundle bundle = new Bundle();
+
+		bundle.putParcelable("conversation", conversation);
+		broadcastIntent.putExtra("conversation", bundle);
+
+		sendBroadcast(broadcastIntent);
+
+		return conversation.getConversation_id();
+
 	}
 	
 }

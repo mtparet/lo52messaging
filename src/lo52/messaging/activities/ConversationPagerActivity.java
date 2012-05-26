@@ -2,7 +2,6 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,7 +9,6 @@ import java.util.Vector;
 
 import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
-import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import android.content.BroadcastReceiver;
@@ -271,7 +269,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		 */
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			//super.destroyItem(container, position, object);
+			super.destroyItem(container, position, object);
 			Log.d(TAG, "NOT destroying item " + position);
 		}
 	}
@@ -373,8 +371,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Set le conversation id
 		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
 		ConversationFragment f_last = (ConversationFragment) mp.getFragmentsList().get(this.mPagerAdapter.getCount()-1);
-		f_last.setConversation_id(conversation_id);		
-
+		f_last.setConversation_id(conversation_id);
 
 		// Cacher le TV
 		if (this.mPagerAdapter.getCount() == 2) {
@@ -455,8 +452,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			Log.d(TAG, "message_client_id:" + message.getClient_id() + "message_convers_id:" + message.getConversation_id() + "message_message " + message.getMessage());
 
+			// On récupère le fragment correspondant à l'id de la conversatoin
+			ConversationFragment frag = getFragmentById(message.getConversation_id());
+			// Et on set le texte
+			frag.appendConversationText(message.getMessage());
+			mPagerAdapter.notifyDataSetChanged();
 		}
-
 	};
 
 	/**
@@ -475,6 +476,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			ConversationFragment lastFrag = getFragmentById(conversation.getConversation_id());
 			Log.d(TAG, "LastFrag : " + lastFrag);
 			lastFrag.setConversName(conversation.getConversation_name());
+			//mPagerAdapter.notifyDataSetChanged();
 			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
 	};
@@ -557,7 +559,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * Exemple pour envoyer un message / une création de conversation
 	 */
 	void sendExemple(){
-
 		String conversation_name = "conversation_1";
 		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
 		int conversation_id = createConversation(conversation_name,users_conversation);
@@ -566,7 +567,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		sendMessage("bonjour c'est moi2", conversation_id);
 		Log.d(TAG, "données exemple lancées");
-
 
 	}
 

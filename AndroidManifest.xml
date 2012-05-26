@@ -45,6 +45,14 @@
     	</receiver>
         
     	<receiver android:name="com.littlefluffytoys.littlefluffylocationlibrary.PassiveLocationChangedReceiver" android:exported="true" />
+    	<receiver android:name="lo52.messaging.activies.LocalizationBroadcastReceiver">
+    	    <action android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo"></action>
+    	</receiver>
+    	<receiver android:name=".LocalizationBroadcastReceiver">
+            <intent-filter>
+                <action android:name="com.littlefluffytoys.littlefluffylocationlibrary.LOCATION_CHANGED" android:exported="false"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

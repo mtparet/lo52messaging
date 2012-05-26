@@ -2,6 +2,11 @@ package lo52.messaging.activities;
 
 import lo52.messaging.R;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +20,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
 import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibrary;
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibraryConstants;
 
 
 /**
@@ -34,7 +41,6 @@ public class LO52Messaging extends Activity {
 	private TextView usernameErrorTv;
 
 
-
 	/*
 	 * Méthodes
 	 */
@@ -45,7 +51,11 @@ public class LO52Messaging extends Activity {
 		setContentView(R.layout.main);
 		
 		// Première initialisation de la library de géolocalisation
-		LocationLibrary.initialiseLibrary(getBaseContext());
+		//LocationLibrary.initialiseLibrary(getBaseContext());
+		LocationLibrary.initialiseLibrary(getBaseContext(), 60000, 60000);
+		LocationInfo latestInfo = new LocationInfo(getBaseContext());
+		latestInfo.refresh(getApplicationContext());
+		Log.d(TAG, "Localization : latitude=" + latestInfo.lastLat + "longitude=" + latestInfo.lastLong);
 
 		// Récupération des préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);

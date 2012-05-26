@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.wifi.WifiConfiguration.GroupCipher;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -111,7 +112,7 @@ public class NetworkService extends Service {
 		boolean isDev = preferences.getBoolean("dev_prefs_emulateur", false);
 		
 		if(isDev){
-			PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_sortant", "5008"));
+			PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_distant", "5008"));
 			PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
 		}
 
@@ -144,7 +145,22 @@ public class NetworkService extends Service {
 
 		String user_name = preferences.getString("prefs_userName", "default");
 		
-		user_me = new User(user_name);
+		/*
+		 * on récupère l'id de l'utilisateur sinon on le créé
+		 */
+		int user_id = preferences.getInt("gen_userId", 0);
+		
+		if(user_id == 0){
+			user_me = new User(user_name);
+			Editor prefEditor =  preferences.edit();
+			prefEditor.putInt("gen_userId", user_me.getId());
+			prefEditor.commit();
+		}else{
+			user_me = new User(user_name);
+			user_me.setId(user_id);
+		}
+		
+		
 		
 		InetAddress addres = null;
 		try {
@@ -210,8 +226,6 @@ public class NetworkService extends Service {
 			
 			packet.setUser_envoyeur(user_me);
 			
-			//permet d'enregistrer dans le service ce qui se passe sur l'activity
-			analysePacket(packet);
 			
 			SendPacket(packet);
 		}
@@ -227,6 +241,9 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			
+			// on ajoute le message à la liste
+			Message mess = new Message(message.getClient_id(), message.getMessage());
+			listConversations.get(message.getConversation_id()).addMessage(mess);
 			
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
@@ -238,9 +255,6 @@ public class NetworkService extends Service {
 				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
 				
 				packet.setUser_envoyeur(user_me);
-				
-				//permet d'enregistrer dans le service ce qui se passe sur l'activity
-				analysePacket(packet);
 				
 				SendPacket(packet);
 			}
@@ -263,6 +277,9 @@ public class NetworkService extends Service {
 				users.add(listUsers.get(id_user));
 			}
 			
+			// on ajoute la conversation à la liste
+			listConversations.put(conversation.getConversation_id(), conversation);
+			
 
 			ContentNetwork content = new ContentNetwork(conversation.getConversation_id(), conversation.getConversation_name(), users);
 			
@@ -273,9 +290,6 @@ public class NetworkService extends Service {
 				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
 				
 				packet.setUser_envoyeur(user_me);
-				
-				//permet d'enregistrer dans le service ce qui se passe sur l'activity
-				analysePacket(packet);
 				
 				SendPacket(packet);
 			}
@@ -327,6 +341,9 @@ public class NetworkService extends Service {
 	@Override
 	public void onDestroy()
 	{
+		unregisterReceiver(Conversation);
+		unregisterReceiver(Message);
+		unregisterReceiver(SendPacket);
 		super.onDestroy();
 	}
 
@@ -347,7 +364,8 @@ public class NetworkService extends Service {
 			
 			if(packet.getUser_destinataire() == null || packet.getUser_envoyeur() == null ){
 				Log.e(TAG, "Error about user_dest or user_env inside packet");
-				Log.e(TAG,packet.toString());
+				Log.e(TAG,"type:" + packet.type);
+				return null ;
 			}
 
 			InetSocketAddress inetAddres = packet.getUser_destinataire().getInetSocketAddressLocal();
@@ -430,7 +448,6 @@ public class NetworkService extends Service {
 			}
 
 			InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_DEST);
-			/*TODO remplacer l'User du packet par soi-même */
 
 			DatagramSocket datagramSocket = null;
 			try {
@@ -585,6 +602,7 @@ public class NetworkService extends Service {
 	private void paquetMessage(PacketNetwork packetReceive) {
 		// TODO Auto-generated method stub
 
+		Log.d(TAG, "message reçu dans le NetworkService");
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
@@ -702,7 +720,7 @@ public class NetworkService extends Service {
 				bundle.putParcelable("conversation", conversation);
 				broadcastIntent.putExtra("conversation", bundle);
 
-				Log.w(TAG, "Envoi d'un broadcast de création de conversation");
+				Log.d(TAG, "Envoi d'un broadcast de création de conversation");
 				sendBroadcast(broadcastIntent);
 			}
 			

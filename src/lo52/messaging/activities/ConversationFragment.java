@@ -54,14 +54,12 @@ public class ConversationFragment extends Fragment {
 		
 		// Création et assignation des onClickListerners
 		mediaButtonClickListener = new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "Click bouton media");
 			}
 		};
 		
 		sendButtonClickListener = new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "Click bouton envoi");
 				procreator.onFragmentSendButtonClick();

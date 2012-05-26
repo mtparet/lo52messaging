@@ -73,98 +73,10 @@ public class LobbyActivity extends TabActivity {
 			// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
 			try {
 				// Unregister du broadcastReceiver & arret du service
-				unregisterReceiver(messageReceiver);
-				unregisterReceiver(conversationReceiver);
 				stopService(networkService);
 			} catch (Exception e) {}
 		}
 	}
 
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		//Enregistrement de l'intent filter
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(NetworkService.SendMessage);
-		registerReceiver(messageReceiver, filter);
-
-		//Enregistrement de l'intent filter
-		IntentFilter filter2 = new IntentFilter();
-		filter2.addAction(NetworkService.SendConversation);
-		registerReceiver(conversationReceiver, filter2);
-	}
-
-
-	@Override
-	protected void onPause() {
-		unregisterReceiver(messageReceiver);
-		unregisterReceiver(conversationReceiver);
-		super.onPause();
-	}
-
-
-	/**
-	 * Here there was a wtf error : class instead of BroadcastReceiver
-	 */
-	private BroadcastReceiver messageReceiver = new  BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "Réception broadcast");
-			Bundle bundle = intent.getBundleExtra("message");
-			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
-
-		}
-
-	};
-
-	/**
-	 * Recoit les nouvelles conversation
-	 */
-	private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "Réception broadcast");
-			Bundle bundle = intent.getBundleExtra("conversation");
-			Conversation conversation = bundle.getParcelable("conversation");
-
-		}
-
-	};
-
-	/**
-	 * Envoyer un message dans une conversation
-	 * @param message
-	 * @param id_conversation
-	 */
-	private void sendMessage(String message, int id_conversation){
-		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
-		Bundle bundle = new Bundle();
-
-		MessageBroacast messageBroad = new MessageBroacast(message, id_conversation);
-		bundle.putParcelable("message", messageBroad);
-		broadcastIntent.putExtra("message", bundle);
-
-		sendBroadcast(broadcastIntent);
-	}
-
-	/**
-	 * Crééer une conversation
-	 * @param conversation_name
-	 * @param userList
-	 */
-	private void createConversation(String conversation_name, ArrayList<Integer> userListId){
-		Conversation conversation = new Conversation(conversation_name, userListId);
-
-		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
-		Bundle bundle = new Bundle();
-
-		bundle.putParcelable("conversation", conversation);
-		broadcastIntent.putExtra("conversation", bundle);
-
-		sendBroadcast(broadcastIntent);
-
-	}
 }

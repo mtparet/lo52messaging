@@ -1,11 +1,19 @@
 package lo52.messaging.activities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import lo52.messaging.R;
+import lo52.messaging.model.Conversation;
+import lo52.messaging.model.User;
+import lo52.messaging.model.broadcast.MessageBroacast;
+import lo52.messaging.services.NetworkService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -106,6 +114,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// Intialision du ViewPager
 		this.intialiseViewPager();
+		
+		//on lance les exemples
+		sendExemple();
 	}
 
 	/** (non-Javadoc)
@@ -396,4 +407,123 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	public void onFragmentSendButtonClick() {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 	}
+	
+
+	/**
+	 * To receive message
+	 */
+	private BroadcastReceiver messageReceiver = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "Réception d'un nouveau message");
+			Bundle bundle = intent.getBundleExtra("message");
+			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
+			Log.d(TAG, "message_client_id:" + message.getClient_id() + "message_convers_id:" + message.getConversation_id() + "message_message " + message.getMessage());
+
+		}
+
+	};
+
+	/**
+	 * Recoit les nouvelles conversation
+	 */
+	private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "Réception d'une création de conversation");
+			Bundle bundle = intent.getBundleExtra("conversation");
+			Conversation conversation = bundle.getParcelable("conversation");
+			Log.d(TAG, "conversation_id:" + conversation.getConversation_id() + "conversation_name:" + conversation.getConversation_name());
+		
+
+		}
+
+	};
+
+	/**
+	 * Envoyer un message dans une conversation
+	 * @param message
+	 * @param id_conversation
+	 */
+	private void sendMessage(String message, int id_conversation){
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
+		Bundle bundle = new Bundle();
+
+		MessageBroacast messageBroad = new MessageBroacast(message, id_conversation);
+		bundle.putParcelable("message", messageBroad);
+		broadcastIntent.putExtra("message", bundle);
+
+		sendBroadcast(broadcastIntent);
+	}
+
+	/**
+	 * Crééer une conversation
+	 * @param conversation_name
+	 * @param userList
+	 * @return le numéro de la conversation créé
+	 */
+	private int createConversation(String conversation_name, ArrayList<Integer> userListId){
+		Conversation conversation = new Conversation(conversation_name, userListId);
+
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
+		Bundle bundle = new Bundle();
+
+		bundle.putParcelable("conversation", conversation);
+		broadcastIntent.putExtra("conversation", bundle);
+
+		sendBroadcast(broadcastIntent);
+		
+		return conversation.getConversation_id();
+
+	}
+	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		//Enregistrement de l'intent filter
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(NetworkService.SendMessage);
+		registerReceiver(messageReceiver, filter);
+
+		//Enregistrement de l'intent filter
+		IntentFilter filter2 = new IntentFilter();
+		filter2.addAction(NetworkService.SendConversation);
+		registerReceiver(conversationReceiver, filter2);
+	}
+
+
+	@Override
+	protected void onPause() {
+		unregisterReceiver(messageReceiver);
+		unregisterReceiver(conversationReceiver);
+		super.onPause();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+	
+	
+	/**
+	 * Exemple pour envoyer un message / une création de conversation
+	 */
+	void sendExemple(){
+		
+		
+		String conversation_name = "conversation_1";
+		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
+		
+		int conversation_id = createConversation(conversation_name,users_conversation);
+		
+		sendMessage("bonjour c'est moi1", conversation_id);
+		
+		sendMessage("bonjour c'est moi2", conversation_id);
+		Log.d(TAG, "données exemple lancées");
+		
+	}
+	
 }

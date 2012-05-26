@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lo52.messaging.activities.LobbyActivity;
 import lo52.messaging.model.Conversation;
@@ -189,9 +191,10 @@ public class NetworkService extends Service {
 		listenSocket.execute(null);
 		
 		/*
-		 * On s'annonce sur le réseau
+		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
-		sendBroadcastHelloNetwork();	
+		 Timer timer = new Timer();
+		 timer.schedule(new SendBroadcatsimeTask(),1000);	
 		
 		/*
 		 * 
@@ -204,6 +207,15 @@ public class NetworkService extends Service {
 	/**
 	 * Permet d'envoyer un broadcast Hello
 	 */
+	class SendBroadcatsimeTask extends TimerTask {
+
+		@Override
+		public void run() {
+			sendBroadcastHelloNetwork();
+			
+		}
+		
+	}
 	private void sendBroadcastHelloNetwork() {
 		
 		PacketNetwork packet = new PacketNetwork(PacketNetwork.HELLO);
@@ -427,7 +439,7 @@ public class NetworkService extends Service {
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
-			
+
 			/*
 			 * Vérification du paquet
 			 */

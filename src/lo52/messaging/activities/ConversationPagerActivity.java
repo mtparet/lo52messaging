@@ -3,6 +3,8 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import lo52.messaging.R;
@@ -115,8 +117,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Intialision du ViewPager
 		this.intialiseViewPager();
 		
-		//on lance les exemples
-		sendExemple();
+		/*
+		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
+		 */
+		 Timer timer = new Timer();
+		 timer.schedule(new SendExempletimeTask(),4000);
 	}
 
 	/** (non-Javadoc)
@@ -508,21 +513,28 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 	
 	
+	class SendExempletimeTask extends TimerTask {
+
+		@Override
+		public void run() {
+			sendExemple();
+		}
+	}
+	
 	/**
 	 * Exemple pour envoyer un message / une création de conversation
 	 */
 	void sendExemple(){
 		
-		
 		String conversation_name = "conversation_1";
 		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
-		
 		int conversation_id = createConversation(conversation_name,users_conversation);
 		
 		sendMessage("bonjour c'est moi1", conversation_id);
 		
 		sendMessage("bonjour c'est moi2", conversation_id);
 		Log.d(TAG, "données exemple lancées");
+
 		
 	}
 	

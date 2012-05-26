@@ -194,12 +194,7 @@ public class NetworkService extends Service {
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
 		 Timer timer = new Timer();
-		 timer.schedule(new SendBroadcatsimeTask(),1000);	
-		
-		/*
-		 * 
-		 * Test d'envoit d'un packet autre
-		 */
+		 timer.schedule(new SendBroadcatsimeTask(),10000);	
 		
 		
 	}
@@ -212,6 +207,7 @@ public class NetworkService extends Service {
 		@Override
 		public void run() {
 			sendBroadcastHelloNetwork();
+			 sendSample();
 			
 		}
 		
@@ -308,6 +304,7 @@ public class NetworkService extends Service {
 
 		}
 	};
+	
 
 
 	/**
@@ -791,6 +788,21 @@ public class NetworkService extends Service {
 
 	public static void setUser_me(User user_me) {
 		NetworkService.user_me = user_me;
+	}
+	
+	private void sendSample(){
+		Intent broadcastIntent = new Intent(NetworkService.SendConversation);
+		Bundle bundle = new Bundle();
+
+		ArrayList<Integer> listIdUser = new ArrayList<Integer>();
+		listIdUser.add(user_me.getId());
+		
+		Conversation conversation = new Conversation(37647346, "conversation 1", listIdUser);
+		bundle.putParcelable("conversation", conversation);
+		broadcastIntent.putExtra("conversation", bundle);
+
+		Log.d(TAG, "Envoi d'un broadcast de création de conversation");
+		sendBroadcast(broadcastIntent);
 	}
 	
 	private void checkAddresseLocalPublic(DatagramPacket packetReceive){

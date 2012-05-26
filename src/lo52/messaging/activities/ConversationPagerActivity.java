@@ -2,6 +2,7 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -116,12 +117,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// Intialision du ViewPager
 		this.intialiseViewPager();
-		
+
 		/*
 		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
-		 Timer timer = new Timer();
-		 timer.schedule(new SendExempletimeTask(),4000);
+		Timer timer = new Timer();
+		timer.schedule(new SendExempletimeTask(),4000);
 	}
 
 	/** (non-Javadoc)
@@ -286,9 +287,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		
+
 		// TODO refactoriser ce code pour prendre en compte le tab 0 (liste)
-		
+
 		/*// Menu supprimer: ajouté quand il y a exactement 1 conversation (sinon il est créé plusieurs fois), ...
 		if (this.mPagerAdapter.getCount() == 2) {
 			// On vérifie que l'item n'est pas déjà dans le menu
@@ -312,7 +313,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				}
 			}
 		}*/
-		
+
 		// On supprime aussi l'option "Fermer la conversation courante" quand on est sur la liste des convers (premier tab)
 		if (mTabHost.getCurrentTab() == 0) {
 			menu.removeGroup(MENU_ITEM_CLOSE_CONV);
@@ -326,7 +327,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
 			}
 		}
-		
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -336,7 +337,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		if (item.getItemId() == 1) {
 
 			Log.d(TAG, "Ajout fragment");
-			addFragment();
+			addFragment(0123456);
 			Log.d(TAG, "Frag ajouté");
 
 			/**
@@ -359,20 +360,48 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * TODO Francois
 	 * voir pour les paramètres nécessaires (nom du tab, contenu de base...)
 	 */
-	public void addFragment() {
+	public void addFragment(int conversation_id) {
 
 		// Ajout d'un tab
 		TabInfo tabInfo = null;
 		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
-		
+
 		mPagerAdapter.addFragment(this);
+
+
+		// Set le conversation id
+		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
+		ConversationFragment f_last = (ConversationFragment) mp.getFragmentsList().get(this.mPagerAdapter.getCount()-1);
+		f_last.setConversation_id(conversation_id);		
+
 
 		// Cacher le TV
 		if (this.mPagerAdapter.getCount() == 2) {
 			TextView tv = (TextView) findViewById(R.id.no_conversation);
 			tv.setVisibility(View.GONE);
 		}
+	}
+
+
+	/**
+	 * Retourne un fragment en fonction de son id
+	 * @param id
+	 * @return
+	 */
+	public ConversationFragment getFragmentById(int id) {
+
+		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
+
+		for (Fragment fragment : mp.getFragmentsList()) {
+			// On ne vérifie que les ConversationFragment (le premier fragment est de type ConversationListFragment)
+			if (fragment instanceof ConversationFragment) {
+				if (((ConversationFragment) fragment).getConversation_id() == id) {
+					return (ConversationFragment) fragment; 
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -406,13 +435,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			tv.setVisibility(View.VISIBLE);
 		}
 	}
-	
-	
-	
+
+
+
 	public void onFragmentSendButtonClick() {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 	}
-	
+
 
 	/**
 	 * To receive message
@@ -441,10 +470,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			Bundle bundle = intent.getBundleExtra("conversation");
 			Conversation conversation = bundle.getParcelable("conversation");
 			Log.d(TAG, "conversation_id:" + conversation.getConversation_id() + "conversation_name:" + conversation.getConversation_name());
-		
-
+			
+			addFragment(conversation.getConversation_id());
+			ConversationFragment lastFrag = getFragmentById(conversation.getConversation_id());
+			Log.d(TAG, "LastFrag : " + lastFrag);
+			lastFrag.setConversName(conversation.getConversation_name());
+			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
-
 	};
 
 	/**
@@ -479,11 +511,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		broadcastIntent.putExtra("conversation", bundle);
 
 		sendBroadcast(broadcastIntent);
-		
+
 		return conversation.getConversation_id();
 
 	}
-	
+
 
 	@Override
 	protected void onResume() {
@@ -506,13 +538,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		unregisterReceiver(conversationReceiver);
 		super.onPause();
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
 	}
-	
-	
+
+
 	class SendExempletimeTask extends TimerTask {
 
 		@Override
@@ -520,22 +552,22 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			sendExemple();
 		}
 	}
-	
+
 	/**
 	 * Exemple pour envoyer un message / une création de conversation
 	 */
 	void sendExemple(){
-		
+
 		String conversation_name = "conversation_1";
 		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
 		int conversation_id = createConversation(conversation_name,users_conversation);
-		
+
 		sendMessage("bonjour c'est moi1", conversation_id);
-		
+
 		sendMessage("bonjour c'est moi2", conversation_id);
 		Log.d(TAG, "données exemple lancées");
 
-		
+
 	}
-	
+
 }

@@ -23,6 +23,7 @@ public class ConversationFragment extends Fragment {
 	/**
 	 * TODO : pour le moment il y a juste le layout test
 	 */
+	int conversation_id;
 	TextView conversName_tv;
 	EditText conversText_edit;
 	EditText conversUserText_edit;
@@ -30,10 +31,12 @@ public class ConversationFragment extends Fragment {
 	Button conversSend_btn;
 	View v;
 	
+	String conversationName_str = "";
+	
 	OnClickListener mediaButtonClickListener;
 	OnClickListener sendButtonClickListener;
 	
-	ConversationPagerActivity procreator;
+	ConversationPagerActivity parentActivity;
 
 	@Override
 	public void onResume() {
@@ -41,7 +44,6 @@ public class ConversationFragment extends Fragment {
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
 		// Inflate le layout depuis le xml
 		v = inflater.inflate(R.layout.conversation, container, false);
 		
@@ -51,6 +53,10 @@ public class ConversationFragment extends Fragment {
 		conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
 		conversMedia_btn 		= (Button) v.findViewById(R.id.conversation_media_button);
 		conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
+		
+		conversName_tv.setText(conversationName_str);
+		
+		parentActivity = (ConversationPagerActivity) getActivity();
 		
 		// Création et assignation des onClickListerners
 		mediaButtonClickListener = new OnClickListener() {
@@ -62,18 +68,78 @@ public class ConversationFragment extends Fragment {
 		sendButtonClickListener = new OnClickListener() {
 			public void onClick(View v) {
 				Log.d(TAG, "Click bouton envoi");
-				procreator.onFragmentSendButtonClick();
+				parentActivity.onFragmentSendButtonClick();
 			}
 		};
 		
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
-
-		procreator = (ConversationPagerActivity) getActivity();
 		
 		return v;
 	}
 
+	
+	/**
+	 * 
+	 * Getters / Setters
+	 * 
+	 */
+	
+	public int getConversation_id() {
+		return conversation_id;
+	}
+	
+	public void setConversation_id(int conversation_id) {
+		this.conversation_id = conversation_id;
+	}
+
+	public String getConversName() {
+		return (String) conversName_tv.getText();
+	}
+
+	public void setConversName(String conversName) {
+		conversationName_str = conversName;
+		//TextView tv = (TextView) v.findViewById(R.id.conversation_name);
+		//Log.d(TAG, "Test TV " + tv);
+		//tv.setText(conversName);
+		//this.conversName_tv.setText(conversName);
+	}
+
+	public String getConversText() {
+		return conversText_edit.getText().toString();
+	}
+
+	/**
+	 * Met du texte dans le champ de conversation de la vue. Attention, si du texte est déjà présent il sera écrasé.
+	 * @param conversText
+	 * @see appendConversationText()
+	 */
+	public void setConversText(String conversText) {
+		this.conversText_edit.setText(conversText);
+	}
+
+	public String getConversUserText() {
+		return conversUserText_edit.getText().toString();
+	}
+
+	/**
+	 * Set le texte dans le champ dans lequel l'uilisateur écrit. Ne devrait pas être utilisé directement.
+	 * @param conversUserText
+	 */
+	public void setConversUserText(String conversUserText) {
+		this.conversUserText_edit.setText(conversUserText);
+	}
+	
+	
+	/**
+	 * Ajoute du texte à la suite du texte présent dans le champ de conversation sans écraser le texte présent
+	 * @param text
+	 */
+	public void appendConversationText(String text) {
+		this.setConversText(this.getConversText() + " " + text);
+	}
+
+	
 	public View getFragmentView() {
 		return v;
 	}
@@ -81,4 +147,5 @@ public class ConversationFragment extends Fragment {
 	public ConversationFragment getThisFrag() {
 		return thisFrag;
 	}
+	
 }

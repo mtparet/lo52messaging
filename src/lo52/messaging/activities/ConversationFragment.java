@@ -1,6 +1,9 @@
 package lo52.messaging.activities;
 
+import java.util.ArrayList;
+
 import lo52.messaging.R;
+import lo52.messaging.services.NetworkService;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -24,11 +27,11 @@ public class ConversationFragment extends Fragment {
 	 * TODO : pour le moment il y a juste le layout test
 	 */
 	int conversation_id;
-	TextView conversName_tv;
-	EditText conversText_edit;
-	EditText conversUserText_edit;
-	Button conversMedia_btn;
-	Button conversSend_btn;
+	//TextView conversName_tv;
+	//EditText conversText_edit;
+	//EditText conversUserText_edit;
+	//Button conversMedia_btn;
+	//Button conversSend_btn;
 	View v;
 	
 	String conversationName_str = "";
@@ -49,12 +52,13 @@ public class ConversationFragment extends Fragment {
 		v = inflater.inflate(R.layout.conversation, container, false);
 		
 		// Initialise les différents éléments du layout
-		conversName_tv 			= (TextView) v.findViewById(R.id.conversation_name);
-		conversText_edit		= (EditText) v.findViewById(R.id.conversation_content);
-		conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
-		conversMedia_btn 		= (Button) v.findViewById(R.id.conversation_media_button);
-		conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
+		TextView conversName_tv 		= (TextView) v.findViewById(R.id.conversation_name);
+		EditText conversText_edit		= (EditText) v.findViewById(R.id.conversation_content);
+		//EditText conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
+		Button conversMedia_btn 	= (Button) v.findViewById(R.id.conversation_media_button);
+		Button conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
 		
+		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
 		conversText_edit.setText(conversationText_str);
 		
@@ -87,28 +91,37 @@ public class ConversationFragment extends Fragment {
 	 * 
 	 */
 	
+	/**
+	 * Retourne l'ID associé à cette conversation
+	 * @return
+	 */
 	public int getConversation_id() {
 		return conversation_id;
 	}
 	
+	/**
+	 * Attribue un ID à la conversation. Doit (devrait) être appelé une fois que le fragment de la conversation a été créé.
+	 * @param conversation_id
+	 */
 	public void setConversation_id(int conversation_id) {
 		this.conversation_id = conversation_id;
 	}
 
-	public String getConversName() {
-		return (String) conversName_tv.getText();
-	}
-
+	/**
+	 * Met à jour le nom de la conversation, affiché en haut du fragment de conversation 
+	 * @param conversName
+	 */
 	public void setConversName(String conversName) {
+		Log.d(TAG, "nom modifié");
 		conversationName_str = conversName;
-		//TextView tv = (TextView) v.findViewById(R.id.conversation_name);
-		//Log.d(TAG, "Test TV " + tv);
-		//tv.setText(conversName);
-		//this.conversName_tv.setText(conversName);
 	}
 
+	/**
+	 * Retourne le texte contenu dans le champ de conversation
+	 * @return
+	 */
 	public String getConversText() {
-		return conversText_edit.getText().toString();
+		return conversationText_str;
 	}
 
 	/**
@@ -117,21 +130,27 @@ public class ConversationFragment extends Fragment {
 	 * @see appendConversationText()
 	 */
 	public void setConversText(String conversText) {
-		//this.conversText_edit.setText(conversText);
 		this.conversationText_str = conversText;
 	}
 
+	
+	/**
+	 * Retourne le texte entré par l'utilisateur
+	 * @return
+	 */
 	public String getConversUserText() {
+		EditText conversUserText_edit = (EditText) v.findViewById(R.id.conversation_usermessage);
 		return conversUserText_edit.getText().toString();
 	}
 
+	
 	/**
 	 * Set le texte dans le champ dans lequel l'uilisateur écrit. Ne devrait pas être utilisé directement.
 	 * @param conversUserText
 	 */
-	public void setConversUserText(String conversUserText) {
+	/*public void setConversUserText(String conversUserText) {
 		this.conversUserText_edit.setText(conversUserText);
-	}
+	}*/
 	
 	
 	/**
@@ -144,10 +163,18 @@ public class ConversationFragment extends Fragment {
 	}
 
 	
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public View getFragmentView() {
 		return v;
 	}
 	
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public ConversationFragment getThisFrag() {
 		return thisFrag;
 	}

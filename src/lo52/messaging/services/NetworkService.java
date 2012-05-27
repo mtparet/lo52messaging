@@ -72,6 +72,9 @@ public class NetworkService extends Service {
 
 	//liste des packets en attente d'ACK
 	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
+	
+	// Liste des IDs des conversations qui ont été créées par le service mais qui n'ont pas encore de fragment associés dans l'UI
+	private static ArrayList<Integer> conversationsToCreateUI = new ArrayList<Integer>();
 
 	private static User user_me;
 	
@@ -194,8 +197,8 @@ public class NetworkService extends Service {
 		 Timer timer = new Timer();
 		 timer.schedule(new SendBroadcatsimeTask(), 500);	
 		
-		// Timer timer2 = new Timer();
-		 //timer2.schedule(new SendExempleMessage(), 10000);
+		 //Timer timer2 = new Timer();
+		 //timer2.schedule(new SendExempleMessage(), 8000);
 		
 	}
 
@@ -818,7 +821,7 @@ public class NetworkService extends Service {
 		Bundle bundle = new Bundle();
 
 		
-		MessageBroacast message = new MessageBroacast(user_me.getId(), "Je m'apelle françois et je suis un connard", 37647346);
+		MessageBroacast message = new MessageBroacast(user_me.getId(), "Je m'apelle matthieu et je suis une grosse pute", 37647346);
 
 		bundle.putParcelable(MessageBroacast.tag_parcelable, message);
 		broadcastIntent.putExtra("message", bundle);
@@ -854,6 +857,28 @@ public class NetworkService extends Service {
 				packetReceive.setUser_envoyeur(user_envoyeur);
 			}
 		}*/
+	}
+
+	
+	/**
+	 * Ajoute l'ID correspondant à la conversation qui a été créée par le service et dont le fragment correspondant doit être créé
+	 * dans le tab des conversations.
+	 * @param conversation_id
+	 */
+	public static void setHasLocalConversationToCreate(int conversation_id) {
+		conversationsToCreateUI.add(conversation_id);
+	}
+	
+	
+	/**
+	 * Retourne la liste des IDs des conversations dont le fragment UI doit être créé. /!\ La liste est vidée une fois retournée. 
+	 * @return ArrayList contenant
+	 */
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Integer> getLocalConversationsToCreate() {
+		ArrayList<Integer> l = (ArrayList<Integer>) conversationsToCreateUI.clone();
+		conversationsToCreateUI.clear();
+		return l;
 	}
 
 }

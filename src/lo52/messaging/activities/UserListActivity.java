@@ -66,12 +66,12 @@ public class UserListActivity extends ListActivity {
 		 */
 		//on récupère la liste des users
 		userList = NetworkService.getListUsers();
-		/*values.clear();
+		values.clear();
 		for( User user : userList.values()){
 			values.add(user.getName());
 			
 		}
-		adapter.notifyDataSetChanged();*/
+		adapter.notifyDataSetChanged();
 		
 		super.onResume();
 	}
@@ -83,10 +83,9 @@ public class UserListActivity extends ListActivity {
 		Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
 		
 		// FIXME utiliser les vrais paramètres
-		/*ArrayList<Integer> list = new ArrayList<Integer>();
+		ArrayList<Integer> list = new ArrayList<Integer>();
 		list.add(37647346);
-		createConversation("conversation test", list);
-		*/
+		int newConvers = createConversation("conversation test", list);
 
 		// Rend le tab des conversations actif
 		LobbyActivity parent = (LobbyActivity) getParent();
@@ -177,7 +176,7 @@ public class UserListActivity extends ListActivity {
 	
 	
 	/**
-	 * Crééer une conversation
+	 * Créé une conversation
 	 * @param conversation_name
 	 * @param userList
 	 * @return le numéro de la conversation créé
@@ -193,6 +192,10 @@ public class UserListActivity extends ListActivity {
 
 		sendBroadcast(broadcastIntent);
 
+		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
+		Log.d(TAG, "setting to create " + conversation.getConversation_id());
+		NetworkService.setHasLocalConversationToCreate(conversation.getConversation_id());
+		
 		return conversation.getConversation_id();
 
 	}

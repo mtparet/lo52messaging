@@ -1,10 +1,15 @@
 package lo52.messaging.model;
 
+import lo52.messaging.model.broadcast.MessageBroacast;
+import lo52.messaging.services.NetworkService;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Contient un message dans un conversation, le client_id de l'émetteur et le corps du message
+ * Contient un message dans un conversation, le client_id de l'ï¿½metteur et le corps du message
  * @author SYSTEMMOI
  *
  */

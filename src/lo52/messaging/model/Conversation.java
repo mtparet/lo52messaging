@@ -3,8 +3,14 @@ package lo52.messaging.model;
 import java.util.ArrayList;
 import java.util.Random;
 
+import lo52.messaging.services.NetworkService;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * Classe qui stocke une conversation: son id, name, et les différents Message
@@ -118,6 +124,23 @@ public class Conversation implements Parcelable {
 			return new Conversation[size];
 		}
 	};
+	
+	public int sendToNetworkService(Context ctx){
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
+		Bundle bundle = new Bundle();
+
+		bundle.putParcelable("conversation", this);
+		broadcastIntent.putExtra("conversation", bundle);
+
+		ctx.sendBroadcast(broadcastIntent);
+
+		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
+		Log.d("TAG", "setting to create " + getConversation_id());
+		NetworkService.setHasLocalConversationToCreate(this.getConversation_id());
+		
+		return getConversation_id();
+
+	}
 	
 	
 

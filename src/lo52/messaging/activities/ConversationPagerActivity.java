@@ -121,8 +121,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		/*
 		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
-		Timer timer = new Timer();
-		timer.schedule(new SendExempletimeTask(),4000);
+		//Timer timer = new Timer();
+		//timer.schedule(new SendExempletimeTask(),4000);
 	}
 
 	/** (non-Javadoc)

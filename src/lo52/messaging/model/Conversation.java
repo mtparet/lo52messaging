@@ -1,11 +1,7 @@
 package lo52.messaging.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
-
-import lo52.messaging.model.broadcast.MessageBroacast;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -29,9 +25,9 @@ public class Conversation implements Parcelable {
 	/**
 	 * Permet de créer une NOUVELLE conversation avec un utilisateur
 	 */
-	public Conversation(String name, int idUser){
+	public Conversation(String name, int idUser) {
 		Random rand = new Random();
-		conversation_id = rand.nextInt();
+		conversation_id = Math.abs(rand.nextInt());
 		
 		this.conversation_name = name;
 		this.listIdUser.add(idUser);
@@ -40,9 +36,9 @@ public class Conversation implements Parcelable {
 	/**
 	 * Permet de créer une NOUVELLE conversation avec de multiples utilisateurs
 	 */
-	public Conversation(String name, ArrayList<Integer> listIdUser ){
+	public Conversation(String name, ArrayList<Integer> listIdUser) {
 		Random rand = new Random();
-		conversation_id = rand.nextInt();
+		conversation_id = Math.abs(rand.nextInt());
 		
 		this.conversation_name = name;
 		this.listIdUser = listIdUser;
@@ -52,7 +48,7 @@ public class Conversation implements Parcelable {
 	 * Permet de récupérer localement une conversation déjà créé
 	 * @param conversation_id
 	 */
-	public Conversation(int conversation_id, String conversation_name, ArrayList<Integer> listIdUser){
+	public Conversation(int conversation_id, String conversation_name, ArrayList<Integer> listIdUser) {
 		this.conversation_id = conversation_id;
 		this.setConversation_name(conversation_name);
 		this.listIdUser = listIdUser;
@@ -89,7 +85,7 @@ public class Conversation implements Parcelable {
 	 * Permet d'ajouter un message à la conversation
 	 * @param message
 	 */
-	public void addMessage(Message message){
+	public void addMessage(Message message) {
 		this.listMessage.add(message);
 	}
 

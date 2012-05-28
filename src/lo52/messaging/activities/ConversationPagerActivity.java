@@ -439,8 +439,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-	public void onFragmentSendButtonClick() {
+	public void onFragmentSendButtonClick(String textMessage, int conversation_id) {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
+		sendMessage(textMessage, conversation_id);
 	}
 
 

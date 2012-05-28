@@ -37,11 +37,8 @@ public class ConversationFragment extends Fragment {
 	String conversationName_str = "";
 	String conversationText_str = "";
 	
-	OnClickListener mediaButtonClickListener;
-	OnClickListener sendButtonClickListener;
-	
 	ConversationPagerActivity parentActivity;
-
+	
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -64,25 +61,25 @@ public class ConversationFragment extends Fragment {
 		
 		parentActivity = (ConversationPagerActivity) getActivity();
 		
-		// Création et assignation des onClickListerners
-		mediaButtonClickListener = new OnClickListener() {
-			public void onClick(View v) {
-				Log.d(TAG, "Click bouton media");
-			}
-		};
-		
-		sendButtonClickListener = new OnClickListener() {
-			public void onClick(View v) {
-				Log.d(TAG, "Click bouton envoi");
-				parentActivity.onFragmentSendButtonClick();
-			}
-		};
-		
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
 		
 		return v;
 	}
+	
+	// Création et assignation des onClickListerners
+	OnClickListener mediaButtonClickListener = new OnClickListener() {
+		public void onClick(View v) {
+			Log.d(TAG, "Click bouton media");
+		}
+	};
+	
+	OnClickListener sendButtonClickListener = new OnClickListener() {
+		public void onClick(View v) {
+			Log.d(TAG, "Click bouton envoi");
+			parentActivity.onFragmentSendButtonClick(getConversUserText(), getConversation_id());
+		}
+	};
 
 	
 	/**

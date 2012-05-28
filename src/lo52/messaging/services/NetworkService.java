@@ -261,6 +261,8 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 			
+			message.setClient_id(user_me.getId());
+			
 			// on ajoute le message à la liste
 			Message mess = new Message(message.getClient_id(), message.getMessage());
 			listConversations.get(message.getConversation_id()).addMessage(mess);

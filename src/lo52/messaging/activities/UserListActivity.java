@@ -41,9 +41,7 @@ public class UserListActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		values = new ArrayList<String>(Arrays.asList("Pierre", "Paul", "Jacques",
-				"Michelle", "Gros connard", "Jean-René", "Superman", "Chuck Norris",
-				"Jean Claude Van Dam", "Yoda"));
+		values = new ArrayList<String>(Arrays.asList(""));
 
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
@@ -82,9 +80,23 @@ public class UserListActivity extends ListActivity {
 		String item = (String) getListAdapter().getItem(position);
 		Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
 		
-		// FIXME utiliser les vrais paramètres
+		// oui et bien moi j'ai des TODO, mais toi t'as des FIXME !
+		User user_selected = null;
+		for(User user : userList.values()){
+			if(user.getName() == item){
+				user_selected = user;
+			}
+		}
+		
+		if(user_selected == null){
+			Log.e(TAG,"user inconnu");
+			return;
+		}
+		
 		ArrayList<Integer> list = new ArrayList<Integer>();
-		list.add(37647346);
+		
+		list.add(user_selected.getId());
+		
 		int newConvers = createConversation("conversation test", list);
 
 		// Rend le tab des conversations actif

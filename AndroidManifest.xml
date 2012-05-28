@@ -34,7 +34,7 @@
         <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.UserListActivity"></activity>
         <activity android:name=".activities.ConversationPagerActivity"></activity>
-        <activity android:name=".activities.ConversationFragment"></activity>
+        <activity android:name=".fragments.ConversationFragment"></activity>
         
         <service android:name=".services.NetworkService"/>
         <service android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationBroadcastService" />

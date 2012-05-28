@@ -1,6 +1,7 @@
-package lo52.messaging.activities;
+package lo52.messaging.broadcastreceivers;
 
 import lo52.messaging.R;
+import lo52.messaging.activities.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

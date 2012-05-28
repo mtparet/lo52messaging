@@ -1,4 +1,4 @@
-package lo52.messaging.activities;
+package lo52.messaging.fragments;
 
 import lo52.messaging.R;
 import android.os.Bundle;

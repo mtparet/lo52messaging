@@ -8,6 +8,8 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import lo52.messaging.R;
+import lo52.messaging.fragments.ConversationFragment;
+import lo52.messaging.fragments.ConversationListFragment;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;

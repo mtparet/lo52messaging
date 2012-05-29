@@ -618,7 +618,7 @@ public class NetworkService extends Service {
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
 			
 			if(packetReceive.getUser_envoyeur() != user_me){
-				Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
+				Intent broadcastIntent = new Intent(NetworkService.SendMessage);
 				Bundle bundle = new Bundle();
 
 				MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
@@ -790,9 +790,9 @@ public class NetworkService extends Service {
 		return user_me;
 	}
 
-	public static void setUser_me(User user_me) {
-		NetworkService.user_me = user_me;
-	}
+	//public static void setUser_me(User user_me) {
+	//	NetworkService.user_me = user_me;
+	//}
 	
 	
 	private void checkAddresseLocalPublic(DatagramPacket packetReceive){

@@ -3,7 +3,6 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
@@ -22,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -53,6 +53,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private ViewPager mViewPager;
 	private HashMap<String, TabInfo> mapTabInfo = new HashMap<String, ConversationPagerActivity.TabInfo>();
 	private MPagerAdapter mPagerAdapter;
+	private ConversationListFragment conversationListFragment;
 
 	/**
 	 * Maintains extrinsic info of a tab's construct
@@ -121,8 +122,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		/*
 		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
-		Timer timer = new Timer();
-		timer.schedule(new SendExempletimeTask(),4000);
+		//Timer timer = new Timer();
+		//timer.schedule(new SendExempletimeTask(),4000);
 	}
 
 	/** (non-Javadoc)
@@ -140,8 +141,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		List<Fragment> fragments = new Vector<Fragment>();
 
-		ConversationListFragment f = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
-		fragments.add(f);
+		// Initialise le ConversationListFragment
+		conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
+		// Et le cache
+		conversationListFragment.setVisibility(View.GONE);
+		fragments.add(conversationListFragment);
+		
 
 		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
@@ -318,6 +323,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		if (this.mPagerAdapter.getCount() == 2) {
 			TextView tv = (TextView) findViewById(R.id.no_conversation);
 			tv.setVisibility(View.GONE);
+			// Affiche la liste des conversations
+			setListFragmentVisibility(View.VISIBLE);
 		}
 		
 		if (autoSwitchOnFragment) {
@@ -375,6 +382,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		if (this.mPagerAdapter.getCount() == 1) {
 			TextView tv = (TextView) findViewById(R.id.no_conversation);
 			tv.setVisibility(View.VISIBLE);
+			setListFragmentVisibility(View.GONE);
 		}
 	}
 
@@ -382,6 +390,18 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	public void onFragmentSendButtonClick(String textMessage, int conversation_id) {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 		sendMessage(textMessage, conversation_id);
+	}
+	
+	
+	
+	
+	public void setListFragmentVisibility(int visibility_constant) {
+		// conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
+		conversationListFragment.setVisibility(visibility_constant);
+		// A une meilleure chance de rafraichir la vue en direct
+		if (conversationListFragment.getView() != null) {
+			conversationListFragment.getView().setVisibility(visibility_constant);
+		}
 	}
 
 

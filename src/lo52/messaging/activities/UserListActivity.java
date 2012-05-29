@@ -46,9 +46,6 @@ public class UserListActivity extends ListActivity {
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
 		setListAdapter(adapter);
-		
-		// Ajout/suppression d'items dans la liste
-		addUser("test connard");
 	}
 	
 
@@ -67,7 +64,6 @@ public class UserListActivity extends ListActivity {
 		values.clear();
 		for( User user : userList.values()){
 			values.add(user.getName());
-			
 		}
 		adapter.notifyDataSetChanged();
 		
@@ -209,7 +205,6 @@ public class UserListActivity extends ListActivity {
 		NetworkService.setHasLocalConversationToCreate(conversation.getConversation_id());
 		
 		return conversation.getConversation_id();
-
 	}
 	
 }

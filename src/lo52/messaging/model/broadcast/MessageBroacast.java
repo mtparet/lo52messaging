@@ -1,5 +1,9 @@
 package lo52.messaging.model.broadcast;
 
+import lo52.messaging.services.NetworkService;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -85,6 +89,21 @@ public class MessageBroacast implements Parcelable{
 
 	public void setConversation_id(int conversation_id) {
 		this.conversation_id = conversation_id;
+	}
+	
+	/**
+	 * Envoyer un message dans une conversation
+	 * @param message
+	 * @param id_conversation
+	 */
+	public void sendToNetWorkService(Context ctx){
+		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
+		Bundle bundle = new Bundle();
+
+		bundle.putParcelable("message", this);
+		broadcastIntent.putExtra("message", bundle);
+
+		ctx.sendBroadcast(broadcastIntent);
 	}
 
 }

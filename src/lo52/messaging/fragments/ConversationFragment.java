@@ -1,10 +1,7 @@
 package lo52.messaging.fragments;
 
-import java.util.ArrayList;
-
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
-import lo52.messaging.services.NetworkService;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;

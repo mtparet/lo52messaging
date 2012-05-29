@@ -356,7 +356,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	public void onFragmentSendButtonClick(String textMessage, int conversation_id) {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
-		sendMessage(textMessage, conversation_id);
+		MessageBroacast messageBroad = new MessageBroacast(textMessage, conversation_id);
+		messageBroad.sendToNetWorkService(getApplicationContext());
+
 	}
 
 
@@ -414,22 +416,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
 	};
-
-	/**
-	 * Envoyer un message dans une conversation
-	 * @param message
-	 * @param id_conversation
-	 */
-	private void sendMessage(String message, int id_conversation){
-		Intent broadcastIntent = new Intent(NetworkService.ReceiveMessage);
-		Bundle bundle = new Bundle();
-
-		MessageBroacast messageBroad = new MessageBroacast(message, id_conversation);
-		bundle.putParcelable("message", messageBroad);
-		broadcastIntent.putExtra("message", bundle);
-
-		sendBroadcast(broadcastIntent);
-	}
 
 	/**
 	 * Crééer une conversation

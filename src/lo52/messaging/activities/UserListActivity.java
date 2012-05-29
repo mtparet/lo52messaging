@@ -91,7 +91,8 @@ public class UserListActivity extends ListActivity {
 		
 		list.add(user_selected.getId());
 		
-		createConversation("conversation test", list);
+		Conversation conversation = new Conversation("conversation test", list);
+		conversation.sendToNetworkService(getApplicationContext());
 
 		// Rend le tab des conversations actif
 		LobbyActivity parent = (LobbyActivity) getParent();
@@ -178,36 +179,6 @@ public class UserListActivity extends ListActivity {
 			imageView.setImageResource(R.drawable.ic_launcher);
 			return rowView;
 		}
-	}
-	
-	
-	/**
-	 * Créé une conversation
-	 * @param conversation_name
-	 * @param userList
-	 * @return le numéro de la conversation créé
-	 */
-	private int createConversation(String conversation_name, ArrayList<Integer> userListId){
-		
-		// Création de la conversation
-		Conversation conversation = new Conversation(conversation_name, userListId);
-
-		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
-		Bundle bundle = new Bundle();
-
-		bundle.putParcelable("conversation", conversation);
-		broadcastIntent.putExtra("conversation", bundle);
-
-		sendBroadcast(broadcastIntent);
-
-		// Ajout de la conversation au NetworkService
-		//NetworkService.addConversation(conversation.getConversation_id(), conversation);
-		
-		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
-		Log.d(TAG, "setting to create " + conversation.getConversation_id());
-		NetworkService.setHasLocalConversationToCreate(conversation.getConversation_id());
-		
-		return conversation.getConversation_id();
 	}
 	
 }

@@ -201,7 +201,7 @@ public class UserListActivity extends ListActivity {
 		sendBroadcast(broadcastIntent);
 
 		// Ajout de la conversation au NetworkService
-		NetworkService.addConversation(conversation.getConversation_id(), conversation);
+		//NetworkService.addConversation(conversation.getConversation_id(), conversation);
 		
 		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
 		Log.d(TAG, "setting to create " + conversation.getConversation_id());

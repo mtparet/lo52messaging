@@ -197,8 +197,6 @@ public class NetworkService extends Service {
 		 Timer timer = new Timer();
 		 timer.schedule(new SendBroadcatsimeTask(), 500);	
 		
-		 //Timer timer2 = new Timer();
-		 //timer2.schedule(new SendExempleMessage(), 8000);
 		
 	}
 
@@ -210,15 +208,6 @@ public class NetworkService extends Service {
 		@Override
 		public void run() {
 			sendBroadcastHelloNetwork();
-			//sendSample();
-		}
-	}
-	class SendExempleMessage extends TimerTask {
-
-		@Override
-		public void run() {
-			//sendBroadcastHelloNetwork();
-			 sendSampleMessage();
 		}
 	}
 	
@@ -724,10 +713,13 @@ public class NetworkService extends Service {
 			}
 			
 		}else{
-			//TODO ajouter les user non connus à sa liste
 			ArrayList<Integer> listIdUser = new ArrayList<Integer>();
 			for(User user : packetReceive.getContent().getUserList()){
 				listIdUser.add(user.getId());
+				
+				if(!listUsers.containsKey(user.getId())){
+					listUsers.put(user.getId(), user);
+				}
 			}
 			
 			Conversation conversation = new Conversation(packetReceive.getContent().getConversation_id(), packetReceive.getContent().getConversation_name(),listIdUser);
@@ -802,36 +794,6 @@ public class NetworkService extends Service {
 		NetworkService.user_me = user_me;
 	}
 	
-	private void sendSample(){
-		Intent broadcastIntent = new Intent(NetworkService.SendConversation);
-		Bundle bundle = new Bundle();
-
-		ArrayList<Integer> listIdUser = new ArrayList<Integer>();
-		listIdUser.add(user_me.getId());
-		
-		Conversation conversation = new Conversation(37647346, "conversation 1", listIdUser);
-		listConversations.put(conversation.getConversation_id(), conversation);
-		bundle.putParcelable("conversation", conversation);
-		broadcastIntent.putExtra("conversation", bundle);
-
-		Log.d(TAG, "Envoi d'un broadcast de création de conversation");
-		sendBroadcast(broadcastIntent);
-	}
-	
-	private void sendSampleMessage(){
-		Intent broadcastIntent = new Intent(NetworkService.SendMessage);
-		Bundle bundle = new Bundle();
-
-		
-		MessageBroacast message = new MessageBroacast(user_me.getId(), "Je m'apelle matthieu et je suis une grosse pute", 37647346);
-
-		bundle.putParcelable(MessageBroacast.tag_parcelable, message);
-		broadcastIntent.putExtra("message", bundle);
-
-		Log.d(TAG, "Envoi d'un broadcast de message");
-		sendBroadcast(broadcastIntent);
-	}
-	
 	
 	private void checkAddresseLocalPublic(DatagramPacket packetReceive){
 		/*
@@ -881,18 +843,6 @@ public class NetworkService extends Service {
 		ArrayList<Integer> l = (ArrayList<Integer>) conversationsToCreateUI.clone();
 		conversationsToCreateUI.clear();
 		return l;
-	}
-	
-	
-	/**
-	 * Notifie le NetworkService d'une nouvelle conversation.
-	 * @param conversationId
-	 * @param conversation
-	 */
-	public static void addConversation(int conversationId, Conversation conversation) {
-		listConversations.put(conversationId, conversation);
-		
-		
 	}
 	
 }

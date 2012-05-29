@@ -48,12 +48,13 @@ public class ConversationListFragment extends ListFragment {
 		// Initialise la liste des conversations
 		conversationsTable = new Hashtable<Integer, Conversation>();
 				
+		// Met à jour la liste des noms des conversations
+		updateLocalConversationsList();
+		
 		// Utilisation d'un layout classique en 1 ligne, pas besoin de définir de layout (inclus dans android.R)
 		setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, conversationNames));
 
-		// Met à jour la liste des noms des conversations
-		// FIXME déplacer juste au dessus
-		updateLocalConversationsList();
+
 	}
 
 	/**

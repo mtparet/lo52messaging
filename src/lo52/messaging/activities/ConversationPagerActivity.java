@@ -19,15 +19,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
@@ -146,7 +142,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Et le cache
 		conversationListFragment.setVisibility(View.GONE);
 		fragments.add(conversationListFragment);
-		
+
 
 		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
@@ -217,8 +213,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-
-
 	/**
 	 * Création du menu d'options. Crafté à la main ici et non pas selon un .xml car le menu varie selon le nombre de conversations ouvertes
 	 */
@@ -230,33 +224,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-
-		// TODO refactoriser ce code pour prendre en compte le tab 0 (liste)
-
-		/*// Menu supprimer: ajouté quand il y a exactement 1 conversation (sinon il est créé plusieurs fois), ...
-		if (this.mPagerAdapter.getCount() == 2) {
-			// On vérifie que l'item n'est pas déjà dans le menu
-			if (menu.size() >= 1) {
-				boolean itemFound = false;
-				for(int i = 0; i < menu.size(); i++) {
-					if (menu.getItem(i).getItemId() == MENU_ITEM_CLOSE_CONV) itemFound = true;
-				}
-				if (!itemFound) {
-					// Fix: mettre un groupId différent, pour faciliter la suppression du menuitem 
-					menu.add(MENU_ITEM_CLOSE_CONV, MENU_ITEM_CLOSE_CONV, 2, getString(R.string.conversations_close_current));
-					menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
-				}
-			}
-		}
-		// ... supprimé quand il y en a 0 et que l'item est présent.
-		else if (this.mPagerAdapter.getCount() == 0 && menu.size() >= 1) {
-			for (int i = 0; i < menu.size(); i++) {
-				if (menu.getItem(i).getItemId() == MENU_ITEM_CLOSE_CONV) {
-					menu.removeGroup(MENU_ITEM_CLOSE_CONV);
-				}
-			}
-		}*/
-
 		// On supprime aussi l'option "Fermer la conversation courante" quand on est sur la liste des convers (premier tab)
 		if (mTabHost.getCurrentTab() == 0) {
 			menu.removeGroup(MENU_ITEM_CLOSE_CONV);
@@ -326,7 +293,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// Affiche la liste des conversations
 			setListFragmentVisibility(View.VISIBLE);
 		}
-		
+
 		if (autoSwitchOnFragment) {
 			this.mViewPager.setCurrentItem(this.mPagerAdapter.getCount());
 		}
@@ -391,14 +358,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 		sendMessage(textMessage, conversation_id);
 	}
-	
-	
-	
-	
+
+
 	public void setListFragmentVisibility(int visibility_constant) {
-		// conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
+		// Met à jour la visibilité en attribut du fragment
 		conversationListFragment.setVisibility(visibility_constant);
-		// A une meilleure chance de rafraichir la vue en direct
+		// Essaye de directement modifier la vue du fragment, a une meilleure chance de la rafraichir en direct
 		if (conversationListFragment.getView() != null) {
 			conversationListFragment.getView().setVisibility(visibility_constant);
 		}
@@ -472,7 +437,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param userList
 	 * @return le numéro de la conversation créé
 	 */
-	private int createConversation(String conversation_name, ArrayList<Integer> userListId){
+	/*private int createConversation(String conversation_name, ArrayList<Integer> userListId){
 		Conversation conversation = new Conversation(conversation_name, userListId);
 
 		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
@@ -484,7 +449,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		sendBroadcast(broadcastIntent);
 
 		return conversation.getConversation_id();
-	}
+	}*/
 
 
 	@Override
@@ -502,9 +467,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
 		ArrayList<Integer> ids = NetworkService.getLocalConversationsToCreate();
-		Log.d(TAG, "liste a créer récupérer " + ids + " - " + ids.size());
 		for (int id : ids) {
-			Log.d(TAG, "create frag " + id);
 			addFragment(id, true);
 		}
 	}
@@ -522,18 +485,18 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-	class SendExempletimeTask extends TimerTask {
+	/*class SendExempletimeTask extends TimerTask {
 
 		@Override
 		public void run() {
 			sendExemple();
 		}
-	}
+	}*/
 
 	/**
 	 * Exemple pour envoyer un message / une création de conversation
 	 */
-	void sendExemple(){
+	/*void sendExemple(){
 		String conversation_name = "conversation_1";
 		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
 		int conversation_id = createConversation(conversation_name,users_conversation);
@@ -543,6 +506,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		sendMessage("bonjour c'est moi2", conversation_id);
 		Log.d(TAG, "données exemple lancées");
 
-	}
+	}*/
 
 }

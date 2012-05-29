@@ -71,7 +71,9 @@ public class LobbyActivity extends TabActivity {
 			try {
 				// Unregister du broadcastReceiver & arret du service
 				stopService(networkService);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				Log.e(TAG, "Service non arrêté");
+			}
 		}
 	}
 

@@ -23,6 +23,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -85,7 +86,6 @@ public class NetworkService extends Service {
 	public static final String ReceiveMessage = "NetworkService.receive.Message";
 	
 	public static final String ReceiveConversation = "NetworkService.receive.Conversation";
-
 
 	public static final String SendMessage = "NetworkService.send.Message";
 	
@@ -210,7 +210,7 @@ public class NetworkService extends Service {
 		@Override
 		public void run() {
 			sendBroadcastHelloNetwork();
-			 sendSample();
+			//sendSample();
 		}
 	}
 	class SendExempleMessage extends TimerTask {
@@ -882,5 +882,17 @@ public class NetworkService extends Service {
 		conversationsToCreateUI.clear();
 		return l;
 	}
-
+	
+	
+	/**
+	 * Notifie le NetworkService d'une nouvelle conversation.
+	 * @param conversationId
+	 * @param conversation
+	 */
+	public static void addConversation(int conversationId, Conversation conversation) {
+		listConversations.put(conversationId, conversation);
+		
+		
+	}
+	
 }

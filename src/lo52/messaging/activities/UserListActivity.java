@@ -49,11 +49,9 @@ public class UserListActivity extends ListActivity {
 	}
 	
 
-	
-
 	@Override
 	protected void onResume() {
-		
+		Log.d(TAG, "onResume");
 		/**
 		 * TODO voir comment on réalise la synchronisation:
 		 * - soit manuelle : à chaque fois que l'on remet l'activity en premier plan et avec un bouton rafraichir
@@ -93,7 +91,7 @@ public class UserListActivity extends ListActivity {
 		
 		list.add(user_selected.getId());
 		
-		int newConvers = createConversation("conversation test", list);
+		createConversation("conversation test", list);
 
 		// Rend le tab des conversations actif
 		LobbyActivity parent = (LobbyActivity) getParent();
@@ -190,6 +188,8 @@ public class UserListActivity extends ListActivity {
 	 * @return le numéro de la conversation créé
 	 */
 	private int createConversation(String conversation_name, ArrayList<Integer> userListId){
+		
+		// Création de la conversation
 		Conversation conversation = new Conversation(conversation_name, userListId);
 
 		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
@@ -200,6 +200,9 @@ public class UserListActivity extends ListActivity {
 
 		sendBroadcast(broadcastIntent);
 
+		// Ajout de la conversation au NetworkService
+		NetworkService.addConversation(conversation.getConversation_id(), conversation);
+		
 		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
 		Log.d(TAG, "setting to create " + conversation.getConversation_id());
 		NetworkService.setHasLocalConversationToCreate(conversation.getConversation_id());

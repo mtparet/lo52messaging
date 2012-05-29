@@ -717,7 +717,7 @@ public class NetworkService extends Service {
 			for(User user : packetReceive.getContent().getUserList()){
 				listIdUser.add(user.getId());
 				
-				if(!listUsers.containsKey(user.getId())){
+				if(!listUsers.containsKey(user.getId()) && user.getId() != user_me.getId()){
 					listUsers.put(user.getId(), user);
 				}
 			}
@@ -771,20 +771,20 @@ public class NetworkService extends Service {
 
 	
 	public static Hashtable<Integer, User> getListUsers() {
-		return listUsers;
+		return (Hashtable<Integer, User>) listUsers.clone();
 	}
 
-	public static void setListUsers(Hashtable<Integer, User> listUsersE) {
-		listUsers = listUsersE;
-	}
+	//public static void setListUsers(Hashtable<Integer, User> listUsersE) {
+	//	listUsers = listUsersE;
+	//}
 
 	public static Hashtable<Integer, Conversation> getListConversations() {
-		return listConversations;
+		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
 
-	public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
-		NetworkService.listConversations = listConversations;
-	}
+	//public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
+	//	NetworkService.listConversations = listConversations;
+	//}
 
 	public static User getUser_me() {
 		return user_me;

@@ -2,6 +2,7 @@ package lo52.messaging.fragments;
 
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
+import lo52.messaging.model.Conversation;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,15 +22,10 @@ public class ConversationFragment extends Fragment {
 	private static final String TAG = "ConversationFragment";
 	final ConversationFragment thisFrag = this;
 	
-	/**
-	 * TODO : pour le moment il y a juste le layout test
-	 */
+	// La conversation associée à ce fragment
+	private Conversation conversation = null;
+	
 	int conversation_id;
-	//TextView conversName_tv;
-	//EditText conversText_edit;
-	//EditText conversUserText_edit;
-	//Button conversMedia_btn;
-	//Button conversSend_btn;
 	View v;
 	
 	String conversationName_str = "";
@@ -86,6 +82,10 @@ public class ConversationFragment extends Fragment {
 	 * 
 	 */
 	
+	public void setConversation(Conversation c) {
+		conversation = c;
+	}
+	
 	/**
 	 * Retourne l'ID associé à cette conversation
 	 * @return
@@ -108,6 +108,8 @@ public class ConversationFragment extends Fragment {
 	 */
 	public void setConversName(String conversName) {
 		Log.d(TAG, "nom modifié");
+		// FIXME éventuellement, histoire de faire plus classe. Mais là ca crashe
+		//conversationName_str = getString(R.string.conversations_name_prefix);
 		conversationName_str = conversName;
 	}
 

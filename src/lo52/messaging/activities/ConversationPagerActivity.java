@@ -3,7 +3,6 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.Vector;
 
 import lo52.messaging.R;
@@ -39,6 +38,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 	// Hauteur des tabs de titre des conversation
 	private static final int TAB_HEIGHT = 40;
+
+	// Longueur maximale, en caractères, pour le nom d'un fragment
+	private static final int TAB_NAME_MAX_LENGTH = 7;
 
 	private static final String TAG = "ConversationPagerActivity";
 
@@ -140,9 +142,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Initialise le ConversationListFragment
 		conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
 		// Et le cache
-		conversationListFragment.setVisibility(View.GONE);
+		//conversationListFragment.setVisibility(View.GONE);
+		setListFragmentVisibility(View.GONE);
 		fragments.add(conversationListFragment);
-
 
 		this.mPagerAdapter  = new MPagerAdapter(super.getSupportFragmentManager(), fragments);
 		this.mViewPager = (ViewPager)super.findViewById(R.id.viewpager);
@@ -246,9 +248,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		if (item.getItemId() == 1) {
 
-			Log.d(TAG, "Ajout fragment");
-			addFragment(0123456, false);
-			Log.d(TAG, "Frag ajouté");
+			Log.d(TAG, "DESACTIVE");
+			//addFragment(0123456, false);
 
 			/**
 			 * MODIF D'UN FRAGMENT
@@ -271,11 +272,16 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param conversation_id	Id de la conversation associée
 	 * @param autoSwitchOnFragment	Changer la vue pour le fragment créé
 	 */
-	public void addFragment(int conversation_id, boolean autoSwitchOnFragment) {
+	public void addFragment(Conversation conversation, boolean autoSwitchOnFragment) {
 
 		// Ajout d'un tab
 		TabInfo tabInfo = null;
-		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator("Tab " + (this.mPagerAdapter.getCount()+1)), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
+
+		// Génère le nom du tab. S'il est trop long, on le raccourcit
+		String tabName = conversation.generateConversationName();
+		if (tabName.length() > TAB_NAME_MAX_LENGTH) tabName = tabName.substring(0, TAB_NAME_MAX_LENGTH) + "...";
+
+		ConversationPagerActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab"+(this.mPagerAdapter.getCount()+1)).setIndicator(tabName), ( tabInfo = new TabInfo("Tab"+(this.mPagerAdapter.getCount()+1), ConversationFragment.class, null)));
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 
 		mPagerAdapter.addFragment(this);
@@ -284,7 +290,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Set le conversation id
 		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
 		ConversationFragment f_last = (ConversationFragment) mp.getFragmentsList().get(this.mPagerAdapter.getCount()-1);
-		f_last.setConversation_id(conversation_id);
+		f_last.setConversation(conversation);
+		f_last.setConversation_id(conversation.getConversation_id());
+		f_last.setConversName(conversation.generateConversationName());
 
 		// Cacher le TV
 		if (this.mPagerAdapter.getCount() == 2) {
@@ -323,6 +331,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	/**
 	 * Supprime le fragment à l'index donné
 	 * @param index
+	 * @deprecated : utilisé pour les tests, doit être réimplémenté pour quitter une conversation proprement...
 	 *
 	 *	FIXME semble être buggé quand on supprime plusieurs fragments et qu'au lieu de swiper, on clique sur leur titre (peut générer un force close)
 	 */
@@ -358,7 +367,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 		MessageBroacast messageBroad = new MessageBroacast(textMessage, conversation_id);
 		messageBroad.sendToNetWorkService(getApplicationContext());
-
 	}
 
 
@@ -368,6 +376,21 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Essaye de directement modifier la vue du fragment, a une meilleure chance de la rafraichir en direct
 		if (conversationListFragment.getView() != null) {
 			conversationListFragment.getView().setVisibility(visibility_constant);
+		}
+		// On "aide" le fragment à rafraichir sa liste de conversations
+		conversationListFragment.updateLocalConversationsList();
+	}
+
+	/**
+	 * Switche la vue sur la conversation donnée
+	 * @param number
+	 */
+	public void goToConversationNumber(int number) {
+		try {
+			mTabHost.setCurrentTab(number);
+		} catch (Exception e) {
+			Log.e(TAG, "Fragment " + number + " inexistant...");
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
@@ -403,40 +426,24 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			Bundle bundle = intent.getBundleExtra("conversation");
 			Conversation conversation = bundle.getParcelable("conversation");
 			Log.d(TAG, "conversation_id:" + conversation.getConversation_id() + "conversation_name:" + conversation.getConversation_name());
+			Log.w(TAG, "Membres de la conversations: " + conversation.getListIdUser().size());
+			for (int i : conversation.getListIdUser()) {
+				Log.d(TAG, "> Membre : " + i);
+			}
+			Log.d(TAG, "(Pour info, User_me = " + NetworkService.getUser_me().getId() + ")");
+
 
 			// Ajout du fragment
-			addFragment(conversation.getConversation_id(), false);
+			addFragment(conversation, false);
 			// On récupère le nouveau fragment pour pouvoir setter son nom
 			ConversationFragment lastFrag = getFragmentById(conversation.getConversation_id());
-			Log.d(TAG, "LastFrag : " + lastFrag);
-			lastFrag.setConversName(conversation.getConversation_name());
+			lastFrag.setConversName(conversation.generateConversationName());
 
 
 			//mPagerAdapter.notifyDataSetChanged();
 			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
 	};
-
-	/**
-	 * Crééer une conversation
-	 * @param conversation_name
-	 * @param userList
-	 * @return le numéro de la conversation créé
-	 */
-	/*private int createConversation(String conversation_name, ArrayList<Integer> userListId){
-		Conversation conversation = new Conversation(conversation_name, userListId);
-
-		Intent broadcastIntent = new Intent(NetworkService.ReceiveConversation);
-		Bundle bundle = new Bundle();
-
-		bundle.putParcelable("conversation", conversation);
-		broadcastIntent.putExtra("conversation", bundle);
-
-		sendBroadcast(broadcastIntent);
-
-		return conversation.getConversation_id();
-	}*/
-
 
 	@Override
 	protected void onResume() {
@@ -452,10 +459,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		registerReceiver(conversationReceiver, filter2);
 
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
-		ArrayList<Integer> ids = NetworkService.getLocalConversationsToCreate();
-		for (int id : ids) {
-			addFragment(id, true);
+		ArrayList<Conversation> conversations = NetworkService.getLocalConversationsToCreate();
+		for (Conversation conv : conversations) {
+			addFragment(conv, true);
 		}
+
+		// On rafraichit la liste des conversations
+		conversationListFragment.updateLocalConversationsList();
 	}
 
 	@Override

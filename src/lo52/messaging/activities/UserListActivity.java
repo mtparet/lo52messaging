@@ -10,7 +10,6 @@ import lo52.messaging.model.User;
 import lo52.messaging.services.NetworkService;
 import android.app.ListActivity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -72,9 +71,7 @@ public class UserListActivity extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		String item = (String) getListAdapter().getItem(position);
-		Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
 		
-		// oui et bien moi j'ai des TODO, mais toi t'as des FIXME !
 		User user_selected = null;
 		for(User user : userList.values()){
 			if(user.getName() == item){
@@ -91,13 +88,13 @@ public class UserListActivity extends ListActivity {
 		
 		list.add(user_selected.getId());
 		
-		Conversation conversation = new Conversation("conversation test", list);
+		// Création de la conversation avec en nom le nom de l'utilisateur
+		Conversation conversation = new Conversation(item, list);
 		conversation.sendToNetworkService(getApplicationContext());
 
 		// Rend le tab des conversations actif
 		LobbyActivity parent = (LobbyActivity) getParent();
 		parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
-		
 	}
 
 	/**

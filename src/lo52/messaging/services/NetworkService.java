@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -64,7 +63,7 @@ import com.google.gson.Gson;
  *
  */
 public class NetworkService extends Service {
-	
+
 	// Contient la liste des utilisateur
 	private static Hashtable<Integer,User> listUsers = new Hashtable<Integer,User>();
 
@@ -73,22 +72,22 @@ public class NetworkService extends Service {
 
 	//liste des packets en attente d'ACK
 	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
-	
+
 	// Liste des IDs des conversations qui ont été créées par le service mais qui n'ont pas encore de fragment associés dans l'UI
-	private static ArrayList<Integer> conversationsToCreateUI = new ArrayList<Integer>();
+	private static ArrayList<Conversation> conversationsToCreateUI = new ArrayList<Conversation>();
 
 	private static User user_me;
-	
+
 	private static final String TAG = "NetworkService";
-	
+
 	public static final String ReceivePacket = "NetworkService.receive.Packet";
-	
+
 	public static final String ReceiveMessage = "NetworkService.receive.Message";
-	
+
 	public static final String ReceiveConversation = "NetworkService.receive.Conversation";
 
 	public static final String SendMessage = "NetworkService.send.Message";
-	
+
 	public static final String SendConversation = "NetworkService.send.Conversation";
 
 	private int PORT_DEST = 5008;
@@ -113,7 +112,7 @@ public class NetworkService extends Service {
 		 */
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean isDev = preferences.getBoolean("dev_prefs_emulateur", false);
-		
+
 		if(isDev){
 			PORT_DEST = Integer.valueOf(preferences.getString("dev_prefs_port_distant", "5008"));
 			PORT_LOCAL = Integer.valueOf(preferences.getString("dev_prefs_port_entrant", "5008"));
@@ -126,33 +125,33 @@ public class NetworkService extends Service {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ReceivePacket);
 		registerReceiver(SendPacket, filter);
-		
+
 		/*
 		 * enregistrer l'intent permettant de recevoir les messages depuis un intent
 		 */
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(ReceiveMessage);
 		registerReceiver(Message, filter2);
-		
+
 		/*
 		 * enregistrer l'intent permettant de recevoir les conversation depuis un intent
 		 */
 		IntentFilter filter3 = new IntentFilter();
 		filter3.addAction(ReceiveConversation);
 		registerReceiver(Conversation, filter3);
-		
-		
+
+
 		/*
 		 * création de l'utilisateur actuel
 		 */
 
 		String user_name = preferences.getString("prefs_userName", "default");
-		
+
 		/*
 		 * on récupère l'id de l'utilisateur sinon on le créé
 		 */
 		int user_id = preferences.getInt("gen_userId", 0);
-		
+
 		if(user_id == 0){
 			user_me = new User(user_name);
 			Editor prefEditor =  preferences.edit();
@@ -162,9 +161,9 @@ public class NetworkService extends Service {
 			user_me = new User(user_name);
 			user_me.setId(user_id);
 		}
-		
-		
-		
+
+
+
 		InetAddress addres = null;
 		try {
 			addres = Network.getWifiAddress(getApplicationContext());
@@ -172,32 +171,32 @@ public class NetworkService extends Service {
 			Log.e(TAG, "not possible to get wifi addresse");
 			e.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		/**
 		 * TODO : si le wifi est déconnecté reconnecté: intercepter les changement avec un broadcastreceiver
 		 * http://stackoverflow.com/questions/5165099/android-how-to-handle-change-in-network-from-gprs-to-wi-fi-and-vice-versa-whi
 		 */
-		
+
 		InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_LOCAL);
-		
+
 		user_me.setInetSocketAddressLocal(inetAddres);
-		
+
 		/*
 		 * on lance la socket d'écoute sur le réseau 
 		 */
-		
+
 		ListenSocket listenSocket = new ListenSocket();
 		listenSocket.execute(null);
-		
+
 		/*
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
-		 Timer timer = new Timer();
-		 timer.schedule(new SendBroadcatsimeTask(), 500);	
-		
-		
+		Timer timer = new Timer();
+		timer.schedule(new SendBroadcatsimeTask(), 500);	
+
+
 	}
 
 	/**
@@ -210,15 +209,15 @@ public class NetworkService extends Service {
 			sendBroadcastHelloNetwork();
 		}
 	}
-	
-	
-	
+
+
+
 	private void sendBroadcastHelloNetwork() {
-		
+
 		PacketNetwork packet = new PacketNetwork(PacketNetwork.HELLO);
 		packet.setUser_envoyeur(user_me);		
 		SendPacket(packet);
-		
+
 	}
 
 	/*
@@ -232,14 +231,14 @@ public class NetworkService extends Service {
 
 			Gson gson = new Gson();
 			PacketNetwork packet = gson.fromJson(json, PacketNetwork.class);
-			
+
 			packet.setUser_envoyeur(user_me);
-			
-			
+
+
 			SendPacket(packet);
 		}
 	};
-	
+
 	/*
 	 * Recoit un message à envoyer à un client depuis une activity
 	 */
@@ -249,30 +248,30 @@ public class NetworkService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
-			
+
 			message.setClient_id(user_me.getId());
-			
+
 			// on ajoute le message à la liste
 			Message mess = new Message(message.getClient_id(), message.getMessage());
 			listConversations.get(message.getConversation_id()).addMessage(mess);
-			
+
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
-			
+
 			for(int id_user : listIdUser){
 				User user_destinataire = listUsers.get(id_user);
-				
+
 				ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
 				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
-				
+
 				packet.setUser_envoyeur(user_me);
-				
+
 				SendPacket(packet);
 			}
 
 		}
 	};
-	
+
 	/*
 	 * Recoit un Conversation à créer depuis une activity
 	 */
@@ -282,32 +281,42 @@ public class NetworkService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getBundleExtra("conversation");
 			Conversation conversation = bundle.getParcelable("conversation");
-			
+
 			ArrayList<User> users = new ArrayList<User>();
 			for(int id_user : conversation.getListIdUser()){
 				users.add(listUsers.get(id_user));
 			}
-			
+
 			// on ajoute la conversation à la liste
 			listConversations.put(conversation.getConversation_id(), conversation);
+
+			// XXX 2
+			// On recherche si user_me n'est pas dans la liste des users, sinon on l'ajoute
+			boolean user_me_found = false;
 			
+			for (User u : users) {
+				if (u != null && u.getId() == user_me.getId()) user_me_found = true;
+			}
+			if (!user_me_found) users.add(user_me);
 
 			ContentNetwork content = new ContentNetwork(conversation.getConversation_id(), conversation.getConversation_name(), users);
-			
 
+			for(User user_destinataire : users) {
 
-			for(User user_destinataire : users){
-				
-				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
-				
-				packet.setUser_envoyeur(user_me);
-				
-				SendPacket(packet);
+				// On évite de s'envoyer le paquet de création à soi même...
+				if (user_destinataire != null && user_destinataire.getId() != user_me.getId()) {
+
+					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
+
+					packet.setUser_envoyeur(user_me);
+
+					SendPacket(packet);
+				}
 			}
 
 		}
 	};
-	
+
 
 
 	/**
@@ -315,7 +324,7 @@ public class NetworkService extends Service {
 	 * @param packet
 	 */
 	private void SendPacket(PacketNetwork packet){
-		
+
 		/**
 		 * Dans le cas de l'annonciation de l'arrivée dans le réseau (broadcast)
 		 */
@@ -369,11 +378,11 @@ public class NetworkService extends Service {
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
-			
+
 			/*
 			 * Vérification du paquet
 			 */
-			
+
 			if(packet.getUser_destinataire() == null || packet.getUser_envoyeur() == null ){
 				Log.e(TAG, "Error about user_dest or user_env inside packet");
 				Log.e(TAG,"type:" + packet.type);
@@ -386,7 +395,7 @@ public class NetworkService extends Service {
 			if(inetAddres == null){
 				inetAddres = packet.getUser_destinataire().getInetSocketAddressPublic();
 			}
-			
+
 			if(inetAddres == null){
 				Log.e(TAG, "Error, user sans addrese" + packet.toString());
 				return null;
@@ -420,7 +429,6 @@ public class NetworkService extends Service {
 				e.printStackTrace();
 			}
 
-
 			return null;
 		}
 
@@ -443,12 +451,12 @@ public class NetworkService extends Service {
 			/*
 			 * Vérification du paquet
 			 */
-			
+
 			if(packet.getUser_envoyeur() == null ){
 				Log.e(TAG, "Error about user_env inside packet");
 				Log.e(TAG,packet.toString());
 			}
-			
+
 			InetAddress addres = null;
 			try {
 				addres = Network.getBroadcastAddress(getApplicationContext());
@@ -516,7 +524,7 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
-						Log.d(TAG, "Packet recu de" + datagramSocket.getInetAddress());
+						Log.d(TAG, "Packet recu de " + datagramSocket.getInetAddress());
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
@@ -562,7 +570,7 @@ public class NetworkService extends Service {
 		 */
 		if(packetReceive.type != PacketNetwork.ACK ){
 
-			 //On envoit un ACK
+			//On envoit un ACK
 			PacketNetwork packetSend = new PacketNetwork(packetReceive.getUser_envoyeur(), packetReceive.getRamdom_identifiant(),PacketNetwork.ACK);
 
 			packetSend.setUser_envoyeur(user_me);
@@ -574,7 +582,7 @@ public class NetworkService extends Service {
 		analysePacket(packetReceive);
 
 	}
-	
+
 	/**
 	 *	 
 	 * Foncton déclenché pour chaque Paquet reçu,
@@ -616,7 +624,7 @@ public class NetworkService extends Service {
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
-			
+
 			if(packetReceive.getUser_envoyeur() != user_me){
 				Intent broadcastIntent = new Intent(NetworkService.SendMessage);
 				Bundle bundle = new Bundle();
@@ -628,11 +636,11 @@ public class NetworkService extends Service {
 				sendBroadcast(broadcastIntent);
 			}
 
-			
+
 		}else{
 			Log.e(TAG, "Conversation non existante");
 		}
-		
+
 		// on met le user à alive
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
@@ -649,7 +657,7 @@ public class NetworkService extends Service {
 		if(packetReceive.getUser_envoyeur().getId() == user_me.getId()){
 			return;
 		}
-		
+
 		// on teste si l'user est connu
 		if( listUsers.containsKey(packetReceive.getUser_envoyeur().getId()) ){
 
@@ -665,7 +673,7 @@ public class NetworkService extends Service {
 			//on l'ajoute à la liste
 			listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 		}
-		
+
 		// on le met à alive
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
@@ -687,7 +695,7 @@ public class NetworkService extends Service {
 			// on le met à no alive
 			listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(false);
 		}
-		
+
 		//on le fait le suivre à l'activity qui gère la liste des users (et peut être aussi à l'activity qui gère les conversations)
 		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
@@ -701,31 +709,40 @@ public class NetworkService extends Service {
 	 */
 	private void paquetCreationGroup(PacketNetwork packetReceive) {
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
-			
+
 			//Si le nom a changé, on le met à jour
 			if( !(listConversations.get(packetReceive.getContent().getConversation_id()).getConversation_name() ==  packetReceive.getContent().getConversation_name())){
 				Conversation conversation = listConversations.get(packetReceive.getContent().getConversation_id());
 				conversation.setConversation_name(packetReceive.getContent().getConversation_name());
-				
+
 				listConversations.remove(packetReceive.getContent().getConversation_id());
-				
+
 				listConversations.put(conversation.getConversation_id(), conversation);
 			}
-			
-		}else{
+
+		} else {
 			ArrayList<Integer> listIdUser = new ArrayList<Integer>();
-			for(User user : packetReceive.getContent().getUserList()){
-				listIdUser.add(user.getId());
-				
-				if(!listUsers.containsKey(user.getId()) && user.getId() != user_me.getId()){
-					listUsers.put(user.getId(), user);
+			for(User user : packetReceive.getContent().getUserList()) {
+
+				// XXX 1
+				if (user != null) {
+					listIdUser.add(user.getId());
+
+					if(!listUsers.containsKey(user.getId()) && user.getId() != user_me.getId()){
+						listUsers.put(user.getId(), user);
+					}
 				}
 			}
-			
+
+			// Fix pour ajouter user_me
+			if (!listIdUser.contains(user_me.getId())) {
+				listIdUser.add(user_me.getId());
+			}
+
 			Conversation conversation = new Conversation(packetReceive.getContent().getConversation_id(), packetReceive.getContent().getConversation_name(),listIdUser);
-			
+
 			listConversations.put(conversation.getConversation_id(),conversation);
-			
+
 			if(packetReceive.getUser_envoyeur() != user_me){
 				Intent broadcastIntent = new Intent(NetworkService.SendConversation);
 				Bundle bundle = new Bundle();
@@ -736,7 +753,7 @@ public class NetworkService extends Service {
 				Log.d(TAG, "Envoi d'un broadcast de création de conversation");
 				sendBroadcast(broadcastIntent);
 			}
-			
+
 		}
 
 
@@ -752,14 +769,14 @@ public class NetworkService extends Service {
 	private void paquetACK(PacketNetwork packetReceive) {
 
 		packetListACK.remove(packetReceive.getRamdom_identifiant());
-		
+
 		//on considère un ACK comme un hello le cas échéant
 		paquetHello(packetReceive);
 
 		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}
-	
+
 	/**
 	 * Pour traiter un paquet d'un type inconnu
 	 * @param packet
@@ -769,7 +786,8 @@ public class NetworkService extends Service {
 		Log.w(TAG, "Packet inconnu");
 	}
 
-	
+
+	@SuppressWarnings("unchecked")
 	public static Hashtable<Integer, User> getListUsers() {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
@@ -778,6 +796,7 @@ public class NetworkService extends Service {
 	//	listUsers = listUsersE;
 	//}
 
+	@SuppressWarnings("unchecked")
 	public static Hashtable<Integer, Conversation> getListConversations() {
 		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
@@ -793,22 +812,22 @@ public class NetworkService extends Service {
 	//public static void setUser_me(User user_me) {
 	//	NetworkService.user_me = user_me;
 	//}
-	
-	
-	private void checkAddresseLocalPublic(DatagramPacket packetReceive){
-		/*
-		 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on ajoute son adrresse publique avec le port par défault de l'application
-		 *
+
+
+	//private void checkAddresseLocalPublic(DatagramPacket packetReceive){
+	/*
+	 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on ajoute son adrresse publique avec le port par défault de l'application
+	 *
 		if(packetReceive.getUser_envoyeur().getInetSocketAddressLocal() == null ){
-			
+
 			//TODO à suprimer, on suppose que l'envoyeur à toujours spécifier la bonne addresse local
 			//User user_envoyeur  = packetReceive.getUser_envoyeur();
 			//user_envoyeur.setInetSocketAddressLocal(new InetSocketAddress(dataPacket.getAddress(), PORT));
 			//packetReceive.setUser_envoyeur(user_envoyeur);
 
 			/*
-			 * si l'utilisateur n'a pas d'adresse public mais une local, on va l'ajouter à la public on vérifie que ce n'est déjà pas la local
-			 *
+	 * si l'utilisateur n'a pas d'adresse public mais une local, on va l'ajouter à la public on vérifie que ce n'est déjà pas la local
+	 *
 
 		}else if(packetReceive.getUser_envoyeur().getInetSocketAddressPublic() == null ){
 			User user_envoyeur  = packetReceive.getUser_envoyeur();
@@ -821,28 +840,29 @@ public class NetworkService extends Service {
 				packetReceive.setUser_envoyeur(user_envoyeur);
 			}
 		}*/
-	}
+	//}
 
-	
+
 	/**
+	 * Ajoute la conversation qui a été créée par le service et dont le fragment doit être créé
 	 * Ajoute l'ID correspondant à la conversation qui a été créée par le service et dont le fragment correspondant doit être créé
 	 * dans le tab des conversations.
 	 * @param conversation_id
 	 */
-	public static void setHasLocalConversationToCreate(int conversation_id) {
-		conversationsToCreateUI.add(conversation_id);
+	public static void setHasLocalConversationToCreate(Conversation conversation) {
+		conversationsToCreateUI.add(conversation);
 	}
-	
-	
+
+
 	/**
 	 * Retourne la liste des IDs des conversations dont le fragment UI doit être créé. /!\ La liste est vidée une fois retournée. 
 	 * @return ArrayList contenant
 	 */
 	@SuppressWarnings("unchecked")
-	public static ArrayList<Integer> getLocalConversationsToCreate() {
-		ArrayList<Integer> l = (ArrayList<Integer>) conversationsToCreateUI.clone();
+	public static ArrayList<Conversation> getLocalConversationsToCreate() {
+		ArrayList<Conversation> l = (ArrayList<Conversation>) conversationsToCreateUI.clone();
 		conversationsToCreateUI.clear();
 		return l;
 	}
-	
+
 }

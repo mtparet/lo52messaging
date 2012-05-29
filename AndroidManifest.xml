@@ -37,6 +37,7 @@
         <activity android:name=".fragments.ConversationFragment"></activity>
         
         <service android:name=".services.NetworkService"/>
+        <!--
         <service android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationBroadcastService" />
     	<receiver android:name="com.littlefluffytoys.littlefluffylocationlibrary.StartupBroadcastReceiver" android:exported="true">
       	<intent-filter>
@@ -53,6 +54,7 @@
                 <action android:name="com.littlefluffytoys.littlefluffylocationlibrary.LOCATION_CHANGED" android:exported="false"/>
             </intent-filter>
         </receiver>
+        -->
     </application>
 
 </manifest>

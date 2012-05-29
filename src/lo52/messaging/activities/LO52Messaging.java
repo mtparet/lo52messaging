@@ -46,10 +46,10 @@ public class LO52Messaging extends Activity {
 		
 		// Première initialisation de la library de géolocalisation
 		//LocationLibrary.initialiseLibrary(getBaseContext());
-		LocationLibrary.initialiseLibrary(getBaseContext(), 60000, 60000);
+		/*LocationLibrary.initialiseLibrary(getBaseContext(), 60000, 60000);
 		LocationInfo latestInfo = new LocationInfo(getBaseContext());
 		latestInfo.refresh(getApplicationContext());
-		Log.d(TAG, "Localization : latitude=" + latestInfo.lastLat + "longitude=" + latestInfo.lastLong);
+		Log.d(TAG, "Localization : latitude=" + latestInfo.lastLat + "longitude=" + latestInfo.lastLong);*/
 
 		// Récupération des préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);

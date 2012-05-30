@@ -22,6 +22,7 @@ public class LobbyActivity extends TabActivity {
 	// Tags pour les différents onglets de l'activité
 	public static final String	TAG_TAB_USERLIST 		= "tab1";
 	public static final String	TAG_TAB_CONVERSATIONS 	= "tab2";
+	public static final String	TAG_TAB_MAP			 	= "tab3";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,13 @@ public class LobbyActivity extends TabActivity {
 		 **/
 		intent.setClass(this, ConversationPagerActivity.class);
 		spec = tabHost.newTabSpec(TAG_TAB_CONVERSATIONS).setIndicator(getString(R.string.conversations_tab_name), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
+		tabHost.addTab(spec);
+		
+		/**
+		 * Création du tab de carte de géolocalisation des utilisateurs (LocalizationMapActivity)
+		 **/
+		intent = new Intent().setClass(this, LocalizationMapActivity.class);
+		spec = tabHost.newTabSpec(TAG_TAB_MAP).setIndicator(getString(R.string.lobby_tab_map), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);
 
 	}

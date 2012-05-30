@@ -7,9 +7,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Décrit un utilisateur. 
- * De base contient seulement un nom et un id généré pseudo aléatoirement
- * Son adresse ip local/public doit être mise à jour ensuite
+ * Dï¿½crit un utilisateur. 
+ * De base contient seulement un nom et un id gï¿½nï¿½rï¿½ pseudo alï¿½atoirement
+ * Son adresse ip local/public doit ï¿½tre mise ï¿½ jour ensuite
  * @author Matthieu Paret
  *
  */
@@ -20,6 +20,8 @@ public class User implements  Parcelable{
 	private boolean alive = false;
 	private String name;
 	private int id;
+	private Localisation localisation;
+
 
 	/**
 	 * 
@@ -99,6 +101,14 @@ public class User implements  Parcelable{
 
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+	}
+
+	public Localisation getLocalisation() {
+		return localisation;
+	}
+
+	public void setLocalisation(Localisation localisation) {
+		this.localisation = localisation;
 	}
 
 }

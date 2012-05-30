@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.Localisation;
 import lo52.messaging.model.Message;
 import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
@@ -89,6 +90,9 @@ public class NetworkService extends Service {
 	public static final String SendMessage = "NetworkService.send.Message";
 
 	public static final String SendConversation = "NetworkService.send.Conversation";
+	
+	public static final String Receivelocalisation = "NetworkService.receive.Localisation";
+	
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
@@ -139,6 +143,13 @@ public class NetworkService extends Service {
 		IntentFilter filter3 = new IntentFilter();
 		filter3.addAction(ReceiveConversation);
 		registerReceiver(Conversation, filter3);
+		
+		/*
+		 * enregistrer l'intent permettant de recevoir les infos de localisation depuis un intent
+		 */
+		IntentFilter filter4 = new IntentFilter();
+		filter4.addAction(Receivelocalisation);
+		registerReceiver(LocalisationUser, filter4);
 
 
 		/*
@@ -316,6 +327,32 @@ public class NetworkService extends Service {
 				}
 			}
 
+		}
+	};
+	
+	/*
+	 * Recoit  les infos de localisation à enovoyer à tous les clients
+	 */
+	private BroadcastReceiver LocalisationUser = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getBundleExtra("localisation");
+			Localisation loca_user = bundle.getParcelable("localisation");
+			
+			user_me.setLocalisation(loca_user);
+
+			ContentNetwork content = new ContentNetwork(loca_user.getLat(),loca_user.getLon(),user_me.getId());
+
+			for(User user_destinataire : getListUsers().values()){
+
+					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.LOCALISATION);
+
+					packet.setUser_envoyeur(user_me);
+
+					SendPacket(packet);
+
+			}
 		}
 	};
 
@@ -609,12 +646,32 @@ public class NetworkService extends Service {
 		break;
 		case PacketNetwork.MESSAGE : paquetMessage(packet);
 		break;
+		case PacketNetwork.LOCALISATION : paquetLocalisation(packet);
+		break;
 		default: paquetInconnu(packet);
 		break;
 
 		}
 	}
 
+/**
+ * traite un packet de localisation reçu, ajout met à jour la localisation de l'user
+ * @param packet
+ */
+	private void paquetLocalisation(PacketNetwork packet) {
+		Log.d(TAG, "localisation reçu dans le NetworkService");
+		if(listUsers.containsKey(packet.getContent().getClient_id())){
+			Localisation loca = new Localisation(packet.getContent().getLat(), packet.getContent().getLon());
+			User user = listUsers.get(packet.getContent().getClient_id());
+			
+			user.setLocalisation(loca);
+			listUsers.remove(user.getId());
+			listUsers.put(user.getId(), user);
+		}else{
+			Log.d(TAG, "user inconnu");
+		}
+		
+	}
 
 	/**
 	 * Traite un message reçu, le fait suivre à l'activity correspondant

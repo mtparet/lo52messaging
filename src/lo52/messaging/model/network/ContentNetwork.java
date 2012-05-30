@@ -30,6 +30,12 @@ public class ContentNetwork implements Parcelable{
 	@SerializedName("client_id")
 	private int client_id;
 	
+	@SerializedName("lon")
+	public float lon;
+	
+	@SerializedName("lat")
+	public float lat;
+	
 	// List des utilisateur dans la conversation
 	private ArrayList<User> userList;
 	
@@ -45,6 +51,20 @@ public class ContentNetwork implements Parcelable{
 		this.client_id = client_id;
 		// TODO Auto-generated constructor stub
 	}
+
+	/**
+	 * pour les infos de localisation
+	 * @param lat
+	 * @param lon
+	 * @param client_id
+	 */
+	public ContentNetwork(float lat, float lon, int client_id) {
+		this.lat = lat;
+		this.lon = lon;
+		this.client_id = client_id;
+	}
+	
+
 
 	public ContentNetwork( int conversation_id) {
 		this.conversation_id = conversation_id;
@@ -133,6 +153,20 @@ public class ContentNetwork implements Parcelable{
 	}
 	
 	
+	public float getLon() {
+		return lon;
+	}
 
+	public void setLon(float lon) {
+		this.lon = lon;
+	}
+
+	public float getLat() {
+		return lat;
+	}
+
+	public void setLat(float lat) {
+		this.lat = lat;
+	}
 
 }

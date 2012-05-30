@@ -9,6 +9,7 @@ import lo52.messaging.R;
 import lo52.messaging.fragments.ConversationFragment;
 import lo52.messaging.fragments.ConversationListFragment;
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.Message;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import android.content.BroadcastReceiver;
@@ -122,6 +123,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		 */
 		//Timer timer = new Timer();
 		//timer.schedule(new SendExempletimeTask(),4000);
+		
+		/**
+		 * DEBUG
+		 */
+		/*ArrayList<Integer> list1 = new ArrayList<Integer>();
+		list1.add(1234);
+		addFragment(new Conversation(123, "name", list1), true);*/
 	}
 
 	/** (non-Javadoc)
@@ -363,6 +371,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
+	/**
+	 * Appelé au click sur le bouton envoi d'un fragment de conversation
+	 * @param textMessage
+	 * @param conversation_id
+	 */
 	public void onFragmentSendButtonClick(String textMessage, int conversation_id) {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 		MessageBroacast messageBroad = new MessageBroacast(textMessage, conversation_id);
@@ -370,6 +383,10 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
+	/**
+	 * Visibilité d'un fragment de conversation
+	 * @param visibility_constant	Utiliser les constantes de View.
+	 */
 	public void setListFragmentVisibility(int visibility_constant) {
 		// Met à jour la visibilité en attribut du fragment
 		conversationListFragment.setVisibility(visibility_constant);
@@ -410,7 +427,17 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// On récupère le fragment correspondant à l'id de la conversatoin
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
-			frag.appendConversationText(message.getMessage());
+			//frag.appendConversationText(message.getMessage());
+			
+			/**
+			 * FIXME : C'EST PAS PROPRE D'AJOUTER LE MESSAGE A LA CONVERSATION ICI.
+			 * XXX 1
+			 */
+			frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			frag.tryTextRefresh();
+			/**
+			 *  //===
+			 */
 			mPagerAdapter.notifyDataSetChanged();
 		}
 	};

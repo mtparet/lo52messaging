@@ -268,7 +268,6 @@ public class NetworkService extends Service {
 
 				SendPacket(packet);
 			}
-
 		}
 	};
 

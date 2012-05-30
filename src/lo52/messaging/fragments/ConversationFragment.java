@@ -3,8 +3,11 @@ package lo52.messaging.fragments;
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.Message;
+import lo52.messaging.services.NetworkService;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +39,12 @@ public class ConversationFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		// Rafraichit le texte
+		EditText conversText_edit = (EditText) v.findViewById(R.id.conversation_content);
+		
+		if (conversText_edit != null )
+			conversText_edit.setText(conversation.generateUserFriendlyConversationText());
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,9 +58,14 @@ public class ConversationFragment extends Fragment {
 		Button conversMedia_btn 	= (Button) v.findViewById(R.id.conversation_media_button);
 		Button conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
 		
+		// On rend le Text Edit de la convers non éditable
+		//conversText_edit.setEnabled(false);
+		conversText_edit.setFocusable(false);
+		
 		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
-		conversText_edit.setText(conversationText_str);
+		conversationText_str = conversation.generateUserFriendlyConversationText();
+		conversText_edit.setText(Html.fromHtml(conversationText_str));
 		
 		parentActivity = (ConversationPagerActivity) getActivity();
 		
@@ -72,6 +86,13 @@ public class ConversationFragment extends Fragment {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton envoi");
 			parentActivity.onFragmentSendButtonClick(getConversUserText(), getConversation_id());
+			
+			// XXX 1
+			// Ajout du message à la conversation (*localement*) quand l'utilisateur appuie sur le bouton Envoyer
+			// FIXME Debug ===========
+			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), getConversUserText()));
+			tryTextRefresh();
+			// =======================
 		}
 	};
 
@@ -107,7 +128,6 @@ public class ConversationFragment extends Fragment {
 	 * @param conversName
 	 */
 	public void setConversName(String conversName) {
-		Log.d(TAG, "nom modifié");
 		// FIXME éventuellement, histoire de faire plus classe. Mais là ca crashe
 		//conversationName_str = getString(R.string.conversations_name_prefix);
 		conversationName_str = conversName;
@@ -123,6 +143,7 @@ public class ConversationFragment extends Fragment {
 
 	/**
 	 * Met du texte dans le champ de conversation de la vue. Attention, si du texte est déjà présent il sera écrasé.
+	 * @deprecated utiliser la méthode pour générer le texte depuis la conversation
 	 * @param conversText
 	 * @see appendConversationText()
 	 */
@@ -152,6 +173,7 @@ public class ConversationFragment extends Fragment {
 	
 	/**
 	 * Ajoute du texte à la suite du texte présent dans le champ de conversation sans écraser le texte présent
+	 * @deprecated Ajouter le message reçu à la conversation du fragment et regénérer le corps du texte de la conversation
 	 * @param text
 	 */
 	public void appendConversationText(String text) {
@@ -174,6 +196,27 @@ public class ConversationFragment extends Fragment {
 	 */
 	public ConversationFragment getThisFrag() {
 		return thisFrag;
+	}
+	
+	public Conversation getConversation() {
+		return conversation;
+	}
+	
+	/**
+	 * Essaye de regénérer le texte de la conversation si la vue est active
+	 */
+	public void tryTextRefresh() {
+		// Régénère le texte de la conversation
+		conversationText_str = conversation.generateConversationName();
+		// Essaye de rafraichir le textEdit
+		if (v != null) {
+			EditText conversText_edit = (EditText) v.findViewById(R.id.conversation_content);
+			if (conversText_edit != null)
+				conversText_edit.setText(Html.fromHtml(conversationText_str));
+		} else {
+			Log.d(TAG, "N'a pas pu refresh la vue");
+		}
+		
 	}
 	
 }

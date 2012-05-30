@@ -8,11 +8,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Contient un message dans un conversation, le client_id de l'�metteur, l'id de conversation, et le corps du message
- * @author SYSTEMMOI
- *
+ * Contient un message dans un conversation, le client_id de l'émetteur, l'id de conversation, et le corps du message
  */
-public class MessageBroacast implements Parcelable{
+public class MessageBroacast implements Parcelable {
 	
 	private String message;
 	

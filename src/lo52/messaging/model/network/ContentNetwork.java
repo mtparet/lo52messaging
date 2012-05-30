@@ -18,7 +18,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ContentNetwork implements Parcelable{
 	
-	@SerializedName("conversaton_id")
+	@SerializedName("conversation_id")
 	private int conversation_id;
 	
 	@SerializedName("conversation_name")

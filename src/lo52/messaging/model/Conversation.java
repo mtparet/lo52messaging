@@ -197,5 +197,38 @@ public class Conversation implements Parcelable {
 		}
 		return name;
 	}
+	
+	
+	/**
+	 * Génère une chaine de caractères contenant tous les messages de la conversation, pouvant être affichée dans l'EditText.
+	 * La chaine retournée doit être interprétée avec Html.fromHTML();
+	 * @return	String Une chaine HTML
+	 */
+	public String generateUserFriendlyConversationText() {
+		Log.d(TAG, "Génération du texte de conversation...");
+		String text = "";
+		
+		// Liste des messages
+		ArrayList<Message> messages = getListMessage();
+		Log.d(TAG, messages.size() + " messages dans la conversation");
+		
+		// Liste des users
+		Hashtable<Integer, User> users = NetworkService.getListUsers();
+		Log.d(TAG, users.size() + " users connus par le service");
+		
+		for (Message m : messages) {
+			if (!m.getMessage().equals("")) {	// Pour vérifier que le message est du texte
+				Log.d(TAG, "Cherche user " + m.getClient_id());
+				User u  = users.get(m.getClient_id());
+				if (u != null) {
+					text += "<font color=\"#CCCCCC\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
+				} else {
+					Log.e(TAG, "User null, pas normal");
+				}
+			} else Log.w(TAG, "Message vide");
+		}
+		Log.d(TAG, "Texte généré : " + text);
+		return text;
+	}
 
 }

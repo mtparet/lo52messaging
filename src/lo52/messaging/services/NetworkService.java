@@ -249,8 +249,7 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 
-			message.setClient_id(user_me.getId());
-
+			Log.d(TAG, "message à envoyé depuis client" + message.getClient_id() );
 			// on ajoute le message à la liste
 			Message mess = new Message(message.getClient_id(), message.getMessage());
 			listConversations.get(message.getConversation_id()).addMessage(mess);
@@ -263,7 +262,7 @@ public class NetworkService extends Service {
 				if(id_user != user_me.getId()){
 					User user_destinataire = listUsers.get(id_user);
 
-					ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
+					ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage(), message.getClient_id());
 					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
 
 					packet.setUser_envoyeur(user_me);

@@ -379,6 +379,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	public void onFragmentSendButtonClick(String textMessage, int conversation_id) {
 		Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 		MessageBroacast messageBroad = new MessageBroacast(textMessage, conversation_id);
+		messageBroad.setClient_id(NetworkService.getUser_me().getId());
 		messageBroad.sendToNetWorkService(getApplicationContext());
 	}
 

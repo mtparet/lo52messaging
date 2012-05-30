@@ -34,13 +34,15 @@ public class ContentNetwork implements Parcelable{
 	private ArrayList<User> userList;
 	
 	/**
-	 * 
+	 * Pour envoyer un message
 	 * @param conversation_id
 	 * @param message
+	 * @param client_id 
 	 */
-	public ContentNetwork(int conversation_id, String message) {
+	public ContentNetwork(int conversation_id, String message, int client_id) {
 		this.conversation_id = conversation_id;
 		this.message = message;
+		this.client_id = client_id;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -49,7 +51,7 @@ public class ContentNetwork implements Parcelable{
 	}
 	
 	/**
-	 * 
+	 * Pour créer une conversation
 	 * @param conversation_id
 	 * @param name
 	 * @param userList

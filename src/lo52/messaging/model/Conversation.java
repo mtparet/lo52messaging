@@ -223,7 +223,12 @@ public class Conversation implements Parcelable {
 				if (u != null) {
 					text += "<font color=\"#CCCCCC\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
 				} else {
-					Log.e(TAG, "User null, pas normal");
+					if(m.getClient_id() == NetworkService.getUser_me().getId()){
+						u = NetworkService.getUser_me();
+						text += "<font color=\"#CCCCCC\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
+					}else{
+						Log.e(TAG, "User inconnu par le service");
+					}
 				}
 			} else Log.w(TAG, "Message vide");
 		}

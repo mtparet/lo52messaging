@@ -404,6 +404,7 @@ public class NetworkService extends Service {
 		unregisterReceiver(Conversation);
 		unregisterReceiver(Message);
 		unregisterReceiver(SendPacket);
+		unregisterReceiver(LocalisationUser);
 		super.onDestroy();
 	}
 

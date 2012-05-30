@@ -259,14 +259,18 @@ public class NetworkService extends Service {
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
 
 			for(int id_user : listIdUser){
-				User user_destinataire = listUsers.get(id_user);
+				//ne pas s'envoyer à soit même le message
+				if(id_user != user_me.getId()){
+					User user_destinataire = listUsers.get(id_user);
 
-				ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
-				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
+					ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage());
+					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
 
-				packet.setUser_envoyeur(user_me);
+					packet.setUser_envoyeur(user_me);
 
-				SendPacket(packet);
+					SendPacket(packet);
+				}
+
 			}
 		}
 	};
@@ -523,7 +527,6 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
-						Log.d(TAG, "Packet recu de " + datagramSocket.getInetAddress());
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
@@ -560,6 +563,8 @@ public class NetworkService extends Service {
 
 		Gson gson = new Gson();
 		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
+		
+		Log.d(TAG, "Packet recu de " + packetReceive.getUser_envoyeur().getName());
 
 
 

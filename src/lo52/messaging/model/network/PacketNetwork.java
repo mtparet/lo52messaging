@@ -23,6 +23,8 @@ public class PacketNetwork implements Parcelable{
 	final static public int DISCONNECTED = 5;
 	final static public int ALIVE = 6;
 	final static public int LOCALISATION = 7;
+	final static public int BITMAP = 8;
+
 
 	
 	@SerializedName("content")

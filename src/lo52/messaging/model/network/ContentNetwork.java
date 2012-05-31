@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import lo52.messaging.model.User;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
@@ -31,10 +32,12 @@ public class ContentNetwork implements Parcelable{
 	private int client_id;
 	
 	@SerializedName("lon")
-	public float lon;
+	private float lon;
 	
 	@SerializedName("lat")
-	public float lat;
+	private float lat;
+	
+	private Bitmap bitmap;
 	
 	// List des utilisateur dans la conversation
 	private ArrayList<User> userList;
@@ -167,6 +170,14 @@ public class ContentNetwork implements Parcelable{
 
 	public void setLat(float lat) {
 		this.lat = lat;
+	}
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
 	}
 
 }

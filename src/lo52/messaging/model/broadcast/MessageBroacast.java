@@ -3,6 +3,7 @@ package lo52.messaging.model.broadcast;
 import lo52.messaging.services.NetworkService;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,6 +15,8 @@ public class MessageBroacast implements Parcelable {
 	
 	private String message;
 	
+	private Bitmap bitmap;
+
 	private int client_id;
 	
 	private int conversation_id;
@@ -46,6 +49,7 @@ public class MessageBroacast implements Parcelable {
 		this.message = in.readString();
 		this.client_id = in.readInt();
 		this.conversation_id = in.readInt();
+		this.bitmap = in.readParcelable(bitmap.getClass().getClassLoader());
 	}
 
 	public static final Parcelable.Creator<MessageBroacast> CREATOR= new Parcelable.Creator<MessageBroacast>() {
@@ -78,6 +82,7 @@ public class MessageBroacast implements Parcelable {
 		dest.writeString(message);
 		dest.writeInt(client_id);
 		dest.writeInt(conversation_id);
+		dest.writeParcelable(bitmap, 0);
 
 	}
 
@@ -102,6 +107,14 @@ public class MessageBroacast implements Parcelable {
 		broadcastIntent.putExtra("message", bundle);
 
 		ctx.sendBroadcast(broadcastIntent);
+	}
+	
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
 	}
 
 }

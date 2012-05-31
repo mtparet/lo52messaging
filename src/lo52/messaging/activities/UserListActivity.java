@@ -82,14 +82,14 @@ public class UserListActivity extends ListActivity {
 	}
 
 
-	@Override
+	/*@Override
 	protected void onDestroy() {
 		
 		// Désinscription du broadcast receiver
 		unregisterReceiver(UserlistUpdate_BrdcReceiver);
 		
 		super.onDestroy();
-	}
+	}*/
 
 
 	@Override
@@ -108,17 +108,29 @@ public class UserListActivity extends ListActivity {
 			return;
 		}
 		
+		// ArrayList contenant l'ID de l'utilisateur
 		ArrayList<Integer> list = new ArrayList<Integer>();
-		
 		list.add(user_selected.getId());
+		list.add(NetworkService.getUser_me().getId());
 		
-		// Création de la conversation avec en nom le nom de l'utilisateur
-		Conversation conversation = new Conversation(item, list);
-		conversation.sendToNetworkService(getApplicationContext());
+		// Création de la conversation avec en nom le nom de l'utilisateur, si elle n'existe pas déjà
+		if (!NetworkService.doesConversationExist(list)) {
+			Log.d(TAG, "Conversation non existante, nouvelle");
+			
+			Conversation conversation = new Conversation(item, list);
+			conversation.sendToNetworkService(getApplicationContext());
+			
+			// Rend le tab des conversations actif
+			LobbyActivity parent = (LobbyActivity) getParent();
+			parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+		} else {
+			Log.d(TAG, "Conversation existe, switch");
+			// Si la conversation existe déjà on rend le second tab actif et on essaye de switcher sur le fragment correspondant
+			LobbyActivity parent = (LobbyActivity) getParent();
+			parent.setSwitchToConversationFragment(list);
+			parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+		}
 
-		// Rend le tab des conversations actif
-		LobbyActivity parent = (LobbyActivity) getParent();
-		parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
 	}
 
 	/**

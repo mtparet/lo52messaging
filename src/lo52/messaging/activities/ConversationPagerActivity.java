@@ -123,7 +123,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		 */
 		//Timer timer = new Timer();
 		//timer.schedule(new SendExempletimeTask(),4000);
-		
+
 		/**
 		 * DEBUG
 		 */
@@ -429,7 +429,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
 			//frag.appendConversationText(message.getMessage());
-			
+
 			/**
 			 * FIXME : C'EST PAS PROPRE D'AJOUTER LE MESSAGE A LA CONVERSATION ICI.
 			 * XXX 1
@@ -494,6 +494,23 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// On rafraichit la liste des conversations
 		conversationListFragment.updateLocalConversationsList();
+
+		// On regarde si l'on doit se rendre sur un fragment particulier (au cas où l'utilisateur a cliqué sur le nom
+		// d'un utilisateur avec lequel on a déjà une conversation d'ouverte)
+		LobbyActivity parent = (LobbyActivity) getParent();
+		ArrayList<Integer> list = parent.getSwitchToConversationFragmentStatus();
+
+		if (list.size() > 0) {
+			int fragNumber = 0;
+			for (Fragment fragment : mPagerAdapter.getFragmentsList()) {
+				if (fragment instanceof ConversationFragment) {
+					if (((ConversationFragment) fragment).getConversation().getListIdUser().equals(list)) {
+						goToConversationNumber(fragNumber);
+					}
+				}
+				fragNumber++;
+			}
+		}
 	}
 
 	@Override

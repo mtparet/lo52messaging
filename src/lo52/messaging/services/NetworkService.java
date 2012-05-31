@@ -951,11 +951,8 @@ public class NetworkService extends Service {
 
 			// On compare la liste des utilisateurs à celle donnée en paramètre
 			if (c.getListIdUser().equals(userIds)) exists = true;
-			
-			Log.d(TAG, "> Exists : " + exists);
 		}
 
 		return exists;
 	}
-
 }

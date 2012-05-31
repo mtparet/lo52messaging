@@ -81,17 +81,14 @@ public class NetworkService extends Service {
 
 	private static final String TAG = "NetworkService";
 
-	public static final String ReceivePacket = "NetworkService.receive.Packet";
-
-	public static final String ReceiveMessage = "NetworkService.receive.Message";
-
-	public static final String ReceiveConversation = "NetworkService.receive.Conversation";
-
-	public static final String SendMessage = "NetworkService.send.Message";
-
-	public static final String SendConversation = "NetworkService.send.Conversation";
 	
-	public static final String Receivelocalisation = "NetworkService.receive.Localisation";
+	public static final String ReceivePacket 		= "NetworkService.receive.Packet";
+	public static final String ReceiveMessage 		= "NetworkService.receive.Message";
+	public static final String ReceiveConversation 	= "NetworkService.receive.Conversation";
+	public static final String SendMessage 			= "NetworkService.send.Message";
+	public static final String SendConversation 	= "NetworkService.send.Conversation";
+	public static final String Receivelocalisation 	= "NetworkService.receive.Localisation";
+	public static final String UserListUpdated		= "NetworkService.userlist.updated";
 	
 
 	private int PORT_DEST = 5008;
@@ -205,7 +202,7 @@ public class NetworkService extends Service {
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
 		Timer timer = new Timer();
-		timer.schedule(new SendBroadcatsimeTask(), 500);	
+		timer.schedule(new SendBroadcatsimeTask(), 200);	
 
 
 	}
@@ -738,6 +735,10 @@ public class NetworkService extends Service {
 		// on le met à alive
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
+		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
+		// XXX 3
+		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+		sendBroadcast(broadcastIntent);
 	}
 
 

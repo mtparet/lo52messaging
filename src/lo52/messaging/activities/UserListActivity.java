@@ -9,7 +9,10 @@ import lo52.messaging.model.Conversation;
 import lo52.messaging.model.User;
 import lo52.messaging.services.NetworkService;
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  *	Activité servant à lister les utilisateurs 
@@ -36,7 +38,7 @@ public class UserListActivity extends ListActivity {
 	//liste des users
 	Hashtable<Integer, User> userList;
 	ArrayList<String> values;
-
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -45,26 +47,48 @@ public class UserListActivity extends ListActivity {
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
 		setListAdapter(adapter);
+		
+		// Enregistre le broadcast receiver permettant de mettre à jour la liste des users en direct
+		IntentFilter userListUpdatefilter = new IntentFilter();
+		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
+		registerReceiver(UserlistUpdate_BrdcReceiver, userListUpdatefilter);
+		
 	}
 	
 
 	@Override
 	protected void onResume() {
 		Log.d(TAG, "onResume");
-		/**
-		 * TODO voir comment on réalise la synchronisation:
-		 * - soit manuelle : à chaque fois que l'on remet l'activity en premier plan et avec un bouton rafraichir
-		 * - soit automatique : implique de créer un nouveau type de paquet (avec action = REMOVE_USER et ADD_USER)
-		 */
+
+		// on réenregistre le broadcast listener sur la liste des users
+		IntentFilter userListUpdatefilter = new IntentFilter();
+		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
+		registerReceiver(UserlistUpdate_BrdcReceiver, userListUpdatefilter);
+		
 		//on récupère la liste des users
-		userList = NetworkService.getListUsers();
-		values.clear();
-		for( User user : userList.values()){
-			values.add(user.getName());
-		}
-		adapter.notifyDataSetChanged();
+		refreshUserList();
 		
 		super.onResume();
+	}
+
+
+	@Override
+	protected void onPause() {
+		
+		// Désinscription du broadcast receiver
+		unregisterReceiver(UserlistUpdate_BrdcReceiver);
+				
+		super.onPause();
+	}
+
+
+	@Override
+	protected void onDestroy() {
+		
+		// Désinscription du broadcast receiver
+		unregisterReceiver(UserlistUpdate_BrdcReceiver);
+		
+		super.onDestroy();
 	}
 
 
@@ -139,13 +163,26 @@ public class UserListActivity extends ListActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int menuItemId = item.getItemId();
 		if (menuItemId == R.id.item_refresh) {
-			// TODO : refresh liste
-			Toast.makeText(this, "Refresh list to do", Toast.LENGTH_SHORT).show();
+			refreshUserList();
+			//Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
 		}
 		else {
 			Log.e(TAG, "Item non pris en charge");
 		}
 		return true;
+	}
+	
+	/**
+	 * Met à jour la liste des utilisateurs en faisant appel au service
+	 */
+	public void refreshUserList() {
+		userList = NetworkService.getListUsers();
+		values.clear();
+		for(User user : userList.values()){
+			values.add(user.getName());
+		}
+		adapter.notifyDataSetChanged();
+		Log.d(TAG, "Liste users mise à jour");
 	}
 	
 
@@ -177,5 +214,19 @@ public class UserListActivity extends ListActivity {
 			return rowView;
 		}
 	}
+	
+	
+	/**
+	 * Broadcast receiver qui reçoit une notification comme quoi la liste des utilisateurs doit être mise à jour
+	 */
+	private BroadcastReceiver UserlistUpdate_BrdcReceiver = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "réception d'un broadcast pour rafraichir la liste des users !");
+			refreshUserList();
+		}
+		
+	};
 	
 }

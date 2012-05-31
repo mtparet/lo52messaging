@@ -28,7 +28,7 @@ public class LobbyActivity extends TabActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
-
+		
 		Log.d(TAG, "Lancement activité lobby");
 
 		// Lancement du service Network

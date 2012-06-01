@@ -4,6 +4,7 @@ import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -16,6 +17,8 @@ import android.os.Parcelable;
 public class Message implements Parcelable{
 	
 	private String message;
+	
+	private Bitmap bitmap;
 	
 	private int client_id;
 
@@ -64,6 +67,14 @@ public class Message implements Parcelable{
 		dest.writeString(message);
 		dest.writeInt(client_id);
 
+	}
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
 	}
 
 }

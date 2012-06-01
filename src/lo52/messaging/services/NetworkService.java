@@ -564,6 +564,7 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
+						
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {

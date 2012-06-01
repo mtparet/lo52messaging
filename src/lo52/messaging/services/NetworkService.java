@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -81,7 +83,7 @@ public class NetworkService extends Service {
 
 	private static final String TAG = "NetworkService";
 
-	
+
 	public static final String ReceivePacket 		= "NetworkService.receive.Packet";
 	public static final String ReceiveMessage 		= "NetworkService.receive.Message";
 	public static final String ReceiveConversation 	= "NetworkService.receive.Conversation";
@@ -89,7 +91,7 @@ public class NetworkService extends Service {
 	public static final String SendConversation 	= "NetworkService.send.Conversation";
 	public static final String Receivelocalisation 	= "NetworkService.receive.Localisation";
 	public static final String UserListUpdated		= "NetworkService.userlist.updated";
-	
+
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
@@ -140,7 +142,7 @@ public class NetworkService extends Service {
 		IntentFilter filter3 = new IntentFilter();
 		filter3.addAction(ReceiveConversation);
 		registerReceiver(Conversation, filter3);
-		
+
 		/*
 		 * enregistrer l'intent permettant de recevoir les infos de localisation depuis un intent
 		 */
@@ -299,11 +301,12 @@ public class NetworkService extends Service {
 
 			// on ajoute la conversation à la liste
 			listConversations.put(conversation.getConversation_id(), conversation);
+			Log.w(TAG, "AJOUT CONVERSATION LISTE GLOBALE, new size " + listConversations.size());
 
 			// XXX 2
 			// On recherche si user_me n'est pas dans la liste des users, sinon on l'ajoute
 			boolean user_me_found = false;
-			
+
 			for (User u : users) {
 				if (u != null && u.getId() == user_me.getId()) user_me_found = true;
 			}
@@ -326,7 +329,7 @@ public class NetworkService extends Service {
 
 		}
 	};
-	
+
 	/*
 	 * Recoit  les infos de localisation à enovoyer à tous les clients
 	 */
@@ -336,18 +339,18 @@ public class NetworkService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getBundleExtra("localisation");
 			Localisation loca_user = bundle.getParcelable("localisation");
-			
+
 			user_me.setLocalisation(loca_user);
 
 			ContentNetwork content = new ContentNetwork(loca_user.getLat(),loca_user.getLon(),user_me.getId());
 
 			for(User user_destinataire : getListUsers().values()){
 
-					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.LOCALISATION);
+				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.LOCALISATION);
 
-					packet.setUser_envoyeur(user_me);
+				packet.setUser_envoyeur(user_me);
 
-					SendPacket(packet);
+				SendPacket(packet);
 
 			}
 		}
@@ -598,7 +601,7 @@ public class NetworkService extends Service {
 
 		Gson gson = new Gson();
 		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
-		
+
 		Log.d(TAG, "Packet recu de " + packetReceive.getUser_envoyeur().getName());
 
 
@@ -653,23 +656,23 @@ public class NetworkService extends Service {
 		}
 	}
 
-/**
- * traite un packet de localisation reçu, ajout met à jour la localisation de l'user
- * @param packet
- */
+	/**
+	 * traite un packet de localisation reçu, ajout met à jour la localisation de l'user
+	 * @param packet
+	 */
 	private void paquetLocalisation(PacketNetwork packet) {
 		Log.d(TAG, "localisation reçu dans le NetworkService");
 		if(listUsers.containsKey(packet.getContent().getClient_id())){
 			Localisation loca = new Localisation(packet.getContent().getLat(), packet.getContent().getLon());
 			User user = listUsers.get(packet.getContent().getClient_id());
-			
+
 			user.setLocalisation(loca);
 			listUsers.remove(user.getId());
 			listUsers.put(user.getId(), user);
 		}else{
 			Log.d(TAG, "user inconnu");
 		}
-		
+
 	}
 
 	/**
@@ -863,6 +866,10 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, Conversation> getListConversations() {
 		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
+	
+	public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
+		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
+	}
 
 	//public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
 	//	NetworkService.listConversations = listConversations;
@@ -928,4 +935,25 @@ public class NetworkService extends Service {
 		return l;
 	}
 
+	
+	/**
+	 * Vérifie si une conversation existe déjà, en fonction des membres qui la composent
+	 * @param userIds	La liste des membres qui composent cette conversation
+	 * @return	Boolean
+	 */
+	@SuppressWarnings("rawtypes")
+	public static boolean doesConversationExist(ArrayList<Integer> userIds) {
+
+		boolean exists = false;
+		Iterator it = listConversations.entrySet().iterator();
+		while (it.hasNext() && !exists) {
+			Map.Entry pairs = (Map.Entry)it.next();
+			Conversation c = (lo52.messaging.model.Conversation) pairs.getValue();
+
+			// On compare la liste des utilisateurs à celle donnée en paramètre
+			if (c.getListIdUser().equals(userIds)) exists = true;
+		}
+
+		return exists;
+	}
 }

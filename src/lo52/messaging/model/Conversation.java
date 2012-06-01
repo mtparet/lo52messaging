@@ -29,6 +29,9 @@ public class Conversation implements Parcelable {
 	private ArrayList<Integer> listIdUser = new ArrayList<Integer>();
 
 	private static final String TAG = "Conversation";
+	
+	// Couleur utilisée pour écrire le nom des utilisateurs dans les conversations
+	private static final String HTML_USERNAME_COLOR = "#CCCCCC";
 
 	/**
 	 * Permet de créer une NOUVELLE conversation avec un utilisateur
@@ -153,7 +156,6 @@ public class Conversation implements Parcelable {
 		ctx.sendBroadcast(broadcastIntent);
 
 		// Indique à l'activité ConversationPagerActivity qu'il devra créer un fragment correspondant
-		Log.d("TAG", "setting to create " + getConversation_id());
 		NetworkService.setHasLocalConversationToCreate(this);
 
 		return getConversation_id();
@@ -225,7 +227,7 @@ public class Conversation implements Parcelable {
 				} else {
 					if(m.getClient_id() == NetworkService.getUser_me().getId()){
 						u = NetworkService.getUser_me();
-						text += "<font color=\"#CCCCCC\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
+						text += "<font color=\""+HTML_USERNAME_COLOR+"\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
 					}else{
 						Log.e(TAG, "User inconnu par le service");
 					}

@@ -124,8 +124,6 @@ public class ConversationListFragment extends ListFragment {
 
 			Log.d(TAG, "Nom généré : " + conversationName + " : ajouté à la liste");
 			conversationNames.add(conversationName);
-
-			it.remove();
 		}
 	}
 }

@@ -11,25 +11,18 @@ import lo52.messaging.model.User;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.views.UserListView;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  *	Activité servant à lister les utilisateurs 
@@ -103,8 +96,7 @@ public class UserListActivity extends Activity {
     {
 
 		@Override
-		public void onItemClick(AdapterView<?> listView, View view, int position,
-				long row) {
+		public void onItemClick(AdapterView<?> listView, View view, int position, long row) {
 
     		String item = (String) listView.getAdapter().getItem(position);
     		
@@ -120,17 +112,26 @@ public class UserListActivity extends Activity {
     			return;
     		}
     		
+    		// ArrayList contenant l'ID de l'utilisateur
     		ArrayList<Integer> list = new ArrayList<Integer>();
-    		
     		list.add(user_selected.getId());
+    		list.add(NetworkService.getUser_me().getId());
     		
-    		// Création de la conversation avec en nom le nom de l'utilisateur
-    		Conversation conversation = new Conversation(item, list);
-    		conversation.sendToNetworkService(getApplicationContext());
-
-    		// Rend le tab des conversations actif
-    		LobbyActivity parent = (LobbyActivity) getParent();
-    		parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);			
+    		// Création de la conversation avec en nom le nom de l'utilisateur, si elle n'existe pas déjà
+    		if (!NetworkService.doesConversationExist(list)) {
+    			
+    			Conversation conversation = new Conversation(item, list);
+    			conversation.sendToNetworkService(getApplicationContext());
+    			
+    			// Rend le tab des conversations actif
+    			LobbyActivity parent = (LobbyActivity) getParent();
+    			parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+    		} else {
+    			// Si la conversation existe déjà on rend le second tab actif et on essaye de switcher sur le fragment correspondant
+    			LobbyActivity parent = (LobbyActivity) getParent();
+    			parent.setSwitchToConversationFragment(list);
+    			parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+    		}		
 		}
     };
 
@@ -180,7 +181,7 @@ public class UserListActivity extends Activity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG, "réception d'un broadcast pour rafraichir la liste des users !");
+			Log.d(TAG, "réception d'un broadcast pour rafraichir la liste des users");
 			refreshUserList();
 		}
 		

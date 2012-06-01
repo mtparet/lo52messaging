@@ -29,7 +29,7 @@ public class ConversationFragment extends Fragment {
 	private Conversation conversation = null;
 	
 	int conversation_id;
-	View v;
+	View fv;
 	
 	String conversationName_str = "";
 	String conversationText_str = "";
@@ -41,22 +41,22 @@ public class ConversationFragment extends Fragment {
 		super.onResume();
 		
 		// Rafraichit le texte
-		EditText conversText_edit = (EditText) v.findViewById(R.id.conversation_content);
+		EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
 		
 		if (conversText_edit != null )
-			conversText_edit.setText(conversation.generateUserFriendlyConversationText());
+			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText()));
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate le layout depuis le xml
-		v = inflater.inflate(R.layout.conversation, container, false);
+		fv = inflater.inflate(R.layout.conversation, container, false);
 		
 		// Initialise les différents éléments du layout
-		TextView conversName_tv 		= (TextView) v.findViewById(R.id.conversation_name);
-		EditText conversText_edit		= (EditText) v.findViewById(R.id.conversation_content);
+		TextView conversName_tv 		= (TextView) fv.findViewById(R.id.conversation_name);
+		EditText conversText_edit		= (EditText) fv.findViewById(R.id.conversation_content);
 		//EditText conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
-		Button conversMedia_btn 	= (Button) v.findViewById(R.id.conversation_media_button);
-		Button conversSend_btn 		= (Button) v.findViewById(R.id.conversation_send_button);
+		Button conversMedia_btn 	= (Button) fv.findViewById(R.id.conversation_media_button);
+		Button conversSend_btn 		= (Button) fv.findViewById(R.id.conversation_send_button);
 		
 		// On rend le Text Edit de la convers non éditable
 		//conversText_edit.setEnabled(false);
@@ -65,14 +65,14 @@ public class ConversationFragment extends Fragment {
 		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
 		conversationText_str = conversation.generateUserFriendlyConversationText();
-		conversText_edit.setText(Html.fromHtml(conversationText_str));
+		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText()));
 		
 		parentActivity = (ConversationPagerActivity) getActivity();
 		
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
 		
-		return v;
+		return fv;
 	}
 	
 	// Création et assignation des onClickListerners
@@ -86,6 +86,12 @@ public class ConversationFragment extends Fragment {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton envoi");
 			parentActivity.onFragmentSendButtonClick(getConversUserText(), getConversation_id());
+			
+			// Reset du champ d'entrée de texte
+			Log.d(TAG, "CLICK " + fv);
+			
+			EditText conversUserText_edit	= (EditText) fv.findViewById(R.id.conversation_usermessage);
+			conversUserText_edit.setText("");
 			
 			// XXX 1
 			// Ajout du message à la conversation (*localement*) quand l'utilisateur appuie sur le bouton Envoyer
@@ -157,7 +163,7 @@ public class ConversationFragment extends Fragment {
 	 * @return
 	 */
 	public String getConversUserText() {
-		EditText conversUserText_edit = (EditText) v.findViewById(R.id.conversation_usermessage);
+		EditText conversUserText_edit = (EditText) fv.findViewById(R.id.conversation_usermessage);
 		return conversUserText_edit.getText().toString();
 	}
 
@@ -187,7 +193,7 @@ public class ConversationFragment extends Fragment {
 	 * @return
 	 */
 	public View getFragmentView() {
-		return v;
+		return fv;
 	}
 	
 	/**
@@ -209,8 +215,8 @@ public class ConversationFragment extends Fragment {
 		// Régénère le texte de la conversation
 		conversationText_str = conversation.generateConversationName();
 		// Essaye de rafraichir le textEdit
-		if (v != null) {
-			EditText conversText_edit = (EditText) v.findViewById(R.id.conversation_content);
+		if (fv != null) {
+			EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
 			if (conversText_edit != null)
 				conversText_edit.setText(Html.fromHtml(conversationText_str));
 		} else {

@@ -2,6 +2,7 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import lo52.messaging.R;
@@ -21,8 +22,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -35,6 +38,7 @@ public class UserListActivity extends Activity {
 	UserListArrayAdapter adapter;
 
 	UserListView userListView;
+	Button startMultiConversBtn;
 
 	//liste des users
 	Hashtable<Integer, User> userList;
@@ -43,23 +47,30 @@ public class UserListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.useractivity);
 
-		userListView = (UserListView) findViewById(R.id.listView1);
+		userListView 			= (UserListView) findViewById(R.id.listView1);
+		startMultiConversBtn	= (Button) findViewById(R.id.userlist_start_multi_btn);
 
 		ArrayList<String> values = new ArrayList<String>(Arrays.asList(""));
 
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
 		
+		
 		/**
 		 * DEBUG
 		 */
-		NetworkService.getListUsersNoClone().put(12345, new User("user 1"));
-		NetworkService.getListUsersNoClone().put(12346, new User("user 2"));
-		NetworkService.getListUsersNoClone().put(12347, new User("user 3"));
-		Log.d(TAG, "Size users " + NetworkService.getListUsersNoClone().size());
+		NetworkService.getListUsersNoClone().put(12345, new User("pablo gruer"));
+		NetworkService.getListUsersNoClone().put(12346, new User("gilles bertrand"));
+		NetworkService.getListUsersNoClone().put(12347, new User("chuck norris"));
+		/**
+		 * 
+		 */
 		
 		userListView.setAdapter(adapter);
 		userListView.setOnItemClickListener(itemClickListenerList);
+		
+		// Listener sur le bouton pour commencer une conversation avec plusieurs utilisateurs
+		startMultiConversBtn.setOnClickListener(startMultiConversButtonListener);
 
 		// Enregistre le broadcast receiver permettant de mettre à jour la liste des users en direct
 		IntentFilter userListUpdatefilter = new IntentFilter();
@@ -100,11 +111,14 @@ public class UserListActivity extends Activity {
 		super.onDestroy();
 	}
 
-	private OnItemClickListener itemClickListenerList = new OnItemClickListener()
-	{
+	
+	
+	private OnItemClickListener itemClickListenerList = new OnItemClickListener() {
 
 		@Override
 		public void onItemClick(AdapterView<?> listView, View view, int position, long row) {
+			
+			Log.d(TAG, "Click item list " + position);
 
 			String item = (String) listView.getAdapter().getItem(position);
 
@@ -142,9 +156,22 @@ public class UserListActivity extends Activity {
 			}
 		}
 	};
-
-
-
+	
+	private OnClickListener startMultiConversButtonListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			
+			HashSet<String> usernames = adapter.getCheckUsernames();
+			Log.d(TAG, "Multi users : " + usernames);
+			
+			
+			// TODO créer conversation + refactoriser code avec celui de la création de conversation pour le simple click
+			// TODO afficher un Toast si aucun user n'est coché (size() == 0)
+			
+		}
+	};
+	
 
 	/**
 	 * Gestion du menu option et des actions associées
@@ -172,7 +199,8 @@ public class UserListActivity extends Activity {
 			
 			Log.d(TAG, "mode sélection!");
 			adapter.switchMultiUserChoiceMode();
-			adapter.notifyDataSetChanged();
+			
+			refreshUserList();
 			
 		}
 		else {
@@ -196,6 +224,12 @@ public class UserListActivity extends Activity {
 		TextView tv = (TextView) findViewById(R.id.no_user);
 		if (adapter.countValues() > 0) tv.setVisibility(View.GONE);
 		else tv.setVisibility(View.VISIBLE);
+		
+		// On affiche ou cache le bouton pour commencer la conversation à plusieurs
+		if (adapter.isMultiUserChoiceSelectionMode())
+			startMultiConversBtn.setVisibility(View.VISIBLE);
+		else
+			startMultiConversBtn.setVisibility(View.GONE);
 	}
 
 

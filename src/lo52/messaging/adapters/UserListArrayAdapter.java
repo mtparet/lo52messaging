@@ -1,12 +1,13 @@
 package lo52.messaging.adapters;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import lo52.messaging.R;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -21,23 +22,25 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 	private final Context context;
 	private final ArrayList<String> values;
 	private boolean multiUserChoiceSelectionMode;
+	private HashSet<String> checkedValues;
 
 	public UserListArrayAdapter(Context context, ArrayList<String> values) {
 		super(context, R.layout.userlist, values);
 		this.context = context;
 		this.values = values;
 		this.multiUserChoiceSelectionMode = false;
+		this.checkedValues = new HashSet<String>();
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.userlist, parent, false);
 
 		// Récupérer l'accès aux différents éléments du layout
 		TextView textView 	= (TextView) rowView.findViewById(R.id.label);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-		CheckBox chk 		= (CheckBox) rowView.findViewById(R.id.userlist_item_checkBox);
+		final CheckBox chk 	= (CheckBox) rowView.findViewById(R.id.userlist_item_checkBox);
 
 		// Attribution des valeurs
 		textView.setText(values.get(position));
@@ -55,6 +58,21 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 			imageView.setVisibility(View.GONE);
 			chk.setVisibility(View.VISIBLE);
 		}
+		
+		
+		// Click listener sur le checkbox
+		chk.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Si la case est cochée, on ajoute le nom de l'utilisateur
+				if (chk.isChecked())
+					checkedValues.add(values.get(position));
+				// Sinon on l'enlève
+				else
+					checkedValues.remove(values.get(position));
+			}
+		});
 		
 		return rowView;
 	}
@@ -89,7 +107,6 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 	public void clearValues() {
 		values.clear();
 		this.notifyDataSetChanged();
-		
 	}
 	
 	/**
@@ -121,8 +138,14 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 	 */
 	public void switchMultiUserChoiceMode() {
 		multiUserChoiceSelectionMode = !multiUserChoiceSelectionMode;
-		Log.d("fuck", "Nouveau statut multi " + multiUserChoiceSelectionMode);
-		
+	}
+	
+	/**
+	 * Retourne les noms des users cochés
+	 * @return
+	 */
+	public HashSet<String> getCheckUsernames() {
+		return this.checkedValues;
 	}
 	
 }

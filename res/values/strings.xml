@@ -19,6 +19,8 @@
     <!-- USER LIST -->
     <string name="userlist_refresh_option">Rafraichir</string>
     <string name="userlist_no_user">Aucun utilisateur n\'a été détecté.\nCette vue se mettra automatiquement à jour lorsqu\'un utilisateur se connectera.</string>
+    <string name="userlist_multi_user_menuitem">Choisir parmi plusieurs utilisateurs</string>
+    <string name="userlist_multi_user_start">Commencer la conversation</string>
     
     <!-- CONVERSATIONS -->
     <string name="conversations_tab_name">Conversations</string>

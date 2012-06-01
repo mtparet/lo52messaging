@@ -21,4 +21,12 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#AAAAAA" />
 
+    <Button
+        android:id="@+id/userlist_start_multi_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/userlist_multi_user_start" />
+
 </RelativeLayout>

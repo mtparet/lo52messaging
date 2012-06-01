@@ -2,26 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@android:color/transparent">
+    android:background="@android:color/transparent" >
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="22dp"
         android:layout_height="22dp"
+        android:layout_marginBottom="7dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
         android:src="@drawable/ic_launcher" >
     </ImageView>
+
+    <CheckBox
+        android:id="@+id/userlist_item_checkBox"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="" />
 
     <TextView
         android:id="@+id/label"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:paddingTop="4dp"
         android:text="@+id/label"
-        android:textSize="22dp"
-        android:paddingTop="4dp" >
+        android:textSize="22dp" >
     </TextView>
 
 </LinearLayout>

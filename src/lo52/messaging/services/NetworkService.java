@@ -205,9 +205,8 @@ public class NetworkService extends Service {
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
 		 */
 		Timer timer = new Timer();
-		timer.schedule(new SendBroadcatsimeTask(), 200);	
-
-
+		timer.schedule(new SendBroadcatsimeTask(), 200);
+		
 	}
 
 	/**
@@ -857,6 +856,10 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, User> getListUsers() {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
+	
+	public static Hashtable<Integer, User> getListUsersNoClone() {
+		return (Hashtable<Integer, User>) listUsers;
+	}
 
 	//public static void setListUsers(Hashtable<Integer, User> listUsersE) {
 	//	listUsers = listUsersE;
@@ -957,4 +960,5 @@ public class NetworkService extends Service {
 
 		return exists;
 	}
+
 }

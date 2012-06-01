@@ -49,7 +49,15 @@ public class UserListActivity extends Activity {
 
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
-
+		
+		/**
+		 * DEBUG
+		 */
+		NetworkService.getListUsersNoClone().put(12345, new User("user 1"));
+		NetworkService.getListUsersNoClone().put(12346, new User("user 2"));
+		NetworkService.getListUsersNoClone().put(12347, new User("user 3"));
+		Log.d(TAG, "Size users " + NetworkService.getListUsersNoClone().size());
+		
 		userListView.setAdapter(adapter);
 		userListView.setOnItemClickListener(itemClickListenerList);
 
@@ -145,6 +153,11 @@ public class UserListActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.user_list_activity_menu, menu);
+		
+		// FIXME rajouter constante + string
+		menu.add(999, 999, 2, "Mode sélection");
+		
+		
 		return true;
 	}
 
@@ -154,6 +167,13 @@ public class UserListActivity extends Activity {
 		if (menuItemId == R.id.item_refresh) {
 			refreshUserList();
 			//Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+		}
+		else if (menuItemId == 999) {
+			
+			Log.d(TAG, "mode sélection!");
+			adapter.switchMultiUserChoiceMode();
+			adapter.notifyDataSetChanged();
+			
 		}
 		else {
 			Log.e(TAG, "Item non pris en charge");

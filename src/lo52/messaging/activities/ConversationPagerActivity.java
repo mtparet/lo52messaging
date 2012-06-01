@@ -12,6 +12,7 @@ import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
+import lo52.messaging.util.LibUtil;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -504,7 +505,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			int fragNumber = 0;
 			for (Fragment fragment : mPagerAdapter.getFragmentsList()) {
 				if (fragment instanceof ConversationFragment) {
-					if (((ConversationFragment) fragment).getConversation().getListIdUser().equals(list)) {
+					if (LibUtil.equalsListsOrderInsensitive(((ConversationFragment) fragment).getConversation().getListIdUser(), list)) {
 						goToConversationNumber(fragNumber);
 					}
 				}

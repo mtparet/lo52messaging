@@ -20,6 +20,7 @@ import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.model.network.ContentNetwork;
 import lo52.messaging.model.network.PacketNetwork;
+import lo52.messaging.util.LibUtil;
 import lo52.messaging.util.Network;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -950,7 +951,8 @@ public class NetworkService extends Service {
 			Conversation c = (lo52.messaging.model.Conversation) pairs.getValue();
 
 			// On compare la liste des utilisateurs à celle donnée en paramètre
-			if (c.getListIdUser().equals(userIds)) exists = true;
+			//if (c.getListIdUser().equals(userIds)) exists = true;
+			if (LibUtil.equalsListsOrderInsensitive(c.getListIdUser(), userIds)) exists = true;
 		}
 
 		return exists;

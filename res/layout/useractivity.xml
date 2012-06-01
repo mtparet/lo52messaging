@@ -12,4 +12,13 @@
         android:layout_marginBottom="228dp" >
     </lo52.messaging.views.UserListView>
 
+    <TextView
+        android:id="@+id/no_user"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:text="@string/userlist_no_user"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#AAAAAA" />
+
 </RelativeLayout>

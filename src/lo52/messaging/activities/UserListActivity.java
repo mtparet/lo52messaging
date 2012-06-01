@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
@@ -42,7 +43,7 @@ public class UserListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.useractivity);
 		
-		userListView = (UserListView)findViewById(R.id.listView1);
+		userListView = (UserListView) findViewById(R.id.listView1);
 		
 		ArrayList<String> values = new ArrayList<String>(Arrays.asList(""));
 		
@@ -56,7 +57,6 @@ public class UserListActivity extends Activity {
 		IntentFilter userListUpdatefilter = new IntentFilter();
 		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
 		registerReceiver(UserlistUpdate_BrdcReceiver, userListUpdatefilter);
-		
 	}
 	
 
@@ -171,6 +171,11 @@ public class UserListActivity extends Activity {
 			adapter.add(user.getName());
 		}
 		Log.d(TAG, "Liste users mise à jour");
+		
+		// Affiche ou cache le texte Pas d'utilisateur
+		TextView tv = (TextView) findViewById(R.id.no_user);
+		if (adapter.countValues() > 0) tv.setVisibility(View.GONE);
+		else tv.setVisibility(View.VISIBLE);
 	}
 	
 	

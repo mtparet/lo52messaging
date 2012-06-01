@@ -72,4 +72,12 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 		
 	}
 	
+	/**
+	 * Retourne le nombre de valeurs dans l'adapter
+	 * @return
+	 */
+	public int countValues() {
+		return values.size();
+	}
+	
 }

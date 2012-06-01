@@ -127,7 +127,6 @@ public class LobbyActivity extends TabActivity {
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayList<Integer> getSwitchToConversationFragmentStatus() {
-		Log.d(TAG, "Récupération de la liste de la convers sur laquelle switcher");
 		
 		ArrayList<Integer> list = (ArrayList<Integer>) switchToConversation.clone();
 		switchToConversation.clear();

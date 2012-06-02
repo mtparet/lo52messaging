@@ -69,7 +69,7 @@ public class LobbyActivity extends TabActivity {
 		 * Création du tab de carte de géolocalisation des utilisateurs (LocalizationMapActivity)
 		 **/
 		intent = new Intent().setClass(this, LocalizationMapActivity.class);
-		spec = tabHost.newTabSpec(TAG_TAB_MAP).setIndicator(getString(R.string.lobby_tab_map), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
+		spec = tabHost.newTabSpec(TAG_TAB_MAP).setIndicator(getString(R.string.lobby_tab_map), getResources().getDrawable(R.drawable.icon_worldmap)).setContent(intent);
 		tabHost.addTab(spec);
 
 	}

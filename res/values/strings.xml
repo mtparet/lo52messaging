@@ -21,6 +21,9 @@
     <string name="userlist_no_user">Aucun utilisateur n\'a été détecté.\nCette vue se mettra automatiquement à jour lorsqu\'un utilisateur se connectera.</string>
     <string name="userlist_multi_user_menuitem">Choisir parmi plusieurs utilisateurs</string>
     <string name="userlist_multi_user_start">Commencer la conversation</string>
+    <string name="userlist_multi_select_multi">Sélection multiple</string>
+    <string name="userlist_multi_select_simple">Sélection unique</string>
+    <string name="userlist_error_no_user">Vous devez spécifier au moins un utilisateur.</string>
     
     <!-- CONVERSATIONS -->
     <string name="conversations_tab_name">Conversations</string>

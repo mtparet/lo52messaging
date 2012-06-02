@@ -882,6 +882,33 @@ public class NetworkService extends Service {
 	public static User getUser_me() {
 		return user_me;
 	}
+	
+	/**
+	 * Retourne l'ID de l'user en fonction de son nom ou 0 s'il n'existe pas
+	 * @param username
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static int getUserIdByName(String username) {
+		int userId = 0;
+		Hashtable<Integer, User> users = getListUsers();	// Récupère un clone
+		
+
+		boolean found = false;
+		Iterator it = users.entrySet().iterator();
+		while (it.hasNext() && !found) {
+			Map.Entry pairs = (Map.Entry) it.next();
+			
+			User u = (User) pairs.getValue();
+			
+			if (u.getName().equals(username)) {
+				userId = u.getId();
+				found = true;
+			}
+		}
+		
+		return userId;
+	}
 
 	//public static void setUser_me(User user_me) {
 	//	NetworkService.user_me = user_me;

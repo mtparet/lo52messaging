@@ -49,7 +49,7 @@ public class MessageBroacast implements Parcelable {
 		this.message = in.readString();
 		this.client_id = in.readInt();
 		this.conversation_id = in.readInt();
-		this.bitmap = in.readParcelable(bitmap.getClass().getClassLoader());
+		//this.bitmap = in.readParcelable(bitmap.getClass().getClassLoader()); // FIXME ca bug tout cette merde
 	}
 
 	public static final Parcelable.Creator<MessageBroacast> CREATOR= new Parcelable.Creator<MessageBroacast>() {

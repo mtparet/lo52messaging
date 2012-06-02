@@ -2,11 +2,9 @@ package lo52.messaging.fragments;
 
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
-import lo52.messaging.activities.FilePickerActivity;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.services.NetworkService;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -89,20 +87,18 @@ public class ConversationFragment extends Fragment {
 	OnClickListener sendButtonClickListener = new OnClickListener() {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton envoi");
-			parentActivity.onFragmentSendButtonClick(getConversUserText(), getConversation_id());
+			String messageText = getConversUserText();
+			parentActivity.onFragmentSendButtonClick(messageText, getConversation_id());
 			
-			// Reset du champ d'entrée de texte
-			Log.d(TAG, "CLICK " + fv);
-			
+			// Ajout du message texte à la conversation locale
+			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
+
+			// Reset du champ d'entrée de texte			
 			EditText conversUserText_edit	= (EditText) fv.findViewById(R.id.conversation_usermessage);
 			conversUserText_edit.setText("");
-			
-			// XXX 1
-			// Ajout du message à la conversation (*localement*) quand l'utilisateur appuie sur le bouton Envoyer
-			// FIXME Debug ===========
-			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), getConversUserText()));
+
+			// Mise à jour de l'UI
 			tryTextRefresh();
-			// =======================
 		}
 	};
 	
@@ -217,7 +213,7 @@ public class ConversationFragment extends Fragment {
 	 */
 	public void tryTextRefresh() {
 		// Régénère le texte de la conversation
-		conversationText_str = conversation.generateConversationName();
+		conversationText_str = conversation.generateUserFriendlyConversationText();
 		// Essaye de rafraichir le textEdit
 		if (fv != null) {
 			EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);

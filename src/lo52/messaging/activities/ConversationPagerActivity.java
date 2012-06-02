@@ -141,7 +141,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Initialise le ConversationListFragment
 		conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
 		// Et le cache
-		//conversationListFragment.setVisibility(View.GONE);
 		setListFragmentVisibility(View.GONE);
 		fragments.add(conversationListFragment);
 
@@ -265,7 +264,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-
 	/**
 	 * Démarre l'activité pour choisir un fichier
 	 */
@@ -307,12 +305,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-
-
+	
+	
 	/***
 	 * 	Méthodes propres à cette activité
 	 ***/
-
 
 	/**
 	 * Créé un fragment
@@ -332,7 +329,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		this.mapTabInfo.put(tabInfo.tag, tabInfo);
 
 		mPagerAdapter.addFragment(this);
-
 
 		// Set le conversation id
 		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
@@ -467,17 +463,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// On récupère le fragment correspondant à l'id de la conversatoin
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
-			//frag.appendConversationText(message.getMessage());
-
-			/**
-			 * FIXME : C'EST PAS PROPRE D'AJOUTER LE MESSAGE A LA CONVERSATION ICI.
-			 * XXX 1
-			 */
 			frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			
+			// On rafraichit la vue
 			frag.tryTextRefresh();
-			/**
-			 *  //===
-			 */
+
 			mPagerAdapter.notifyDataSetChanged();
 		}
 	};

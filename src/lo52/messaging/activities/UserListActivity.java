@@ -60,9 +60,9 @@ public class UserListActivity extends Activity {
 
 
 		/**
-		 * DEBUG
+		 * TESTS: décommentez si vous voulez tester les conversations multi user
 		 */
-		User u1 = new User("pablo gruer");
+		/*User u1 = new User("pablo gruer");
 		u1.setId(12345);
 		User u2 = new User("gilles bertrand");
 		u2.setId(12346);
@@ -71,7 +71,7 @@ public class UserListActivity extends Activity {
 
 		NetworkService.getListUsersNoClone().put(12345, u1);
 		NetworkService.getListUsersNoClone().put(12346, u2);
-		NetworkService.getListUsersNoClone().put(12347, u3);
+		NetworkService.getListUsersNoClone().put(12347, u3);*/
 		/**
 		 * 
 		 */

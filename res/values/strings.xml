@@ -10,6 +10,7 @@
     <!-- LAUNCHER (LO52Messaging) -->
     <string name="launcher_connexion_btn">Connexion</string>
     <string name="launcher_username_error_tv">Vous devez indiquer un nom d\'utilisateur dans les préférences avant de pouvoir vous connecter.</string>
+    <string name="launcher_welcome">Bienvenue,</string>
     
     <!-- LOBBY -->
     <string name="lobby_tab_users">Utilisateurs</string>
@@ -18,16 +19,17 @@
     
     <!-- USER LIST -->
     <string name="userlist_refresh_option">Rafraichir</string>
-    <string name="userlist_no_user">Aucun utilisateur n\'a été détecté.\nCette vue se mettra automatiquement à jour lorsqu\'un utilisateur se connectera.</string>
+    <string name="userlist_no_user">Aucun utilisateur n\'a été détecté.\n\nCette vue se mettra automatiquement à jour lorsqu\'un utilisateur se connectera.</string>
     <string name="userlist_multi_user_menuitem">Choisir parmi plusieurs utilisateurs</string>
     <string name="userlist_multi_user_start">Commencer la conversation</string>
     <string name="userlist_multi_select_multi">Sélection multiple</string>
     <string name="userlist_multi_select_simple">Sélection unique</string>
     <string name="userlist_error_no_user">Vous devez spécifier au moins un utilisateur.</string>
+    <string name="userlist_new_connection"> vient de se connecter</string>
     
     <!-- CONVERSATIONS -->
     <string name="conversations_tab_name">Conversations</string>
-    <string name="conversations_none">Vous n\'avez aucune conversation en cours</string>
+    <string name="conversations_none">Vous n\'avez aucune conversation en cours.</string>
     <string name="conversations_close_current">Fermer la conversation courante</string>
     <string name="conversations_name">::Nom de la conversation::</string>
     <string name="conversations_media_btn">Choisir un média</string>

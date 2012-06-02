@@ -742,6 +742,10 @@ public class NetworkService extends Service {
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
 		// XXX 3
 		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+		Bundle bundle = new Bundle();
+		bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
+		broadcastIntent.putExtra("new_user", bundle);
+
 		sendBroadcast(broadcastIntent);
 	}
 

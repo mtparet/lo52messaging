@@ -2,39 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/view"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="100dp"
     android:paddingBottom="20dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
-    android:gravity="center_horizontal"
-    android:background="@drawable/view">
+    android:paddingTop="100dp" >
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
         android:layout_marginBottom="20dp"
-        >
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
             android:layout_marginBottom="15dp"
             android:gravity="center_horizontal"
+            android:text="@string/app_name"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
             android:id="@+id/username_error_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/launcher_username_error_tv"
             android:gravity="center_horizontal"
+            android:text="@string/launcher_username_error_tv"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-        
     </LinearLayout>
 
     <LinearLayout
@@ -47,23 +45,33 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/launcher_connexion_btn" />
-
     </LinearLayout>
-    
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
-        
-        <TextView
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <!--
+             <TextView
             android:id="@+id/a_enlever_logo"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:text="@string/app_name"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-        
+
+        -->
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:contentDescription="@string/image_content_description"
+            android:gravity="center"
+            android:src="@drawable/background_logo" />
     </LinearLayout>
 
 </LinearLayout>

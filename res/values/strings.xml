@@ -44,8 +44,21 @@
     <string name="preferencesServiceNetwork">Service réseau toujours allumé</string>
     <string name="preferencesServiceNetworkDesc">Garder le service réseau toujours allumé en quittant l\'appli.</string>
     
+    <!-- FILE PICKER -->
+    <string name="filePicker_invalid_ext">Extension de fichier invalide</string>
+    <string name="filePicker_cant_read">ne peut pas être ouvert en lecture</string>
+    <string name="filePicker_new">Nouveau</string>
+    <string name="filePicker_select">Sélectionner</string>
+    <string name="filePicker_name">Nom : </string>
+    <string name="filePicker_cancel">Annuler</string>
+    <string name="filePicker_save">Sauvegarder</string>
+    <string name="filePicker_no_data">Aucune donnée</string>
+    
     <!-- MENUS -->
     <string name="preferencesTitle">Préférences</string>
+    
+    <!-- AUTRES -->
+    <string name="image_content_description"></string>
     
 
 </resources>

@@ -16,7 +16,7 @@
             android:id="@+id/conversation_name"
             android:layout_width="fill_parent"
             android:layout_height="24dp"
-            android:paddingBottom="4dp"
+            android:layout_marginBottom="4dp"
             android:paddingLeft="2dp"
             android:text="@string/conversations_name"
             android:textAppearance="?android:attr/textAppearanceMedium" />

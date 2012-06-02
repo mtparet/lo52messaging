@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -42,12 +43,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private static final int TAB_HEIGHT = 40;
 
 	// Longueur maximale, en caractères, pour le nom d'un fragment
-	private static final int TAB_NAME_MAX_LENGTH = 7;
+	private static final int TAB_NAME_MAX_LENGTH = 14;
 
 	private static final String TAG = "ConversationPagerActivity";
 
-	// Constantes des menus d'option (valeurs aléatoires mais uniques)
-	private static final int MENU_ITEM_CLOSE_CONV = 1001;
+	// Constantes des menus d'option et autres
+	private static final int MENU_ITEM_CLOSE_CONV 		= 0x01;
+	private static final int FILE_PICKER_ACTIVITY_CODE	= 0x10;
 
 	private TabHost mTabHost;
 	private ViewPager mViewPager;
@@ -119,18 +121,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Intialision du ViewPager
 		this.intialiseViewPager();
 
-		/*
-		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
-		 */
-		//Timer timer = new Timer();
-		//timer.schedule(new SendExempletimeTask(),4000);
-
-		/**
-		 * DEBUG
-		 */
-		/*ArrayList<Integer> list1 = new ArrayList<Integer>();
-		list1.add(1234);
-		addFragment(new Conversation(123, "name", list1), true);*/
 	}
 
 	/** (non-Javadoc)
@@ -181,7 +171,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param clss
 	 * @param args
 	 */
-
 	private static void AddTab(ConversationPagerActivity activity, TabHost tabHost, TabHost.TabSpec tabSpec, TabInfo tabInfo) {
 		// Attach a Tab view factory to the spec
 		tabSpec.setContent(activity.new TabFactory(activity));
@@ -274,6 +263,55 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 		return true;
 	}
+
+
+
+	/**
+	 * Démarre l'activité pour choisir un fichier
+	 */
+	public void startFilePickerActivity() {
+		// Démarrage de l'activité pour choisir un fichier			
+		Intent intent = new Intent(this, FilePickerActivity.class);
+		intent.putExtra(FilePickerActivity.START_PATH, "/sdcard");
+		startActivityForResult(intent, FILE_PICKER_ACTIVITY_CODE);		
+	}
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		String filePath = "";
+		// Retour de l'activité de choix d'un fichier
+		if (requestCode == FILE_PICKER_ACTIVITY_CODE) {
+
+			if (resultCode == RESULT_OK) {
+				filePath = data.getStringExtra(FilePickerActivity.RESULT_PATH);
+				Log.d(TAG, "Choix fichier: " + filePath);
+
+				// Extension
+				String filenameArray[] = filePath.split("\\.");
+				String extension = filenameArray[filenameArray.length-1];
+				Log.d(TAG, "Extension: " + extension);
+
+				// Vérification que l'extension de l'image est autorisée
+				boolean b1 = LibUtil.MEDIA_ALLOWED_EXTENSIONS.contains(extension);
+
+				if (!b1) {
+					Toast.makeText(this, getString(R.string.filePicker_invalid_ext), Toast.LENGTH_LONG).show();
+				}
+				else {
+					// TODO envoyer le fichier à tout les membres de la conversation
+					Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
+				}
+			}
+		}
+	}
+
+
+
+
+	/***
+	 * 	Méthodes propres à cette activité
+	 ***/
 
 
 	/**
@@ -526,28 +564,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		super.onStop();
 	}
 
-
-	/*class SendExempletimeTask extends TimerTask {
-
-		@Override
-		public void run() {
-			sendExemple();
-		}
-	}*/
-
-	/**
-	 * Exemple pour envoyer un message / une création de conversation
-	 */
-	/*void sendExemple(){
-		String conversation_name = "conversation_1";
-		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
-		int conversation_id = createConversation(conversation_name,users_conversation);
-
-		sendMessage("bonjour c'est moi1", conversation_id);
-
-		sendMessage("bonjour c'est moi2", conversation_id);
-		Log.d(TAG, "données exemple lancées");
-
-	}*/
+	
+	
 
 }

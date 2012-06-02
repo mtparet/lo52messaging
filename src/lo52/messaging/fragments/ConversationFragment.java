@@ -2,9 +2,11 @@ package lo52.messaging.fragments;
 
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
+import lo52.messaging.activities.FilePickerActivity;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.services.NetworkService;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -79,6 +81,8 @@ public class ConversationFragment extends Fragment {
 	OnClickListener mediaButtonClickListener = new OnClickListener() {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton media");
+			
+			parentActivity.startFilePickerActivity();
 		}
 	};
 	
@@ -101,7 +105,7 @@ public class ConversationFragment extends Fragment {
 			// =======================
 		}
 	};
-
+	
 	
 	/**
 	 * 

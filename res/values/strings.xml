@@ -33,6 +33,7 @@
     <string name="conversations_media_btn">Choisir un média</string>
     <string name="conversations_send_btn">Envoyer</string>
     <string name="conversations_name_prefix">Conversation avec </string>
+    <string name="conversations_myself">Moi</string>
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>

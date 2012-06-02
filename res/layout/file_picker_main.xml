@@ -29,7 +29,7 @@
 
                 <Button
                     android:id="@+id/fdButtonNew"
-                    style="@style/boutton"
+                    style="@style/bouton"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight=".3"
@@ -38,7 +38,7 @@
 
                 <Button
                     android:id="@+id/fdButtonSelect"
-                    style="@style/boutton"
+                    style="@style/bouton"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight=".7"
@@ -79,7 +79,7 @@
 
                 <Button
                     android:id="@+id/fdButtonCancel"
-                    style="@style/boutton"
+                    style="@style/bouton"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight=".3"
@@ -88,7 +88,7 @@
 
                 <Button
                     android:id="@+id/fdButtonCreate"
-                    style="@style/boutton"
+                    style="@style/bouton"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight=".7"

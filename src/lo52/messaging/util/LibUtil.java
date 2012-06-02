@@ -23,7 +23,7 @@ public class LibUtil {
 	 */
 	public static final Set<String> MEDIA_ALLOWED_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"jpg", "jpeg", "png", "avi"}
-	));
+			));
 
 
 
@@ -49,5 +49,28 @@ public class LibUtil {
 		} else return false;
 
 		return equal;
+	}
+
+
+	/**
+	 * Retourne le rang d'une valeur dans une liste
+	 * @param list
+	 * @param value
+	 * @return	int >= 0 si trouvé, -1 sinon
+	 */
+	public static <E> int getValueRankInList(ArrayList<E> list, E value) {
+		int rank = -1;
+		boolean found = false;
+		int k = 0;
+
+		while (k < list.size() && !found) {
+
+			if (list.get(k).equals(value)) {
+				rank = k;
+				found = true;
+			}
+			k++;
+		}
+		return rank;
 	}
 }

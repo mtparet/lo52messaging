@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 
+import lo52.messaging.R;
 import lo52.messaging.services.NetworkService;
+import lo52.messaging.util.LibUtil;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,9 +31,6 @@ public class Conversation implements Parcelable {
 	private ArrayList<Integer> listIdUser = new ArrayList<Integer>();
 
 	private static final String TAG = "Conversation";
-	
-	// Couleur utilisée pour écrire le nom des utilisateurs dans les conversations
-	private static final String HTML_USERNAME_COLOR = "#CCCCCC";
 
 	/**
 	 * Permet de créer une NOUVELLE conversation avec un utilisateur
@@ -199,36 +198,69 @@ public class Conversation implements Parcelable {
 		}
 		return name;
 	}
-	
-	
+
+
 	/**
 	 * Génère une chaine de caractères contenant tous les messages de la conversation, pouvant être affichée dans l'EditText.
 	 * La chaine retournée doit être interprétée avec Html.fromHTML();
 	 * @return	String Une chaine HTML
 	 */
-	public String generateUserFriendlyConversationText() {
+	public String generateUserFriendlyConversationText(Context ctx) {
 		Log.d(TAG, "Génération du texte de conversation...");
 		String text = "";
-		
+
 		// Liste des messages
 		ArrayList<Message> messages = getListMessage();
 		Log.d(TAG, messages.size() + " messages dans la conversation");
-		
+
 		// Liste des users
 		Hashtable<Integer, User> users = NetworkService.getListUsers();
 		Log.d(TAG, users.size() + " users connus par le service");
-		
+
+		int mySelf 	= NetworkService.getUser_me().getId();
+		int color 	= 0;
+		String name = "";
+
 		for (Message m : messages) {
 			if (!m.getMessage().equals("")) {	// Pour vérifier que le message est du texte
 				Log.d(TAG, "Cherche user " + m.getClient_id());
 				User u  = users.get(m.getClient_id());
 				if (u != null) {
-					text += "<font color=\"#CCCCCC\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
+
+					// Attribution de la couleur et du nom en fonction de l'user
+					if (u.getId() == mySelf) {
+						color 	= ctx.getResources().getColor(R.color.conversation_myself);
+						name	= ctx.getString(R.string.conversations_myself);
+					}
+					else {
+						// Numéro en fonction du rang de l'user dans la liste des membres de la conversation
+						int rank = LibUtil.getValueRankInList(this.listIdUser, u.getId());
+						Log.d(TAG, "RANK TROUVE : " + rank);
+
+						// Au cas où l'user n'a pas été trouvé
+						if (rank < 0) rank = 0;
+
+						// Modulo
+						rank = rank % 4;	// % nombre de couleurs différentes définies dans styles.xml
+
+						// Attribution couleur
+						if (rank == 0)		color = ctx.getResources().getColor(R.color.conversation_user1);
+						else if (rank == 1)	color = ctx.getResources().getColor(R.color.conversation_user2);
+						else if (rank == 2)	color = ctx.getResources().getColor(R.color.conversation_user3);
+						else if (rank == 3)	color = ctx.getResources().getColor(R.color.conversation_user4);
+
+						name = u.getName();
+					}
+
+
+					text += "<font color=\"" + color + "\">" + name + ":</font> " + m.getMessage() + "<br>";
 				} else {
-					if(m.getClient_id() == NetworkService.getUser_me().getId()){
-						u = NetworkService.getUser_me();
-						text += "<font color=\""+HTML_USERNAME_COLOR+"\">" + u.getName() + ":</font> " + m.getMessage() + "<br>";
-					}else{
+					if(m.getClient_id() == mySelf){
+
+						text += "<font color=\""+ ctx.getResources().getColor(R.color.conversation_myself) +"\">" + ctx.getString(R.string.conversations_myself) + ":</font> " + m.getMessage() + "<br>";
+
+					} else {
+
 						Log.e(TAG, "User inconnu par le service");
 					}
 				}

@@ -44,7 +44,7 @@ public class ConversationFragment extends Fragment {
 		EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
 		
 		if (conversText_edit != null )
-			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText()));
+			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,12 +62,14 @@ public class ConversationFragment extends Fragment {
 		//conversText_edit.setEnabled(false);
 		conversText_edit.setFocusable(false);
 		
+		parentActivity = (ConversationPagerActivity) getActivity();
+		
 		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
-		conversationText_str = conversation.generateUserFriendlyConversationText();
-		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText()));
+		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
+		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
 		
-		parentActivity = (ConversationPagerActivity) getActivity();
+		
 		
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
@@ -213,7 +215,7 @@ public class ConversationFragment extends Fragment {
 	 */
 	public void tryTextRefresh() {
 		// Régénère le texte de la conversation
-		conversationText_str = conversation.generateUserFriendlyConversationText();
+		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
 		// Essaye de rafraichir le textEdit
 		if (fv != null) {
 			EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);

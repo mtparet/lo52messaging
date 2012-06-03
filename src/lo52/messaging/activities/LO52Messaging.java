@@ -86,7 +86,7 @@ public class LO52Messaging extends Activity {
 		
 		// On rend le logo un peu transparent
 		ImageView logo = (ImageView) findViewById(R.id.imageView1);
-		logo.setAlpha(127);
+		logo.setAlpha(220);	// Entre 0 et 255
 
 	}
 

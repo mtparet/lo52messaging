@@ -206,16 +206,13 @@ public class Conversation implements Parcelable {
 	 * @return	String Une chaine HTML
 	 */
 	public String generateUserFriendlyConversationText(Context ctx) {
-		Log.d(TAG, "Génération du texte de conversation...");
 		String text = "";
 
 		// Liste des messages
 		ArrayList<Message> messages = getListMessage();
-		Log.d(TAG, messages.size() + " messages dans la conversation");
 
 		// Liste des users
 		Hashtable<Integer, User> users = NetworkService.getListUsers();
-		Log.d(TAG, users.size() + " users connus par le service");
 
 		int mySelf 	= NetworkService.getUser_me().getId();
 		int color 	= 0;
@@ -223,7 +220,6 @@ public class Conversation implements Parcelable {
 
 		for (Message m : messages) {
 			if (!m.getMessage().equals("")) {	// Pour vérifier que le message est du texte
-				Log.d(TAG, "Cherche user " + m.getClient_id());
 				User u  = users.get(m.getClient_id());
 				if (u != null) {
 
@@ -235,7 +231,6 @@ public class Conversation implements Parcelable {
 					else {
 						// Numéro en fonction du rang de l'user dans la liste des membres de la conversation
 						int rank = LibUtil.getValueRankInList(this.listIdUser, u.getId());
-						Log.d(TAG, "RANK TROUVE : " + rank);
 
 						// Au cas où l'user n'a pas été trouvé
 						if (rank < 0) rank = 0;
@@ -266,7 +261,6 @@ public class Conversation implements Parcelable {
 				}
 			} else Log.w(TAG, "Message vide");
 		}
-		Log.d(TAG, "Texte généré : " + text);
 		return text;
 	}
 

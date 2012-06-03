@@ -2,14 +2,16 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import lo52.messaging.R;
 import lo52.messaging.fragments.ConversationFragment;
 import lo52.messaging.fragments.ConversationListFragment;
 import lo52.messaging.model.Conversation;
-import lo52.messaging.model.Message;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.util.LibUtil;
@@ -29,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -42,12 +45,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private static final int TAB_HEIGHT = 40;
 
 	// Longueur maximale, en caractères, pour le nom d'un fragment
-	private static final int TAB_NAME_MAX_LENGTH = 7;
+	private static final int TAB_NAME_MAX_LENGTH = 14;
 
 	private static final String TAG = "ConversationPagerActivity";
 
-	// Constantes des menus d'option (valeurs aléatoires mais uniques)
-	private static final int MENU_ITEM_CLOSE_CONV = 1001;
+	// Constantes des menus d'option et autres
+	private static final int MENU_ITEM_CLOSE_CONV 		= 0x01;
+	private static final int FILE_PICKER_ACTIVITY_CODE	= 0x10;
 
 	private TabHost mTabHost;
 	private ViewPager mViewPager;
@@ -119,18 +123,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Intialision du ViewPager
 		this.intialiseViewPager();
 
-		/*
-		 * on lance les exemples, utilisation d'un timer pour attendre que tout le reste soit en place
-		 */
-		//Timer timer = new Timer();
-		//timer.schedule(new SendExempletimeTask(),4000);
-
-		/**
-		 * DEBUG
-		 */
-		/*ArrayList<Integer> list1 = new ArrayList<Integer>();
-		list1.add(1234);
-		addFragment(new Conversation(123, "name", list1), true);*/
 	}
 
 	/** (non-Javadoc)
@@ -151,7 +143,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		// Initialise le ConversationListFragment
 		conversationListFragment = (ConversationListFragment) Fragment.instantiate(this, ConversationListFragment.class.getName());
 		// Et le cache
-		//conversationListFragment.setVisibility(View.GONE);
 		setListFragmentVisibility(View.GONE);
 		fragments.add(conversationListFragment);
 
@@ -181,7 +172,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	 * @param clss
 	 * @param args
 	 */
-
 	private static void AddTab(ConversationPagerActivity activity, TabHost tabHost, TabHost.TabSpec tabSpec, TabInfo tabInfo) {
 		// Attach a Tab view factory to the spec
 		tabSpec.setContent(activity.new TabFactory(activity));
@@ -277,6 +267,53 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 
 	/**
+	 * Démarre l'activité pour choisir un fichier
+	 */
+	public void startFilePickerActivity() {
+		// Démarrage de l'activité pour choisir un fichier			
+		Intent intent = new Intent(this, FilePickerActivity.class);
+		intent.putExtra(FilePickerActivity.START_PATH, "/sdcard");
+		startActivityForResult(intent, FILE_PICKER_ACTIVITY_CODE);		
+	}
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		String filePath = "";
+		// Retour de l'activité de choix d'un fichier
+		if (requestCode == FILE_PICKER_ACTIVITY_CODE) {
+
+			if (resultCode == RESULT_OK) {
+				filePath = data.getStringExtra(FilePickerActivity.RESULT_PATH);
+				Log.d(TAG, "Choix fichier: " + filePath);
+
+				// Extension
+				String filenameArray[] = filePath.split("\\.");
+				String extension = filenameArray[filenameArray.length-1];
+				Log.d(TAG, "Extension: " + extension);
+
+				// Vérification que l'extension de l'image est autorisée
+				boolean b1 = LibUtil.MEDIA_ALLOWED_EXTENSIONS.contains(extension);
+
+				if (!b1) {
+					Toast.makeText(this, getString(R.string.filePicker_invalid_ext), Toast.LENGTH_LONG).show();
+				}
+				else {
+					// TODO envoyer le fichier à tout les membres de la conversation
+					Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
+				}
+			}
+		}
+	}
+
+
+
+
+	/***
+	 * 	Méthodes propres à cette activité
+	 ***/
+
+	/**
 	 * Créé un fragment
 	 * @param conversation_id	Id de la conversation associée
 	 * @param autoSwitchOnFragment	Changer la vue pour le fragment créé
@@ -295,7 +332,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		mPagerAdapter.addFragment(this);
 
-
 		// Set le conversation id
 		MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
 		ConversationFragment f_last = (ConversationFragment) mp.getFragmentsList().get(this.mPagerAdapter.getCount()-1);
@@ -303,24 +339,32 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		f_last.setConversation_id(conversation.getConversation_id());
 		f_last.setConversName(conversation.generateConversationName());
 
-		// Cacher le TV
-		if (this.mPagerAdapter.getCount() == 2) {
-			TextView tv = (TextView) findViewById(R.id.no_conversation);
-			tv.setVisibility(View.GONE);
-			// Affiche la liste des conversations
-			setListFragmentVisibility(View.VISIBLE);
-		}
+		autoUpdateListVisibility();
 
 		if (autoSwitchOnFragment) {
 			this.mViewPager.setCurrentItem(this.mPagerAdapter.getCount());
 		}
 	}
 
+	
+	/**
+	 * Met à jour la visibilité de la liste des conversations et du panneau de fond
+	 */
+	public void autoUpdateListVisibility() {
+		// Cacher le TV
+		if (this.mPagerAdapter.getCount() == 2 || this.conversationListFragment.getConversationsNumber() > 0) {
+			TextView tv = (TextView) findViewById(R.id.no_conversation);
+			tv.setVisibility(View.GONE);
+			// Affiche la liste des conversations
+			setListFragmentVisibility(View.VISIBLE);
+		}
+	}
+
 
 	/**
-	 * Retourne un fragment en fonction de son Id
-	 * @param id
-	 * @return
+	 * Retourne un fragment de conversation en fonction de son Id
+	 * @param id	Id de la conversation
+	 * @return int ou null
 	 */
 	public ConversationFragment getFragmentById(int id) {
 
@@ -429,17 +473,14 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// On récupère le fragment correspondant à l'id de la conversatoin
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
-			//frag.appendConversationText(message.getMessage());
+			// XXX doublon ?
+			//frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			//frag.setConversation(NetworkService.getListConversations().get(frag.getConversation().getConversation_id()));
+			frag.updateConversationFromService();
 
-			/**
-			 * FIXME : C'EST PAS PROPRE D'AJOUTER LE MESSAGE A LA CONVERSATION ICI.
-			 * XXX 1
-			 */
-			frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			// On rafraichit la vue
 			frag.tryTextRefresh();
-			/**
-			 *  //===
-			 */
+
 			mPagerAdapter.notifyDataSetChanged();
 		}
 	};
@@ -474,9 +515,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 	};
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		//Enregistrement de l'intent filter
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
@@ -488,6 +531,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		registerReceiver(conversationReceiver, filter2);
 
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
+		// (coté broadcast receiver / personne qui *créé* la conversation)
 		ArrayList<Conversation> conversations = NetworkService.getLocalConversationsToCreate();
 		for (Conversation conv : conversations) {
 			addFragment(conv, true);
@@ -512,6 +556,26 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				fragNumber++;
 			}
 		}
+
+
+		// Si le mobile a reçu un paquet de création de groupe et que l'activité était en pause, il faut créer un tab pour la conversation
+		if (NetworkService.getListConversations().size() > mPagerAdapter.getCount()-1) {
+
+			Hashtable<Integer, Conversation> convers = NetworkService.getListConversations();
+			Iterator it = convers.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pairs = (Map.Entry) it.next();
+
+				Conversation c = (Conversation) pairs.getValue(); 
+
+				// Si le fragment n'existe pas, on doit le créer
+				if (getFragmentById(c.getConversation_id()) == null) {
+					addFragment(c, false);	// sans auto switch de la vue
+				}
+			}
+		}
+		
+		autoUpdateListVisibility();
 	}
 
 	@Override
@@ -527,27 +591,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-	/*class SendExempletimeTask extends TimerTask {
 
-		@Override
-		public void run() {
-			sendExemple();
-		}
-	}*/
-
-	/**
-	 * Exemple pour envoyer un message / une création de conversation
-	 */
-	/*void sendExemple(){
-		String conversation_name = "conversation_1";
-		ArrayList<Integer> users_conversation = new ArrayList<Integer>(NetworkService.getListUsers().keySet());
-		int conversation_id = createConversation(conversation_name,users_conversation);
-
-		sendMessage("bonjour c'est moi1", conversation_id);
-
-		sendMessage("bonjour c'est moi2", conversation_id);
-		Log.d(TAG, "données exemple lancées");
-
-	}*/
 
 }

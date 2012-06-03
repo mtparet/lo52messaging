@@ -210,7 +210,7 @@ public class NetworkService extends Service {
 		 */
 		Timer timer = new Timer();
 		timer.schedule(new SendBroadcatsimeTask(), 200);
-		
+
 	}
 
 	/**
@@ -263,10 +263,13 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 
-			Log.d(TAG, "message à envoyé depuis client" + message.getClient_id() );
+			Log.d(TAG, "message à envoyer depuis client " + message.getClient_id() );
 			// on ajoute le message à la liste
-			Message mess = new Message(message.getClient_id(), message.getMessage());
-			listConversations.get(message.getConversation_id()).addMessage(mess);
+
+			// Fix : on ajoute le message à la conversation directement depuis le fragment car le broadcast arrive après que la vue du fragment
+			// soit rafraichie
+			//Message mess = new Message(message.getClient_id(), message.getMessage());
+			//listConversations.get(message.getConversation_id()).addMessage(mess);
 
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
@@ -574,7 +577,7 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
-						
+
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
@@ -677,8 +680,6 @@ public class NetworkService extends Service {
 			User user = listUsers.get(packet.getContent().getClient_id());
 
 			user.setLocalisation(loca);
-			listUsers.remove(user.getId());
-			listUsers.put(user.getId(), user);
 		}else{
 			Log.d(TAG, "user inconnu");
 		}
@@ -692,10 +693,12 @@ public class NetworkService extends Service {
 	 */
 	private void paquetMessage(PacketNetwork packetReceive) {
 
-		Log.d(TAG, "message reçu dans le NetworkService");
+		Log.w(TAG, "> Message reçu dans le NetworkService");
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
+			Log.d(TAG, "Network, ajout message avant " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
+			Log.d(TAG, "Network, ajout message apres " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 
 			if(packetReceive.getUser_envoyeur() != user_me){
 				Intent broadcastIntent = new Intent(NetworkService.SendMessage);
@@ -752,6 +755,10 @@ public class NetworkService extends Service {
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
 		// XXX 3
 		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+		Bundle bundle = new Bundle();
+		bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
+		broadcastIntent.putExtra("new_user", bundle);
+
 		sendBroadcast(broadcastIntent);
 	}
 
@@ -791,9 +798,6 @@ public class NetworkService extends Service {
 				Conversation conversation = listConversations.get(packetReceive.getContent().getConversation_id());
 				conversation.setConversation_name(packetReceive.getContent().getConversation_name());
 
-				listConversations.remove(packetReceive.getContent().getConversation_id());
-
-				listConversations.put(conversation.getConversation_id(), conversation);
 			}
 
 		} else {
@@ -867,10 +871,10 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, User> getListUsers() {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
-	
-	public static Hashtable<Integer, User> getListUsersNoClone() {
-		return (Hashtable<Integer, User>) listUsers;
-	}
+
+	//public static Hashtable<Integer, User> getListUsersNoClone() {
+	//	return (Hashtable<Integer, User>) listUsers;
+	//}
 
 	//public static void setListUsers(Hashtable<Integer, User> listUsersE) {
 	//	listUsers = listUsersE;
@@ -880,10 +884,10 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, Conversation> getListConversations() {
 		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
-	
-	public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
-		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
-	}
+
+	//public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
+	//	return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
+	//}
 
 	//public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
 	//	NetworkService.listConversations = listConversations;
@@ -891,6 +895,33 @@ public class NetworkService extends Service {
 
 	public static User getUser_me() {
 		return user_me;
+	}
+
+	/**
+	 * Retourne l'ID de l'user en fonction de son nom ou 0 s'il n'existe pas
+	 * @param username
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static int getUserIdByName(String username) {
+		int userId = 0;
+		Hashtable<Integer, User> users = getListUsers();	// Récupère un clone
+
+
+		boolean found = false;
+		Iterator it = users.entrySet().iterator();
+		while (it.hasNext() && !found) {
+			Map.Entry pairs = (Map.Entry) it.next();
+
+			User u = (User) pairs.getValue();
+
+			if (u.getName().equals(username)) {
+				userId = u.getId();
+				found = true;
+			}
+		}
+
+		return userId;
 	}
 
 	//public static void setUser_me(User user_me) {
@@ -946,10 +977,11 @@ public class NetworkService extends Service {
 	public static ArrayList<Conversation> getLocalConversationsToCreate() {
 		ArrayList<Conversation> l = (ArrayList<Conversation>) conversationsToCreateUI.clone();
 		conversationsToCreateUI.clear();
+
 		return l;
 	}
 
-	
+
 	/**
 	 * Vérifie si une conversation existe déjà, en fonction des membres qui la composent
 	 * @param userIds	La liste des membres qui composent cette conversation

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
@@ -74,13 +75,19 @@ public class LO52Messaging extends Activity {
 			usernameErrorTv.setText(R.string.launcher_username_error_tv);
 			connexionBtn.setEnabled(false);
 		} else {
-			usernameErrorTv.setText("");
+			// On met un message de bienvenur
+			usernameErrorTv.setText(getString(R.string.launcher_welcome) + " " + preferences.getString("prefs_userName", "") + " !");
 
 			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby
 			if (preferences.getBoolean("prefs_autoLogin", false)) {
 				startLobbyActivity();
 			}
 		}
+		
+		// On rend le logo un peu transparent
+		ImageView logo = (ImageView) findViewById(R.id.imageView1);
+		logo.setAlpha(220);	// Entre 0 et 255
+
 	}
 
 	/**
@@ -93,7 +100,7 @@ public class LO52Messaging extends Activity {
 			usernameErrorTv.setText(R.string.launcher_username_error_tv);
 			connexionBtn.setEnabled(false);
 		} else {
-			usernameErrorTv.setText("");
+			usernameErrorTv.setText(getString(R.string.launcher_welcome) + " " + preferences.getString("prefs_userName", "") + " !");
 			connexionBtn.setEnabled(true);
 
 			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby

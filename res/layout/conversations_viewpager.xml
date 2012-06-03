@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TabHost
+        android:id="@android:id/tabhost"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-	<TabHost
-	    android:id="@android:id/tabhost"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    >
-	    <LinearLayout
-	        android:orientation="vertical"
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        >
-	        <TabWidget
-	            android:id="@android:id/tabs"
-	            android:orientation="horizontal"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="0"
-	            />
+        android:layout_height="fill_parent" >
 
-	        <FrameLayout
-	            android:id="@android:id/tabcontent"
-	            android:layout_width="0dp"
-	            android:layout_height="0dp"
-	            android:layout_weight="0"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
 
-	        <android.support.v4.view.ViewPager
-			  	android:id="@+id/viewpager"
-			  	android:layout_width="fill_parent"
-			 	android:layout_height="0dp"
-			 	android:layout_weight="1"
-			  	/>
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:orientation="horizontal" />
 
-	    </LinearLayout>
-	    
-	    <TextView
-	            android:id="@+id/no_conversation"
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:text="@string/conversations_none"
-	            android:gravity="center"
-	            android:textColor="#AAAAAA"
-	            android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	</TabHost>
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/no_conversation"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:padding="6dp"
+            android:text="@string/conversations_none"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#AAAAAA" />
+    </TabHost>
+
 </LinearLayout>

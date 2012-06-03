@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Couleurs -->
+    <color name="conversation_myself">#BBBBBB</color>
+    <color name="conversation_user1">#5979C2</color>	<!-- ~bleu -->
+    <color name="conversation_user2">#519C74</color>	<!-- ~vert -->
+    <color name="conversation_user3">#B85FC9</color>	<!-- ~violet -->
+    <color name="conversation_user4">#F0C654</color>	<!-- ~orange -->
+    
+    
+    
+    <!-- Styles pour le FilePicker -->
+    
+    <style name="donnee" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">15dip</item>
+        <item name="android:textColor">#4a708b</item>
+        <item name="android:textStyle">bold|italic</item>
+    </style>
+
+    <style name="sous_titre" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">15dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#fff</item>
+    </style>
+
+    <style name="sous_titre_2" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">15dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#666</item>
+    </style>
+    
+
+    <style name="bouton" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">13dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+
+</resources>

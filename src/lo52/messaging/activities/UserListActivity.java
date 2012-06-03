@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  *	Activité servant à lister les utilisateurs 
@@ -39,8 +40,10 @@ public class UserListActivity extends Activity {
 
 	UserListView userListView;
 	Button startMultiConversBtn;
+	
+	private final int MENU_ITEM_SELECTION_MODE = 0x1;
 
-	//liste des users
+	// Liste des users
 	Hashtable<Integer, User> userList;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -54,21 +57,28 @@ public class UserListActivity extends Activity {
 
 		// Utilisation de l'adapteur custom
 		adapter = new UserListArrayAdapter(this, values);
-		
-		
+
+
 		/**
-		 * DEBUG
+		 * TESTS: décommentez si vous voulez tester les conversations multi user
 		 */
-		NetworkService.getListUsersNoClone().put(12345, new User("pablo gruer"));
-		NetworkService.getListUsersNoClone().put(12346, new User("gilles bertrand"));
-		NetworkService.getListUsersNoClone().put(12347, new User("chuck norris"));
+		/*User u1 = new User("pablo gruer");
+		u1.setId(12345);
+		User u2 = new User("gilles bertrand");
+		u2.setId(12346);
+		User u3 = new User("chuck norris");
+		u3.setId(12347);
+
+		NetworkService.getListUsersNoClone().put(12345, u1);
+		NetworkService.getListUsersNoClone().put(12346, u2);
+		NetworkService.getListUsersNoClone().put(12347, u3);*/
 		/**
 		 * 
 		 */
-		
+
 		userListView.setAdapter(adapter);
 		userListView.setOnItemClickListener(itemClickListenerList);
-		
+
 		// Listener sur le bouton pour commencer une conversation avec plusieurs utilisateurs
 		startMultiConversBtn.setOnClickListener(startMultiConversButtonListener);
 
@@ -111,18 +121,18 @@ public class UserListActivity extends Activity {
 		super.onDestroy();
 	}
 
-	
-	
+
+
 	private OnItemClickListener itemClickListenerList = new OnItemClickListener() {
 
 		@Override
 		public void onItemClick(AdapterView<?> listView, View view, int position, long row) {
-			
+
 			Log.d(TAG, "Click item list " + position);
 
 			String item = (String) listView.getAdapter().getItem(position);
 
-			User user_selected = null;
+			/*User user_selected = null;
 			for(User user : userList.values()){
 				if(user.getName() == item){
 					user_selected = user;
@@ -132,46 +142,90 @@ public class UserListActivity extends Activity {
 			if(user_selected == null){
 				Log.e(TAG,"user inconnu");
 				return;
+			}*/
+			
+			int userId = NetworkService.getUserIdByName(item);
+			
+			if (userId == 0) {	
+				Log.e(TAG,"user inconnu");
+				return;
 			}
 
 			// ArrayList contenant l'ID de l'utilisateur
 			ArrayList<Integer> list = new ArrayList<Integer>();
-			list.add(user_selected.getId());
-			list.add(NetworkService.getUser_me().getId());
-
-			// Création de la conversation avec en nom le nom de l'utilisateur, si elle n'existe pas déjà
-			if (!NetworkService.doesConversationExist(list)) {
-
-				Conversation conversation = new Conversation(item, list);
-				conversation.sendToNetworkService(getApplicationContext());
-
-				// Rend le tab des conversations actif
-				LobbyActivity parent = (LobbyActivity) getParent();
-				parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
-			} else {
-				// Si la conversation existe déjà on rend le second tab actif et on essaye de switcher sur le fragment correspondant
-				LobbyActivity parent = (LobbyActivity) getParent();
-				parent.setSwitchToConversationFragment(list);
-				parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
-			}
+			list.add(userId);
+			
+			// Création de la conversation
+			createConversation(list);
+			
 		}
 	};
-	
+
 	private OnClickListener startMultiConversButtonListener = new OnClickListener() {
-		
+
 		@Override
 		public void onClick(View v) {
-			
+
 			HashSet<String> usernames = adapter.getCheckUsernames();
 			Log.d(TAG, "Multi users : " + usernames);
+
+			ArrayList<Integer> userIds = new ArrayList<Integer>();
 			
+			for (String s : usernames) {
+				int id = NetworkService.getUserIdByName(s);
+				if (id == 0) {
+					Log.e(TAG, "Erreur, user inconnu");
+					
+				}
+				userIds.add(id);
+			}
 			
-			// TODO créer conversation + refactoriser code avec celui de la création de conversation pour le simple click
-			// TODO afficher un Toast si aucun user n'est coché (size() == 0)
+			Log.d(TAG, "Création avec multi " + userIds.toString());
 			
+			// Avant de créer la conversation et mettre en pause cette activité on revient en mode de sélection simple
+			adapter.switchMultiUserChoiceMode();
+			refreshUserList();
+			
+			// Création de la conversation
+			createConversation(userIds);
 		}
 	};
-	
+
+
+	/**
+	 * S'occupe de créer la conversation et fait l'appel à la fonction du service network pour envoyer la demande création de conversation.
+	 * Vérifie également qu'une conversation identique n'existe pas, dans quel cas la vue est redirigée vers le fragment concerné.
+	 * @param userIds	Liste des Ids des membres de la conversation
+	 */
+	private void createConversation(ArrayList<Integer> userIds) {
+		// Activité lobby
+		LobbyActivity parent = (LobbyActivity) getParent();
+		
+		// On vérifie qu'au moins 1 user a été spécifié
+		if (userIds.size() < 1) {
+			Toast.makeText(this, getString(R.string.userlist_error_no_user), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		// Ajout de user_me à la conversation
+		if (!userIds.contains(NetworkService.getUser_me().getId()))
+			userIds.add(NetworkService.getUser_me().getId());
+
+		
+		// Création de la conversation si elle n'existe pas déjà
+		if (!NetworkService.doesConversationExist(userIds)) {
+
+			Conversation conversation = new Conversation("conversation_name", userIds);	// Le nom n'est plus utilisé
+			conversation.sendToNetworkService(getApplicationContext());
+		} else {
+			// Si la conversation existe déjà on rend le second tab actif et on essaye de switcher sur le fragment correspondant
+			parent.setSwitchToConversationFragment(userIds);
+		}
+		
+		// Rend le tab des conversations actif
+		parent.setActiveTabByTag(LobbyActivity.TAG_TAB_CONVERSATIONS);
+	}
+
 
 	/**
 	 * Gestion du menu option et des actions associées
@@ -180,13 +234,35 @@ public class UserListActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.user_list_activity_menu, menu);
-		
-		// FIXME rajouter constante + string
-		menu.add(999, 999, 2, "Mode sélection");
-		
-		
+
 		return true;
 	}
+
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		
+		// Exécuté avant l'ouverture du menu
+		// S'il y a moins de 2 utilisateurs on n'affiche pas le bouton de choix multiple
+		if (userList.size() > 1) {
+			
+			// On supprime le bouton d'avant
+			menu.removeGroup(MENU_ITEM_SELECTION_MODE);
+			
+			// On change le texte en fonction du mode de sélection actuel
+			if (adapter.isMultiUserChoiceSelectionMode())
+				menu.add(MENU_ITEM_SELECTION_MODE, MENU_ITEM_SELECTION_MODE, 2, getString(R.string.userlist_multi_select_simple));
+			else
+				menu.add(MENU_ITEM_SELECTION_MODE, MENU_ITEM_SELECTION_MODE, 2, getString(R.string.userlist_multi_select_multi));
+			
+		} else {
+			menu.removeGroup(MENU_ITEM_SELECTION_MODE);
+		}
+		
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -195,13 +271,13 @@ public class UserListActivity extends Activity {
 			refreshUserList();
 			//Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
 		}
-		else if (menuItemId == 999) {
-			
+		else if (menuItemId == MENU_ITEM_SELECTION_MODE) {
+
 			Log.d(TAG, "mode sélection!");
 			adapter.switchMultiUserChoiceMode();
-			
+
 			refreshUserList();
-			
+
 		}
 		else {
 			Log.e(TAG, "Item non pris en charge");
@@ -224,7 +300,7 @@ public class UserListActivity extends Activity {
 		TextView tv = (TextView) findViewById(R.id.no_user);
 		if (adapter.countValues() > 0) tv.setVisibility(View.GONE);
 		else tv.setVisibility(View.VISIBLE);
-		
+
 		// On affiche ou cache le bouton pour commencer la conversation à plusieurs
 		if (adapter.isMultiUserChoiceSelectionMode())
 			startMultiConversBtn.setVisibility(View.VISIBLE);
@@ -240,10 +316,14 @@ public class UserListActivity extends Activity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG, "réception d'un broadcast pour rafraichir la liste des users");
+			
+			// On récupère le nom de l'user depuis le bundle pour afficher un toast
+			Bundle userInfo = intent.getBundleExtra("new_user");
+			if (userInfo != null && userInfo.getString("new_user") != null) {
+				Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
+			}
 			refreshUserList();
 		}
-
 	};
 
 }

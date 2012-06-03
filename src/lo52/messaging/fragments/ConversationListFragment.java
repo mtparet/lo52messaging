@@ -125,5 +125,21 @@ public class ConversationListFragment extends ListFragment {
 			Log.d(TAG, "Nom généré : " + conversationName + " : ajouté à la liste");
 			conversationNames.add(conversationName);
 		}
+		
+		
+		//if (conversationNames.size() > 0) setVisibility(View.VISIBLE);
+		//else setVisibility(View.GONE);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getConversationsNumber() {
+		if (conversationsTable == null) 
+			return 0;
+		
+		else
+			return conversationsTable.size();
 	}
 }

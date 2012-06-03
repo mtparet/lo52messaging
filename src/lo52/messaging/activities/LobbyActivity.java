@@ -91,6 +91,51 @@ public class LobbyActivity extends TabActivity {
 			}
 		}
 	}
+	
+	
+	
+	
+	/**
+	 * Recoit les nouvelles conversations
+	 */
+	/*private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+			/*
+			 * Principe : si le tab des conversations est actif, on
+			 */
+			
+			/*Log.d(TAG, "Réception d'une création de conversation");
+			Bundle bundle = intent.getBundleExtra("conversation");
+			Conversation conversation = bundle.getParcelable("conversation");
+			Log.d(TAG, "conversation_id:" + conversation.getConversation_id() + "conversation_name:" + conversation.getConversation_name());
+			Log.w(TAG, "Membres de la conversations: " + conversation.getListIdUser().size());
+			for (int i : conversation.getListIdUser()) {
+				Log.d(TAG, "> Membre : " + i);
+			}
+			Log.d(TAG, "(Pour info, User_me = " + NetworkService.getUser_me().getId() + ")");
+
+
+			TabHost tabHost = getTabHost();
+			tabHost.getCurrentTabTag();
+			
+			// Ajout du fragment
+			addFragment(conversation, false);
+			// On récupère le nouveau fragment pour pouvoir setter son nom
+			ConversationFragment lastFrag = getFragmentById(conversation.getConversation_id());
+			lastFrag.setConversName(conversation.generateConversationName());
+
+
+			//mPagerAdapter.notifyDataSetChanged();
+			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
+		}
+	};*/
+	
+	
+	
+	
 
 	/**
 	 * @deprecated

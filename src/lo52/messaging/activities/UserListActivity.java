@@ -320,7 +320,7 @@ public class UserListActivity extends Activity {
 			// On récupère le nom de l'user depuis le bundle pour afficher un toast
 			Bundle userInfo = intent.getBundleExtra("new_user");
 			if (userInfo != null && userInfo.getString("new_user") != null) {
-				Toast.makeText(context, userInfo.getString("new_user") + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
 			}
 			refreshUserList();
 		}

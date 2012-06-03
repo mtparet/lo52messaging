@@ -2,7 +2,10 @@ package lo52.messaging.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import lo52.messaging.R;
@@ -305,8 +308,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-	
-	
+
+
 	/***
 	 * 	Méthodes propres à cette activité
 	 ***/
@@ -337,24 +340,32 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		f_last.setConversation_id(conversation.getConversation_id());
 		f_last.setConversName(conversation.generateConversationName());
 
-		// Cacher le TV
-		if (this.mPagerAdapter.getCount() == 2) {
-			TextView tv = (TextView) findViewById(R.id.no_conversation);
-			tv.setVisibility(View.GONE);
-			// Affiche la liste des conversations
-			setListFragmentVisibility(View.VISIBLE);
-		}
+		autoUpdateListVisibility();
 
 		if (autoSwitchOnFragment) {
 			this.mViewPager.setCurrentItem(this.mPagerAdapter.getCount());
 		}
 	}
 
+	
+	/**
+	 * Met à jour la visibilité de la liste des conversations et du panneau de fond
+	 */
+	public void autoUpdateListVisibility() {
+		// Cacher le TV
+		if (this.mPagerAdapter.getCount() == 2 || this.conversationListFragment.getConversationsNumber() > 0) {
+			TextView tv = (TextView) findViewById(R.id.no_conversation);
+			tv.setVisibility(View.GONE);
+			// Affiche la liste des conversations
+			setListFragmentVisibility(View.VISIBLE);
+		}
+	}
+
 
 	/**
-	 * Retourne un fragment en fonction de son Id
-	 * @param id
-	 * @return
+	 * Retourne un fragment de conversation en fonction de son Id
+	 * @param id	Id de la conversation
+	 * @return int ou null
 	 */
 	public ConversationFragment getFragmentById(int id) {
 
@@ -464,7 +475,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
 			frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
-			
+
 			// On rafraichit la vue
 			frag.tryTextRefresh();
 
@@ -502,9 +513,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 	};
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		//Enregistrement de l'intent filter
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
@@ -516,6 +529,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		registerReceiver(conversationReceiver, filter2);
 
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
+		// (coté broadcast receiver / personne qui *créé* la conversation)
 		ArrayList<Conversation> conversations = NetworkService.getLocalConversationsToCreate();
 		for (Conversation conv : conversations) {
 			addFragment(conv, true);
@@ -540,6 +554,35 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				fragNumber++;
 			}
 		}
+
+
+		Log.e(TAG, "===========================================");
+		Log.d(TAG, "Comparaison tailles listes " + NetworkService.getListConversations().size() + " vs ");
+		Log.d(TAG, "vs > " + (mPagerAdapter.getCount()-1));
+		
+		
+		// Si le mobile a reçu un paquet de création de groupe et que l'activité était en pause, il faut créer un tab pour la conversation
+		if (NetworkService.getListConversations().size() > mPagerAdapter.getCount()-1) {
+			Log.d(TAG, "Création fragment manquant");
+
+			Hashtable<Integer, Conversation> convers = NetworkService.getListConversations();
+			Iterator it = convers.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pairs = (Map.Entry) it.next();
+
+				Conversation c = (Conversation) pairs.getValue(); 
+
+				// Si le fragment n'existe pas, on doit le créer
+				if (getFragmentById(c.getConversation_id()) == null) {
+					Log.w(TAG, "Création fragment manquant");
+
+					addFragment(c, false);	// sans auto switch de la vue
+				}
+			}
+		}
+		
+		autoUpdateListVisibility();
+
 	}
 
 	@Override
@@ -554,7 +597,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		super.onStop();
 	}
 
-	
-	
+
+
 
 }

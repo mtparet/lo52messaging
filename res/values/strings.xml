@@ -36,6 +36,8 @@
     <string name="conversations_send_btn">Envoyer</string>
     <string name="conversations_name_prefix">Conversation avec </string>
     <string name="conversations_myself">Moi</string>
+    <string name="conversation_creation_toast_sing">vient de créer une conversation avec vous.</string>
+    <string name="conversation_creation_toast_plur">viennent de créer une conversation avec vous.</string>
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>

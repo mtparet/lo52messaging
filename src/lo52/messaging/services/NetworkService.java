@@ -956,7 +956,6 @@ public class NetworkService extends Service {
 	 */
 	public static void setHasLocalConversationToCreate(Conversation conversation) {
 		conversationsToCreateUI.add(conversation);
-		Log.e(TAG, "SET LOCAL CONVERS " + conversationsToCreateUI.size());
 	}
 
 
@@ -966,12 +965,8 @@ public class NetworkService extends Service {
 	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Conversation> getLocalConversationsToCreate() {
-		Log.e(TAG, "GETTING LOCAL CONVERS " + conversationsToCreateUI.size());
-		
 		ArrayList<Conversation> l = (ArrayList<Conversation>) conversationsToCreateUI.clone();
 		conversationsToCreateUI.clear();
-		
-		Log.e(TAG, "returning list " + l.size());
 		
 		return l;
 	}

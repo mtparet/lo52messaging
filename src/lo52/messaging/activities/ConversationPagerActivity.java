@@ -556,14 +556,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 
 
-		Log.e(TAG, "===========================================");
-		Log.d(TAG, "Comparaison tailles listes " + NetworkService.getListConversations().size() + " vs ");
-		Log.d(TAG, "vs > " + (mPagerAdapter.getCount()-1));
-		
-		
 		// Si le mobile a reçu un paquet de création de groupe et que l'activité était en pause, il faut créer un tab pour la conversation
 		if (NetworkService.getListConversations().size() > mPagerAdapter.getCount()-1) {
-			Log.d(TAG, "Création fragment manquant");
 
 			Hashtable<Integer, Conversation> convers = NetworkService.getListConversations();
 			Iterator it = convers.entrySet().iterator();
@@ -574,15 +568,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 				// Si le fragment n'existe pas, on doit le créer
 				if (getFragmentById(c.getConversation_id()) == null) {
-					Log.w(TAG, "Création fragment manquant");
-
 					addFragment(c, false);	// sans auto switch de la vue
 				}
 			}
 		}
 		
 		autoUpdateListVisibility();
-
 	}
 
 	@Override

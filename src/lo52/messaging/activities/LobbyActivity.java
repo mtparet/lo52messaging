@@ -3,14 +3,19 @@ package lo52.messaging.activities;
 import java.util.ArrayList;
 
 import lo52.messaging.R;
+import lo52.messaging.model.Conversation;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 /**
  *	Activité regroupant plusieurs sous-activités au sein de différents onglets 
@@ -23,7 +28,7 @@ public class LobbyActivity extends TabActivity {
 
 	// Utilisé pour indiquer à l'activité ConversationPagerActivity qu'elle doit aller sur un fragment de conversation particulier
 	private ArrayList<Integer> switchToConversation;
-	
+
 	// Tags pour les différents onglets de l'activité
 	public static final String	TAG_TAB_USERLIST 		= "tab1";
 	public static final String	TAG_TAB_CONVERSATIONS 	= "tab2";
@@ -33,7 +38,7 @@ public class LobbyActivity extends TabActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
-		
+
 		Log.d(TAG, "Lancement activité lobby");
 
 		// Lancement du service Network
@@ -48,7 +53,7 @@ public class LobbyActivity extends TabActivity {
 		TabHost tabHost = getTabHost();
 		TabHost.TabSpec spec; 
 		Intent intent;
-		
+
 		switchToConversation = new ArrayList<Integer>();
 
 		/**
@@ -64,7 +69,7 @@ public class LobbyActivity extends TabActivity {
 		intent.setClass(this, ConversationPagerActivity.class);
 		spec = tabHost.newTabSpec(TAG_TAB_CONVERSATIONS).setIndicator(getString(R.string.conversations_tab_name), getResources().getDrawable(R.drawable.icon_chat)).setContent(intent);
 		tabHost.addTab(spec);
-		
+
 		/**
 		 * Création du tab de carte de géolocalisation des utilisateurs (LocalizationMapActivity)
 		 **/
@@ -92,50 +97,50 @@ public class LobbyActivity extends TabActivity {
 		}
 	}
 	
-	
-	
-	
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		//Enregistrement de l'intent filter
+		IntentFilter filter2 = new IntentFilter();
+		filter2.addAction(NetworkService.SendConversation);
+		registerReceiver(conversationReceiver, filter2);
+	}
+
+	@Override
+	protected void onPause() {
+		unregisterReceiver(conversationReceiver);
+		super.onPause();
+	}
+
+
+
+
 	/**
 	 * Recoit les nouvelles conversations
 	 */
-	/*private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
+	private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
+
 			/*
-			 * Principe : si le tab des conversations est actif, on
+			 * Principe : si le tab des conversations est actif, on affiche un toast
 			 */
 			
-			/*Log.d(TAG, "Réception d'une création de conversation");
-			Bundle bundle = intent.getBundleExtra("conversation");
-			Conversation conversation = bundle.getParcelable("conversation");
-			Log.d(TAG, "conversation_id:" + conversation.getConversation_id() + "conversation_name:" + conversation.getConversation_name());
-			Log.w(TAG, "Membres de la conversations: " + conversation.getListIdUser().size());
-			for (int i : conversation.getListIdUser()) {
-				Log.d(TAG, "> Membre : " + i);
+			TabHost tabhost = getTabHost();
+			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
+				Bundle bundle = intent.getBundleExtra("conversation");
+				Conversation conversation = bundle.getParcelable("conversation");
+				
+				// Phrase au pluriel ou singulier selon le nombre de personnes dans la conversation
+				String phrase = (conversation.getListIdUser().size() > 2) ? getString(R.string.conversation_creation_toast_plur) : getString(R.string.conversation_creation_toast_sing) ;
+
+				// Affichage du toast
+				Toast.makeText(context, conversation.generateConversationName() + " " + phrase, Toast.LENGTH_LONG).show();
 			}
-			Log.d(TAG, "(Pour info, User_me = " + NetworkService.getUser_me().getId() + ")");
-
-
-			TabHost tabHost = getTabHost();
-			tabHost.getCurrentTabTag();
-			
-			// Ajout du fragment
-			addFragment(conversation, false);
-			// On récupère le nouveau fragment pour pouvoir setter son nom
-			ConversationFragment lastFrag = getFragmentById(conversation.getConversation_id());
-			lastFrag.setConversName(conversation.generateConversationName());
-
-
-			//mPagerAdapter.notifyDataSetChanged();
-			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
-	};*/
-	
-	
-	
-	
+	};
 
 	/**
 	 * @deprecated
@@ -155,8 +160,8 @@ public class LobbyActivity extends TabActivity {
 		TabHost tabHost = getTabHost();
 		tabHost.setCurrentTabByTag(tabTag);
 	}
-	
-	
+
+
 	/**
 	 * Indique à l'activité ConversationPagerActivity qu'elle doit changer la vue vers une conversation précise quand elle onResume()
 	 * @param userIds
@@ -164,15 +169,15 @@ public class LobbyActivity extends TabActivity {
 	public void setSwitchToConversationFragment(ArrayList<Integer> userIds) {
 		switchToConversation = userIds;
 	}
-	
-	
+
+
 	/**
 	 * Utilisé par l'activité ConversationPagerActivity pour savoir si elle doit aller sur un fragment particulier quand elle reprend
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayList<Integer> getSwitchToConversationFragmentStatus() {
-		
+
 		ArrayList<Integer> list = (ArrayList<Integer>) switchToConversation.clone();
 		switchToConversation.clear();
 		return list;

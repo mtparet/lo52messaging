@@ -247,7 +247,6 @@ public class Conversation implements Parcelable {
 						name = u.getName();
 					}
 
-
 					text += "<font color=\"" + color + "\">" + name + ":</font> " + m.getMessage() + "<br>";
 				} else {
 					if(m.getClient_id() == mySelf){
@@ -262,6 +261,11 @@ public class Conversation implements Parcelable {
 			} else Log.w(TAG, "Message vide");
 		}
 		return text;
+	}
+
+
+	public int getMessageCount() {
+		return listMessage.size();
 	}
 
 }

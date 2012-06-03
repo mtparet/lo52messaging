@@ -206,7 +206,7 @@ public class NetworkService extends Service {
 		 */
 		Timer timer = new Timer();
 		timer.schedule(new SendBroadcatsimeTask(), 200);
-		
+
 	}
 
 	/**
@@ -259,10 +259,13 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("message");
 			MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
 
-			Log.d(TAG, "message à envoyé depuis client" + message.getClient_id() );
+			Log.d(TAG, "message à envoyer depuis client " + message.getClient_id() );
 			// on ajoute le message à la liste
-			Message mess = new Message(message.getClient_id(), message.getMessage());
-			listConversations.get(message.getConversation_id()).addMessage(mess);
+
+			// Fix : on ajoute le message à la conversation directement depuis le fragment car le broadcast arrive après que la vue du fragment
+			// soit rafraichie
+			//Message mess = new Message(message.getClient_id(), message.getMessage());
+			//listConversations.get(message.getConversation_id()).addMessage(mess);
 
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
@@ -564,7 +567,7 @@ public class NetworkService extends Service {
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
-						
+
 						analysePacket(dataPacket);
 
 					} catch (IOException e) {
@@ -858,7 +861,7 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, User> getListUsers() {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
-	
+
 	//public static Hashtable<Integer, User> getListUsersNoClone() {
 	//	return (Hashtable<Integer, User>) listUsers;
 	//}
@@ -871,7 +874,7 @@ public class NetworkService extends Service {
 	public static Hashtable<Integer, Conversation> getListConversations() {
 		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
-	
+
 	//public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
 	//	return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
 	//}
@@ -883,7 +886,7 @@ public class NetworkService extends Service {
 	public static User getUser_me() {
 		return user_me;
 	}
-	
+
 	/**
 	 * Retourne l'ID de l'user en fonction de son nom ou 0 s'il n'existe pas
 	 * @param username
@@ -893,21 +896,21 @@ public class NetworkService extends Service {
 	public static int getUserIdByName(String username) {
 		int userId = 0;
 		Hashtable<Integer, User> users = getListUsers();	// Récupère un clone
-		
+
 
 		boolean found = false;
 		Iterator it = users.entrySet().iterator();
 		while (it.hasNext() && !found) {
 			Map.Entry pairs = (Map.Entry) it.next();
-			
+
 			User u = (User) pairs.getValue();
-			
+
 			if (u.getName().equals(username)) {
 				userId = u.getId();
 				found = true;
 			}
 		}
-		
+
 		return userId;
 	}
 
@@ -964,11 +967,11 @@ public class NetworkService extends Service {
 	public static ArrayList<Conversation> getLocalConversationsToCreate() {
 		ArrayList<Conversation> l = (ArrayList<Conversation>) conversationsToCreateUI.clone();
 		conversationsToCreateUI.clear();
-		
+
 		return l;
 	}
 
-	
+
 	/**
 	 * Vérifie si une conversation existe déjà, en fonction des membres qui la composent
 	 * @param userIds	La liste des membres qui composent cette conversation

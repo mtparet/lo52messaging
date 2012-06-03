@@ -43,16 +43,11 @@ public class ConversationFragment extends Fragment {
 		// Rafraichit le texte
 		EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
 
-		Log.d(TAG, "RESUME");
-
 		// Met à jour la conversation en reprenant celle du service. Permet d'avoir un objet Conversation à jour,
 		// qui peut contenir des messages qui ont été reçus pendant que le fragment était onPause.
 		updateConversationFromService();
 
 		if (conversText_edit != null) {
-			Log.d(TAG, "MAJ TEXTE");
-			Log.d(TAG, "Nombre messages " + conversation.getListMessage().size());
-
 
 			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
 		}
@@ -80,8 +75,6 @@ public class ConversationFragment extends Fragment {
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
 		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
 
-
-
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
 
@@ -102,18 +95,23 @@ public class ConversationFragment extends Fragment {
 			String messageText = getConversUserText();
 
 			if (messageText.equals("")) return;
-
-			parentActivity.onFragmentSendButtonClick(messageText, getConversation_id());
-
+			
+			
 			// Ajout du message texte à la conversation locale
 			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
+			
+			/*Log.d(TAG, "Update convers");
+			updateConversationFromService();
+			Log.d(TAG, "Updated convers");*/
+			
+			// Mise à jour de l'UI
+			tryTextRefresh();
 
 			// Reset du champ d'entrée de texte			
 			EditText conversUserText_edit	= (EditText) fv.findViewById(R.id.conversation_usermessage);
 			conversUserText_edit.setText("");
-
-			// Mise à jour de l'UI
-			tryTextRefresh();
+			
+			parentActivity.onFragmentSendButtonClick(messageText, getConversation_id());
 		}
 	};
 
@@ -237,11 +235,14 @@ public class ConversationFragment extends Fragment {
 	public void tryTextRefresh() {
 		// Régénère le texte de la conversation
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
+		Log.d(TAG, "Texte mis à jour " + conversationText_str);
+		
 		// Essaye de rafraichir le textEdit
 		if (fv != null) {
 			EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
 			if (conversText_edit != null)
 				conversText_edit.setText(Html.fromHtml(conversationText_str));
+			else Log.d(TAG, "Champ de texte null");
 		} else {
 			Log.d(TAG, "N'a pas pu refresh la vue");
 		}

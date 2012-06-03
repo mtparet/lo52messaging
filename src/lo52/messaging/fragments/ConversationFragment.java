@@ -24,74 +24,87 @@ public class ConversationFragment extends Fragment {
 
 	private static final String TAG = "ConversationFragment";
 	final ConversationFragment thisFrag = this;
-	
+
 	// La conversation associée à ce fragment
 	private Conversation conversation = null;
-	
+
 	int conversation_id;
 	View fv;
-	
+
 	String conversationName_str = "";
 	String conversationText_str = "";
-	
+
 	ConversationPagerActivity parentActivity;
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		// Rafraichit le texte
 		EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
-		
-		if (conversText_edit != null )
+
+		Log.d(TAG, "RESUME");
+
+		// Met à jour la conversation en reprenant celle du service. Permet d'avoir un objet Conversation à jour,
+		// qui peut contenir des messages qui ont été reçus pendant que le fragment était onPause.
+		updateConversationFromService();
+
+		if (conversText_edit != null) {
+			Log.d(TAG, "MAJ TEXTE");
+			Log.d(TAG, "Nombre messages " + conversation.getListMessage().size());
+
+
 			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
+		}
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate le layout depuis le xml
 		fv = inflater.inflate(R.layout.conversation, container, false);
-		
+
 		// Initialise les différents éléments du layout
 		TextView conversName_tv 		= (TextView) fv.findViewById(R.id.conversation_name);
 		EditText conversText_edit		= (EditText) fv.findViewById(R.id.conversation_content);
 		//EditText conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);
 		Button conversMedia_btn 	= (Button) fv.findViewById(R.id.conversation_media_button);
 		Button conversSend_btn 		= (Button) fv.findViewById(R.id.conversation_send_button);
-		
+
 		// On rend le Text Edit de la convers non éditable
 		//conversText_edit.setEnabled(false);
 		conversText_edit.setFocusable(false);
-		
+
 		parentActivity = (ConversationPagerActivity) getActivity();
-		
+
 		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
 		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
-		
-		
-		
+
+
+
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
-		
+
 		return fv;
 	}
-	
+
 	// Création et assignation des onClickListerners
 	OnClickListener mediaButtonClickListener = new OnClickListener() {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton media");
-			
+
 			parentActivity.startFilePickerActivity();
 		}
 	};
-	
+
 	OnClickListener sendButtonClickListener = new OnClickListener() {
 		public void onClick(View v) {
-			Log.d(TAG, "Click bouton envoi");
 			String messageText = getConversUserText();
+
+			if (messageText.equals("")) return;
+
 			parentActivity.onFragmentSendButtonClick(messageText, getConversation_id());
-			
+
 			// Ajout du message texte à la conversation locale
 			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
 
@@ -103,18 +116,26 @@ public class ConversationFragment extends Fragment {
 			tryTextRefresh();
 		}
 	};
-	
-	
+
+	/**
+	 * Met à jour son objet Conversation en prenant celui du service, qui est plus à jour
+	 */
+	public void updateConversationFromService() {
+		if (conversation != null)	// car peut ne pas avoir encore été initialisé par le pager
+			conversation = NetworkService.getListConversations().get(conversation.getConversation_id()); 
+	}
+
+
 	/**
 	 * 
 	 * Getters / Setters
 	 * 
 	 */
-	
+
 	public void setConversation(Conversation c) {
 		conversation = c;
 	}
-	
+
 	/**
 	 * Retourne l'ID associé à cette conversation
 	 * @return
@@ -122,7 +143,7 @@ public class ConversationFragment extends Fragment {
 	public int getConversation_id() {
 		return conversation_id;
 	}
-	
+
 	/**
 	 * Attribue un ID à la conversation. Doit (devrait) être appelé une fois que le fragment de la conversation a été créé.
 	 * @param conversation_id
@@ -159,7 +180,7 @@ public class ConversationFragment extends Fragment {
 		this.conversationText_str = conversText;
 	}
 
-	
+
 	/**
 	 * Retourne le texte entré par l'utilisateur
 	 * @return
@@ -169,7 +190,7 @@ public class ConversationFragment extends Fragment {
 		return conversUserText_edit.getText().toString();
 	}
 
-	
+
 	/**
 	 * Set le texte dans le champ dans lequel l'uilisateur écrit. Ne devrait pas être utilisé directement.
 	 * @param conversUserText
@@ -177,8 +198,8 @@ public class ConversationFragment extends Fragment {
 	/*public void setConversUserText(String conversUserText) {
 		this.conversUserText_edit.setText(conversUserText);
 	}*/
-	
-	
+
+
 	/**
 	 * Ajoute du texte à la suite du texte présent dans le champ de conversation sans écraser le texte présent
 	 * @deprecated Ajouter le message reçu à la conversation du fragment et regénérer le corps du texte de la conversation
@@ -189,7 +210,7 @@ public class ConversationFragment extends Fragment {
 		this.conversationText_str += " " + text;
 	}
 
-	
+
 	/**
 	 * @deprecated
 	 * @return
@@ -197,7 +218,7 @@ public class ConversationFragment extends Fragment {
 	public View getFragmentView() {
 		return fv;
 	}
-	
+
 	/**
 	 * @deprecated
 	 * @return
@@ -205,11 +226,11 @@ public class ConversationFragment extends Fragment {
 	public ConversationFragment getThisFrag() {
 		return thisFrag;
 	}
-	
+
 	public Conversation getConversation() {
 		return conversation;
 	}
-	
+
 	/**
 	 * Essaye de regénérer le texte de la conversation si la vue est active
 	 */
@@ -224,7 +245,7 @@ public class ConversationFragment extends Fragment {
 		} else {
 			Log.d(TAG, "N'a pas pu refresh la vue");
 		}
-		
+
 	}
-	
+
 }

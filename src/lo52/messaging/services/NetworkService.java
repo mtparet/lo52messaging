@@ -680,10 +680,12 @@ public class NetworkService extends Service {
 	 */
 	private void paquetMessage(PacketNetwork packetReceive) {
 
-		Log.d(TAG, "message reçu dans le NetworkService");
+		Log.w(TAG, "> Message reçu dans le NetworkService");
 		if(listConversations.containsKey(packetReceive.getContent().getConversation_id())){
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
+			Log.d(TAG, "Network, ajout message avant " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 			listConversations.get(packetReceive.getContent().getConversation_id()).addMessage(message);
+			Log.d(TAG, "Network, ajout message apres " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 
 			if(packetReceive.getUser_envoyeur() != user_me){
 				Intent broadcastIntent = new Intent(NetworkService.SendMessage);

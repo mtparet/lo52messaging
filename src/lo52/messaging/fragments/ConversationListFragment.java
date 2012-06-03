@@ -106,7 +106,6 @@ public class ConversationListFragment extends ListFragment {
 		// initialisée (si le second tab n'a pas été ouvert).
 		if (conversationNames == null) return;
 
-		Log.d(TAG, "Updating conversation list... ");
 		// Vide la liste actuelle des noms de conversations
 		conversationNames.clear();
 
@@ -122,7 +121,6 @@ public class ConversationListFragment extends ListFragment {
 
 			String conversationName = conv.generateConversationName();
 
-			Log.d(TAG, "Nom généré : " + conversationName + " : ajouté à la liste");
 			conversationNames.add(conversationName);
 		}
 		

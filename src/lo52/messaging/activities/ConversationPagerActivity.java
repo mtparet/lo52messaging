@@ -474,7 +474,10 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// On récupère le fragment correspondant à l'id de la conversatoin
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
-			frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			// XXX doublon ?
+			//frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
+			//frag.setConversation(NetworkService.getListConversations().get(frag.getConversation().getConversation_id()));
+			frag.updateConversationFromService();
 
 			// On rafraichit la vue
 			frag.tryTextRefresh();

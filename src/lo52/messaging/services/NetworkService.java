@@ -96,6 +96,10 @@ public class NetworkService extends Service {
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
+	
+	//Taille du buffer en réception, en Byte
+	public static final int BUFFER_SIZE = 30000;
+	
 	public NetworkService() {
 
 	}
@@ -452,15 +456,20 @@ public class NetworkService extends Service {
 			}
 
 			Gson gson = new Gson();
+			
 			String json = gson.toJson(packet);
 
-			byte[] buffer = json.getBytes();
+			byte[] packet_byte = json.getBytes();
+			
+			// non utilisé pour le moment, pour info
+			byte[] content_byte = gson.toJson(packet.getContent()).getBytes();
 
 			DatagramPacket dataPacket = null;
 			try {
-				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
+				dataPacket = new DatagramPacket(packet_byte, packet_byte.length, inetAddres);
 				datagramSocket.send(dataPacket);
 				Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
+				Log.d(TAG, "Taille total du packet:" + packet_byte.length + "taille du contenu sans les en têtes " + content_byte.length);
 
 				//on l'ajoute dans la liste des paquets envoyé
 				packetListACK.put(packet.getRamdom_identifiant(), packet);
@@ -524,7 +533,8 @@ public class NetworkService extends Service {
 			try {
 				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
 				datagramSocket.send(dataPacket);
-				Log.d(TAG, "paquet broadcast envoyé à " + inetAddres.toString());
+				Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
+				Log.d(TAG, "Taille total du packet:" + buffer.length + "taille du contenu sans les en têtes " + gson.toJson(packet.getContent()).getBytes().length);
 
 				//on l'ajoute dans la liste des paquets envoyé
 				packetListACK.put( packet.getRamdom_identifiant(), packet);
@@ -560,7 +570,7 @@ public class NetworkService extends Service {
 
 
 				do{
-					byte[] buffer2 = new byte[300000]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
+					byte[] buffer2 = new byte[BUFFER_SIZE]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
@@ -961,5 +971,4 @@ public class NetworkService extends Service {
 
 		return exists;
 	}
-
 }

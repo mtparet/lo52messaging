@@ -1,8 +1,13 @@
 package lo52.messaging.model.network;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import lo52.messaging.model.User;
+import lo52.messaging.services.NetworkService;
 
 import android.os.BadParcelableException;
 import android.os.Parcel;
@@ -41,6 +46,12 @@ public class PacketNetwork implements Parcelable{
 	
 	@SerializedName("ramdom_identifiant")
 	private int ramdom_identifiant;
+	
+	@SerializedName("next_packet")
+	private int next_packet;
+	
+	@SerializedName("next_packet")
+	private int previous_packet;
 	
 	/**
 	 * 
@@ -156,6 +167,14 @@ public class PacketNetwork implements Parcelable{
 		this.user_destinataire = user_destinataire;
 	}
 	
+	public int getNext_packet() {
+		return next_packet;
+	}
+
+	public void setNext_packet(int next_packet) {
+		this.next_packet = next_packet;
+	}
+
 	public static final Parcelable.Creator<PacketNetwork> CREATOR= new Parcelable.Creator<PacketNetwork>() {
 		public PacketNetwork createFromParcel(Parcel in) {
 			return new PacketNetwork(in);
@@ -165,5 +184,102 @@ public class PacketNetwork implements Parcelable{
 			return new PacketNetwork[size];
 		}
 	};
+	
+	/*
+	 * Fonction a appelé lorsque l'on détecte que la taille du packet est trop grand.
+	 */
+	public static ArrayList<PacketNetwork> division(PacketNetwork packet){
+		/*   on va supposer que toute la partie "texte" n'occupe pas plus de 2000 bytes.
+		 */
+		int size_dispo = NetworkService.BUFFER_SIZE - 2000;
+		int size_byte_content = packet.getContent().getByte_content().length;
+		int nb_packet = (size_byte_content / size_dispo) + 1;
+				
+		ArrayList<PacketNetwork> listPacketNetworks = new ArrayList<PacketNetwork>();
+		
+		int size_new_content = size_dispo / nb_packet;
 
+		Random rand = new Random();
+		int[] random_numbers = new int[nb_packet];
+		
+		for(int i = 0; i < nb_packet; i++){
+			random_numbers[i] = rand.nextInt();
+		}
+		
+		for(int i = 0; i < nb_packet; i++){
+			int start_copy;
+			int end_copy;
+			PacketNetwork pn = packet;
+			pn.setRamdom_identifiant(random_numbers[i]);
+			start_copy = i * size_new_content;
+			//Si c'est le dernier packet on le remplit avec les bytes restant
+			if(i ==  (nb_packet -1)){
+				end_copy = size_byte_content;
+				pn.next_packet = 0;
+				pn.previous_packet = random_numbers[i-1];
+			}else{
+				end_copy = (i+1) * size_new_content;
+				pn.next_packet = random_numbers[i+1];
+
+				if(i == 0){
+					pn.previous_packet = 0;
+
+				}else{
+					pn.previous_packet = random_numbers[i-1];
+				}
+				
+
+			}
+			
+			byte[] new_content_byte = new byte[end_copy - start_copy];
+
+			System.arraycopy(packet.getContent().getByte_content(), start_copy, new_content_byte, 0, (end_copy - start_copy));
+			
+			pn.getContent().setByte_content(new_content_byte);
+			
+			listPacketNetworks.add(pn);
+		}
+		
+		return listPacketNetworks;
+	}
+	
+	/*
+	 * Fonction a appelé lorsque l'on détecte que la taille du packet est trop grand.
+	 */
+	public static PacketNetwork reassemble(ArrayList<PacketNetwork> listPacket){
+		/*
+		 * on re tri la liste dans le bon ordre
+		 */
+		
+		int new_size = 0;
+		for(PacketNetwork packet : listPacket){
+			new_size += packet.getContent().getByte_content().length;
+		}
+		
+		byte[] new_content = new byte[new_size];
+				
+		// on boucle en commençant par la fin
+		int start_copy = 0;
+		PacketNetwork current = listPacket.get(0);
+		
+		//faire avec le previous aussi
+		for(int i = 0; i < listPacket.size(); i++){
+			System.arraycopy(current.getContent().getByte_content(), 0, new_content, start_copy, current.getContent().getByte_content().length);
+			
+			if(current.getNext_packet() != 0){
+				for(PacketNetwork packet : listPacket){
+					if(packet.next_packet == current.getNext_packet()){
+						current = packet;
+					}
+				}
+			}			
+
+		}
+
+		PacketNetwork packet = listPacket.get(0);
+		packet.getContent().setByte_content(new_content);
+		packet.next_packet = 0;
+		packet.previous_packet = 0;
+		return packet;
+	}
 }

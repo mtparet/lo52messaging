@@ -15,7 +15,8 @@ public class MessageBroacast implements Parcelable {
 	
 	private String message;
 	
-	private Bitmap bitmap;
+	//Transmettre le lien sur le device
+	private String link_bitmap;
 
 	private int client_id;
 	
@@ -49,7 +50,7 @@ public class MessageBroacast implements Parcelable {
 		this.message = in.readString();
 		this.client_id = in.readInt();
 		this.conversation_id = in.readInt();
-		this.bitmap = in.readParcelable(bitmap.getClass().getClassLoader());
+		this.link_bitmap = in.readString();
 	}
 
 	public static final Parcelable.Creator<MessageBroacast> CREATOR= new Parcelable.Creator<MessageBroacast>() {
@@ -82,7 +83,7 @@ public class MessageBroacast implements Parcelable {
 		dest.writeString(message);
 		dest.writeInt(client_id);
 		dest.writeInt(conversation_id);
-		dest.writeParcelable(bitmap, 0);
+		dest.writeString(link_bitmap);
 
 	}
 
@@ -108,13 +109,13 @@ public class MessageBroacast implements Parcelable {
 
 		ctx.sendBroadcast(broadcastIntent);
 	}
-	
-	public Bitmap getBitmap() {
-		return bitmap;
+
+	public String getLink_bitmap() {
+		return link_bitmap;
 	}
 
-	public void setBitmap(Bitmap bitmap) {
-		this.bitmap = bitmap;
+	public void setLink_bitmap(String link_bitmap) {
+		this.link_bitmap = link_bitmap;
 	}
 
 }

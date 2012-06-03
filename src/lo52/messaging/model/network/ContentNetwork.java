@@ -3,6 +3,7 @@ package lo52.messaging.model.network;
 import java.util.ArrayList;
 
 import lo52.messaging.model.User;
+import lo52.messaging.services.NetworkService;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
@@ -19,6 +20,11 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ContentNetwork implements Parcelable{
 	
+	//Détermine le type du content si c'est un message
+	private static final int TEXT = 1;
+	private static final int JPEG = 2;
+	private static final int MP3 = 3;
+
 	@SerializedName("conversation_id")
 	private int conversation_id;
 	
@@ -37,7 +43,9 @@ public class ContentNetwork implements Parcelable{
 	@SerializedName("lat")
 	private float lat;
 	
-	private Bitmap bitmap;
+	//Sert à stocker du contenu de grande taille (image ou son ou autres fichiers), peut nécessité d'être réassemblé
+	@SerializedName("byte")
+	private byte[] byte_content;
 	
 	// List des utilisateur dans la conversation
 	private ArrayList<User> userList;
@@ -91,6 +99,10 @@ public class ContentNetwork implements Parcelable{
 		userList = new ArrayList<User>();
 		in.readTypedList(userList, User.CREATOR);
 		this.message = in.readString();
+	}
+
+	public ContentNetwork() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public static final Parcelable.Creator<ContentNetwork> CREATOR= new Parcelable.Creator<ContentNetwork>() {
@@ -172,12 +184,12 @@ public class ContentNetwork implements Parcelable{
 		this.lat = lat;
 	}
 
-	public Bitmap getBitmap() {
-		return bitmap;
+	public byte[] getByte_content() {
+		return byte_content;
 	}
 
-	public void setBitmap(Bitmap bitmap) {
-		this.bitmap = bitmap;
+	public void setByte_content(byte[] byte_content) {
+		this.byte_content = byte_content;
 	}
 
 }

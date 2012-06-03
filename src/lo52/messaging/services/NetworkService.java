@@ -667,8 +667,6 @@ public class NetworkService extends Service {
 			User user = listUsers.get(packet.getContent().getClient_id());
 
 			user.setLocalisation(loca);
-			listUsers.remove(user.getId());
-			listUsers.put(user.getId(), user);
 		}else{
 			Log.d(TAG, "user inconnu");
 		}
@@ -785,9 +783,6 @@ public class NetworkService extends Service {
 				Conversation conversation = listConversations.get(packetReceive.getContent().getConversation_id());
 				conversation.setConversation_name(packetReceive.getContent().getConversation_name());
 
-				listConversations.remove(packetReceive.getContent().getConversation_id());
-
-				listConversations.put(conversation.getConversation_id(), conversation);
 			}
 
 		} else {
@@ -862,9 +857,9 @@ public class NetworkService extends Service {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
 	
-	public static Hashtable<Integer, User> getListUsersNoClone() {
-		return (Hashtable<Integer, User>) listUsers;
-	}
+	//public static Hashtable<Integer, User> getListUsersNoClone() {
+	//	return (Hashtable<Integer, User>) listUsers;
+	//}
 
 	//public static void setListUsers(Hashtable<Integer, User> listUsersE) {
 	//	listUsers = listUsersE;
@@ -875,9 +870,9 @@ public class NetworkService extends Service {
 		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations.clone();
 	}
 	
-	public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
-		return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
-	}
+	//public static Hashtable<Integer, Conversation> getListConversationsNoClone() {
+	//	return (Hashtable<Integer, lo52.messaging.model.Conversation>) listConversations;
+	//}
 
 	//public static void setListConversations(Hashtable<Integer, Conversation> listConversations) {
 	//	NetworkService.listConversations = listConversations;

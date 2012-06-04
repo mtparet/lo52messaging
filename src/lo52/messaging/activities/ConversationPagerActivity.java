@@ -549,8 +549,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			int fragNumber = 0;
 			for (Fragment fragment : mPagerAdapter.getFragmentsList()) {
 				if (fragment instanceof ConversationFragment) {
-					if (LibUtil.equalsListsOrderInsensitive(((ConversationFragment) fragment).getConversation().getListIdUser(), list)) {
-						goToConversationNumber(fragNumber);
+					if (((ConversationFragment) fragment).getConversation_id() > 0) {
+
+						ArrayList<Integer> usersF = NetworkService.getListConversations().get(((ConversationFragment) fragment).getConversation_id()).getListIdUser();
+						
+						if (LibUtil.equalsListsOrderInsensitive(usersF, list)) {
+							goToConversationNumber(fragNumber);
+						}
 					}
 				}
 				fragNumber++;

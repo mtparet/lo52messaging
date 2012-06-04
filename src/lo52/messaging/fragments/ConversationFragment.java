@@ -28,7 +28,7 @@ public class ConversationFragment extends Fragment {
 	// La conversation associée à ce fragment
 	private Conversation conversation = null;
 
-	int conversation_id;
+	int conversation_id = -1;
 	View fv;
 
 	String conversationName_str = "";
@@ -47,7 +47,7 @@ public class ConversationFragment extends Fragment {
 		// qui peut contenir des messages qui ont été reçus pendant que le fragment était onPause.
 		updateConversationFromService();
 
-		if (conversText_edit != null) {
+		if (conversText_edit != null && conversation != null && parentActivity != null) {
 
 			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
 		}

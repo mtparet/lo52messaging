@@ -50,7 +50,7 @@ public class PacketNetwork implements Parcelable{
 	@SerializedName("next_packet")
 	private int next_packet;
 	
-	@SerializedName("next_packet")
+	@SerializedName("previous_packet")
 	private int previous_packet;
 	
 	/**

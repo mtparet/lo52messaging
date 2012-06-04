@@ -311,17 +311,12 @@ public class UserListActivity extends Activity {
 
 	/**
 	 * Broadcast receiver qui reçoit une notification comme quoi la liste des utilisateurs doit être mise à jour
+	 * Met simplement à jour la liste des utilisateurs
 	 */
 	private BroadcastReceiver UserlistUpdate_BrdcReceiver = new BroadcastReceiver(){
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
-			// On récupère le nom de l'user depuis le bundle pour afficher un toast
-			Bundle userInfo = intent.getBundleExtra("new_user");
-			if (userInfo != null && userInfo.getString("new_user") != null) {
-				Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
-			}
 			refreshUserList();
 		}
 	};

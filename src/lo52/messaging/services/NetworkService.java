@@ -663,10 +663,18 @@ public class NetworkService extends Service {
 		break;
 		case PacketNetwork.LOCALISATION : paquetLocalisation(packet);
 		break;
+		case PacketNetwork.ALIVE : paquetAlive(packet);
+		break;
 		default: paquetInconnu(packet);
 		break;
 
 		}
+	}
+
+	private void paquetAlive(PacketNetwork packet) {
+		// on le met à alive
+		listUsers.get(packet.getUser_envoyeur().getId()).setAlive(true);
+		
 	}
 
 	/**
@@ -750,9 +758,9 @@ public class NetworkService extends Service {
 			listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 		}
 
-		// on le met à alive
-		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
+		paquetAlive(packetReceive);
+		
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
 		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
 		Bundle bundle = new Bundle();
@@ -850,9 +858,12 @@ public class NetworkService extends Service {
 
 		packetListACK.remove(packetReceive.getRamdom_identifiant());
 
-		//on considère un ACK comme un hello le cas échéant
-		paquetHello(packetReceive);
-
+		if( listUsers.get(packetReceive.getUser_envoyeur().getId()) == null ){
+			//on considère un ACK comme un hello le cas échéant
+			paquetHello(packetReceive);
+		}else{
+			paquetAlive(packetReceive);
+		}
 		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 
 	}

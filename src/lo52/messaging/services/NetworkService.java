@@ -657,7 +657,7 @@ public class NetworkService extends Service {
 		break;
 		case PacketNetwork.DISCONNECTED : paquetDisconnecter(packet);
 		break;
-		case PacketNetwork.HELLO : paquetHello(packet, false);
+		case PacketNetwork.HELLO : paquetHello(packet);
 		break;
 		case PacketNetwork.MESSAGE : paquetMessage(packet);
 		break;
@@ -728,7 +728,7 @@ public class NetworkService extends Service {
 	 * @param packetReceive
 	 * @param isACK	Détermine si la fonction est appelée après réception d'un ACK
 	 */
-	private void paquetHello(PacketNetwork packetReceive, boolean isACK) {
+	private void paquetHello(PacketNetwork packetReceive) {
 
 		if(packetReceive.getUser_envoyeur().getId() == user_me.getId()){
 			return;
@@ -754,15 +754,12 @@ public class NetworkService extends Service {
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
-		// Seulement si la fonction n'a pas été appelée après réception d'un ACK
-		if (!isACK) {
-			Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
-			Bundle bundle = new Bundle();
-			bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
-			broadcastIntent.putExtra("new_user", bundle);
+		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+		Bundle bundle = new Bundle();
+		bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
+		broadcastIntent.putExtra("new_user", bundle);
 
-			sendBroadcast(broadcastIntent);
-		}
+		sendBroadcast(broadcastIntent);
 	}
 
 
@@ -854,7 +851,7 @@ public class NetworkService extends Service {
 		packetListACK.remove(packetReceive.getRamdom_identifiant());
 
 		//on considère un ACK comme un hello le cas échéant
-		paquetHello(packetReceive, true);
+		paquetHello(packetReceive);
 
 		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 

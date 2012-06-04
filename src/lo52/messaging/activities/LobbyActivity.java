@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -96,20 +97,31 @@ public class LobbyActivity extends TabActivity {
 			}
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		//Enregistrement de l'intent filter
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(NetworkService.SendMessage);
+		registerReceiver(messageReceiver, filter);
+
+		//Enregistrement de l'intent filter
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
+
+		IntentFilter userListUpdatefilter = new IntentFilter();
+		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
+		registerReceiver(UserlistUpdate_BrdcReceiver, userListUpdatefilter);
 	}
 
 	@Override
 	protected void onPause() {
 		unregisterReceiver(conversationReceiver);
+		unregisterReceiver(messageReceiver);
+		unregisterReceiver(UserlistUpdate_BrdcReceiver);
 		super.onPause();
 	}
 
@@ -117,7 +129,7 @@ public class LobbyActivity extends TabActivity {
 
 
 	/**
-	 * Recoit les nouvelles conversations
+	 * Recoit les nouvelles conversations. Affiche un toast si l'utilisateur n'est pas sur l'onglet des conversations
 	 */
 	private BroadcastReceiver conversationReceiver = new  BroadcastReceiver() {
 
@@ -125,19 +137,66 @@ public class LobbyActivity extends TabActivity {
 		public void onReceive(Context context, Intent intent) {
 
 			/*
-			 * Principe : si le tab des conversations est actif, on affiche un toast
+			 * Principe : si le tab des conversations est inactif, on affiche un toast
 			 */
-			
+
 			TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
 				Bundle bundle = intent.getBundleExtra("conversation");
 				Conversation conversation = bundle.getParcelable("conversation");
-				
+
 				// Phrase au pluriel ou singulier selon le nombre de personnes dans la conversation
 				String phrase = (conversation.getListIdUser().size() > 2) ? getString(R.string.conversation_creation_toast_plur) : getString(R.string.conversation_creation_toast_sing) ;
 
 				// Affichage du toast
 				Toast.makeText(context, conversation.generateConversationName() + " " + phrase, Toast.LENGTH_LONG).show();
+			}
+		}
+	};
+
+
+	/**
+	 * Nouveau message : affiche un toast si l'utilisateur n'est pas sur l'onglet des conversations
+	 */
+	private BroadcastReceiver messageReceiver = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			TabHost tabhost = getTabHost();
+			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
+
+				Bundle bundle = intent.getBundleExtra("message");
+				MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
+				String userName = "";
+				if (NetworkService.getListUsers().get(message.getClient_id()) != null) 
+					userName = NetworkService.getListUsers().get(message.getClient_id()).getName();
+
+				// Affichage du toast
+				Toast.makeText(context, userName + " " + getString(R.string.conversation_user_received_message), Toast.LENGTH_LONG).show();
+			}
+		}
+	};
+
+
+	/**
+	 * Nouvel utilisateur
+	 * Broadcast receiver qui reçoit une notification comme quoi la liste des utilisateurs doit être mise à jour
+	 * Affiche un toast si l'on est pas sur l'onglet UserList
+	 */
+	private BroadcastReceiver UserlistUpdate_BrdcReceiver = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			TabHost tabhost = getTabHost();
+			if (tabhost.getCurrentTabTag() != TAG_TAB_USERLIST) {
+
+				// On récupère le nom de l'user depuis le bundle pour afficher un toast
+				Bundle userInfo = intent.getBundleExtra("new_user");
+				if (userInfo != null && userInfo.getString("new_user") != null) {
+					Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 	};

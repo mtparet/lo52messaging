@@ -96,10 +96,10 @@ public class NetworkService extends Service {
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
-	
+
 	//Taille du buffer en réception, en Byte
 	public static final int BUFFER_SIZE = 30000;
-	
+
 	public NetworkService() {
 
 	}
@@ -459,11 +459,11 @@ public class NetworkService extends Service {
 			}
 
 			Gson gson = new Gson();
-			
+
 			String json = gson.toJson(packet);
 
 			byte[] packet_byte = json.getBytes();
-			
+
 			// non utilisé pour le moment, pour info
 			byte[] content_byte = gson.toJson(packet.getContent()).getBytes();
 
@@ -657,7 +657,7 @@ public class NetworkService extends Service {
 		break;
 		case PacketNetwork.DISCONNECTED : paquetDisconnecter(packet);
 		break;
-		case PacketNetwork.HELLO : paquetHello(packet);
+		case PacketNetwork.HELLO : paquetHello(packet, false);
 		break;
 		case PacketNetwork.MESSAGE : paquetMessage(packet);
 		break;
@@ -726,8 +726,9 @@ public class NetworkService extends Service {
 	 * Vérfie que l'utilisateur existe sinon l'utilisateur est rajouté à la liste
 	 * Met l'état de l'utilisateur à "en ligne"
 	 * @param packetReceive
+	 * @param isACK	Détermine si la fonction est appelée après réception d'un ACK
 	 */
-	private void paquetHello(PacketNetwork packetReceive) {
+	private void paquetHello(PacketNetwork packetReceive, boolean isACK) {
 
 		if(packetReceive.getUser_envoyeur().getId() == user_me.getId()){
 			return;
@@ -753,13 +754,15 @@ public class NetworkService extends Service {
 		listUsers.get(packetReceive.getUser_envoyeur().getId()).setAlive(true);
 
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
-		// XXX 3
-		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
-		Bundle bundle = new Bundle();
-		bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
-		broadcastIntent.putExtra("new_user", bundle);
+		// Seulement si la fonction n'a pas été appelée après réception d'un ACK
+		if (!isACK) {
+			Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+			Bundle bundle = new Bundle();
+			bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
+			broadcastIntent.putExtra("new_user", bundle);
 
-		sendBroadcast(broadcastIntent);
+			sendBroadcast(broadcastIntent);
+		}
 	}
 
 
@@ -851,7 +854,7 @@ public class NetworkService extends Service {
 		packetListACK.remove(packetReceive.getRamdom_identifiant());
 
 		//on considère un ACK comme un hello le cas échéant
-		paquetHello(packetReceive);
+		paquetHello(packetReceive, true);
 
 		//sendToActivity(packetReceive,"lo52.messaging.activities.LobbyActivity");
 

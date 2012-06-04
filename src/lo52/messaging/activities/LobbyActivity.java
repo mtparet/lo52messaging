@@ -140,9 +140,7 @@ public class LobbyActivity extends TabActivity {
 			 * Principe : si le tab des conversations est inactif, on affiche un toast
 			 */
 
-			// FIXME : est effectué non seulement pour les connexions d'utilisateurs mais aussi à chaque fois
-			// qu'un ACK est reçu (paquetACK appelle paquetHello)
-			/*TabHost tabhost = getTabHost();
+			TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
 				Bundle bundle = intent.getBundleExtra("conversation");
 				Conversation conversation = bundle.getParcelable("conversation");
@@ -152,7 +150,7 @@ public class LobbyActivity extends TabActivity {
 
 				// Affichage du toast
 				Toast.makeText(context, conversation.generateConversationName() + " " + phrase, Toast.LENGTH_LONG).show();
-			}*/
+			}
 		}
 	};
 
@@ -191,7 +189,9 @@ public class LobbyActivity extends TabActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			TabHost tabhost = getTabHost();
+			// FIXME : est effectué non seulement pour les connexions d'utilisateurs mais aussi à chaque fois
+			// qu'un ACK est reçu (paquetACK appelle paquetHello)
+			/*TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_USERLIST) {
 
 				// On récupère le nom de l'user depuis le bundle pour afficher un toast
@@ -199,7 +199,7 @@ public class LobbyActivity extends TabActivity {
 				if (userInfo != null && userInfo.getString("new_user") != null) {
 					Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
 				}
-			}
+			}*/
 		}
 	};
 

@@ -38,8 +38,6 @@
     <string name="conversations_myself">Moi</string>
     <string name="conversation_creation_toast_sing">vient de créer une conversation avec vous.</string>
     <string name="conversation_creation_toast_plur">viennent de créer une conversation avec vous.</string>
-    <string name="conversation_user_received_message">vous a envoyé un message.</string>
-    
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences</string>

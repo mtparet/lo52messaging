@@ -58,7 +58,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	private HashMap<String, TabInfo> mapTabInfo = new HashMap<String, ConversationPagerActivity.TabInfo>();
 	private MPagerAdapter mPagerAdapter;
 	private ConversationListFragment conversationListFragment;
-
+	private String tab = null;
 	/**
 	 * Maintains extrinsic info of a tab's construct
 	 */
@@ -117,7 +117,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		this.initialiseTabHost(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+			tab = savedInstanceState.getString("tab");
 		}
 
 		// Intialision du ViewPager
@@ -576,6 +576,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 		
 		autoUpdateListVisibility();
+		
+		if(tab !=  null){
+			mTabHost.setCurrentTabByTag(tab);
+		}
+
 	}
 
 	@Override

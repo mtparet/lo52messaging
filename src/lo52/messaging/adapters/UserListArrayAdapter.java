@@ -63,7 +63,6 @@ public class UserListArrayAdapter extends ArrayAdapter<String> {
 		// Click listener sur le checkbox
 		chk.setOnClickListener(new OnClickListener() {
 			
-			@Override
 			public void onClick(View v) {
 				// Si la case est cochée, on ajoute le nom de l'utilisateur
 				if (chk.isChecked())

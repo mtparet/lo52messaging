@@ -125,7 +125,6 @@ public class UserListActivity extends Activity {
 
 	private OnItemClickListener itemClickListenerList = new OnItemClickListener() {
 
-		@Override
 		public void onItemClick(AdapterView<?> listView, View view, int position, long row) {
 
 			Log.d(TAG, "Click item list " + position);
@@ -163,7 +162,6 @@ public class UserListActivity extends Activity {
 
 	private OnClickListener startMultiConversButtonListener = new OnClickListener() {
 
-		@Override
 		public void onClick(View v) {
 
 			HashSet<String> usernames = adapter.getCheckUsernames();

@@ -16,6 +16,20 @@
 	</PreferenceCategory>
 	
 	<PreferenceCategory
+	android:title="@string/preferencesNotifications">
+		<CheckBoxPreference android:title="@string/preferencesNotifToast"
+							android:summary="@string/preferencesNotifToastDesc"
+							android:key="prefs_notifToast"
+							android:defaultValue="true">
+		</CheckBoxPreference>
+		<CheckBoxPreference android:title="@string/preferencesNotifVibration"
+							android:summary="@string/preferencesNotifVibrationDesc"
+							android:key="prefs_notifVibrator"
+							android:defaultValue="true">
+		</CheckBoxPreference>
+	</PreferenceCategory>
+	
+	<PreferenceCategory
 	android:title="@string/preferencesServiceTitle">
 		<CheckBoxPreference android:title="@string/preferencesServiceNetwork"
 							android:summary="@string/preferencesServiceNetworkDesc"

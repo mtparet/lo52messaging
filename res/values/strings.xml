@@ -40,9 +40,8 @@
     <string name="conversation_creation_toast_plur">viennent de créer une conversation avec vous.</string>
     <string name="conversation_user_received_message">vous a envoyé un message.</string>
     
-    
     <!-- PREFERENCES -->
-    <string name="preferencesActivity">Préférences</string>
+    <string name="preferencesActivity">Préférences générales</string>
     <string name="preferencesUsername">Nom d\'utilisateur</string>
     <string name="preferencesUsernameDesc">Votre nom tel qu\'il apparaîtra aux autres utilisateurs.</string>
     <string name="preferencesUserAutoLogin">Connexion auto.</string>
@@ -50,6 +49,11 @@
     <string name="preferencesServiceTitle">Services</string>
     <string name="preferencesServiceNetwork">Service réseau toujours allumé</string>
     <string name="preferencesServiceNetworkDesc">Garder le service réseau toujours allumé en quittant l\'appli.</string>
+    <string name="preferencesNotifications">Notifications d\'évènements manqués</string>
+    <string name="preferencesNotifToast">Notification textuelle</string>
+    <string name="preferencesNotifToastDesc">Afficher une notification pour les évènements manqués (nouveau message, …)</string>
+    <string name="preferencesNotifVibration">Vibration</string>
+    <string name="preferencesNotifVibrationDesc">Faire vibrer le téléphone pour les évènements manqués (nouveau message, …)</string>
     
     <!-- FILE PICKER -->
     <string name="filePicker_invalid_ext">Extension de fichier invalide</string>

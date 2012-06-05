@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TabHost;
@@ -34,6 +35,9 @@ public class LobbyActivity extends TabActivity {
 	public static final String	TAG_TAB_USERLIST 		= "tab1";
 	public static final String	TAG_TAB_CONVERSATIONS 	= "tab2";
 	public static final String	TAG_TAB_MAP			 	= "tab3";
+
+	// Durée de la vibration pour la notification de messages, en ms
+	public static final long VIBRATOR_NOTIFICATION_DURATION	= 300;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -142,14 +146,24 @@ public class LobbyActivity extends TabActivity {
 
 			TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
-				Bundle bundle = intent.getBundleExtra("conversation");
-				Conversation conversation = bundle.getParcelable("conversation");
 
-				// Phrase au pluriel ou singulier selon le nombre de personnes dans la conversation
-				String phrase = (conversation.getListIdUser().size() > 2) ? getString(R.string.conversation_creation_toast_plur) : getString(R.string.conversation_creation_toast_sing) ;
+				if(preferences.getBoolean("prefs_notifToast", true)) {
+					Bundle bundle = intent.getBundleExtra("conversation");
+					Conversation conversation = bundle.getParcelable("conversation");
 
-				// Affichage du toast
-				Toast.makeText(context, conversation.generateConversationName() + " " + phrase, Toast.LENGTH_LONG).show();
+					// Phrase au pluriel ou singulier selon le nombre de personnes dans la conversation
+					String phrase = (conversation.getListIdUser().size() > 2) ? getString(R.string.conversation_creation_toast_plur) : getString(R.string.conversation_creation_toast_sing) ;
+
+					// Affichage du toast
+					Toast.makeText(context, conversation.generateConversationName() + " " + phrase, Toast.LENGTH_LONG).show();
+				}
+
+				// Vibration, si les préférences sont configurées pour
+				if(preferences.getBoolean("prefs_notifVibrator", true)) {
+					Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+					vibrator.vibrate(VIBRATOR_NOTIFICATION_DURATION);
+				}
+
 			}
 		}
 	};
@@ -166,14 +180,23 @@ public class LobbyActivity extends TabActivity {
 			TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_CONVERSATIONS) {
 
-				Bundle bundle = intent.getBundleExtra("message");
-				MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
-				String userName = "";
-				if (NetworkService.getListUsers().get(message.getClient_id()) != null) 
-					userName = NetworkService.getListUsers().get(message.getClient_id()).getName();
+				if(preferences.getBoolean("prefs_notifToast", true)) {
+					Bundle bundle = intent.getBundleExtra("message");
+					MessageBroacast message = bundle.getParcelable(MessageBroacast.tag_parcelable);
+					String userName = "";
+					if (NetworkService.getListUsers().get(message.getClient_id()) != null) 
+						userName = NetworkService.getListUsers().get(message.getClient_id()).getName();
 
-				// Affichage du toast
-				Toast.makeText(context, userName + " " + getString(R.string.conversation_user_received_message), Toast.LENGTH_LONG).show();
+					// Affichage du toast
+					Toast.makeText(context, userName + " " + getString(R.string.conversation_user_received_message), Toast.LENGTH_LONG).show();
+				}
+
+				// Vibration, si les préférences sont configurées pour
+				if(preferences.getBoolean("prefs_notifVibrator", true)) {
+					Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+					vibrator.vibrate(VIBRATOR_NOTIFICATION_DURATION);
+				}
+
 			}
 		}
 	};
@@ -192,10 +215,12 @@ public class LobbyActivity extends TabActivity {
 			TabHost tabhost = getTabHost();
 			if (tabhost.getCurrentTabTag() != TAG_TAB_USERLIST) {
 
-				// On récupère le nom de l'user depuis le bundle pour afficher un toast
-				Bundle userInfo = intent.getBundleExtra("new_user");
-				if (userInfo != null && userInfo.getString("new_user") != null) {
-					Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
+				if(preferences.getBoolean("prefs_notifToast", true)) {
+					// On récupère le nom de l'user depuis le bundle pour afficher un toast
+					Bundle userInfo = intent.getBundleExtra("new_user");
+					if (userInfo != null && userInfo.getString("new_user") != null) {
+						Toast.makeText(context, userInfo.getString("new_user") + " " + getString(R.string.userlist_new_connection), Toast.LENGTH_SHORT).show();
+					}
 				}
 			}
 		}

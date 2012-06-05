@@ -15,8 +15,14 @@ public class MessageBroacast implements Parcelable {
 	
 	private String message;
 	
-	//Transmettre le lien sur le device
-	private String link_bitmap;
+	//lien vers une image
+	private String link_image;
+	
+	//lien vers une image
+	private String link_son;
+
+	//lien vers un autre image
+	private String link_file;
 
 	private int client_id;
 	
@@ -50,7 +56,7 @@ public class MessageBroacast implements Parcelable {
 		this.message = in.readString();
 		this.client_id = in.readInt();
 		this.conversation_id = in.readInt();
-		this.link_bitmap = in.readString();
+		this.link_image = in.readString();
 	}
 
 	public static final Parcelable.Creator<MessageBroacast> CREATOR= new Parcelable.Creator<MessageBroacast>() {
@@ -83,7 +89,7 @@ public class MessageBroacast implements Parcelable {
 		dest.writeString(message);
 		dest.writeInt(client_id);
 		dest.writeInt(conversation_id);
-		dest.writeString(link_bitmap);
+		dest.writeString(link_image);
 
 	}
 
@@ -110,12 +116,29 @@ public class MessageBroacast implements Parcelable {
 		ctx.sendBroadcast(broadcastIntent);
 	}
 
-	public String getLink_bitmap() {
-		return link_bitmap;
+
+	public String getLink_image() {
+		return link_image;
 	}
 
-	public void setLink_bitmap(String link_bitmap) {
-		this.link_bitmap = link_bitmap;
+	public void setLink_image(String link_image) {
+		this.link_image = link_image;
+	}
+
+	public String getLink_son() {
+		return link_son;
+	}
+
+	public void setLink_son(String link_son) {
+		this.link_son = link_son;
+	}
+	
+	public String getLink_file() {
+		return link_file;
+	}
+
+	public void setLink_file(String link_file) {
+		this.link_file = link_file;
 	}
 
 }

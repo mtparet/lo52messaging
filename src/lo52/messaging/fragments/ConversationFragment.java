@@ -96,6 +96,7 @@ public class ConversationFragment extends Fragment {
 
 			if (messageText.equals("")) return;
 			
+			makeSureConversationIsNotNull();
 			
 			// Ajout du message texte à la conversation locale
 			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
@@ -120,9 +121,22 @@ public class ConversationFragment extends Fragment {
 	 */
 	public void updateConversationFromService() {
 		if (conversation != null)	// car peut ne pas avoir encore été initialisé par le pager
-			conversation = NetworkService.getListConversations().get(conversation.getConversation_id()); 
+			conversation = NetworkService.getListConversations().get(conversation.getConversation_id());
+		// Si la conversation est nulle on a une chance de pouvoir la récupérer si l'ID de conversation n'est pas null
+		else 
+			makeSureConversationIsNotNull();
 	}
 
+
+	/**
+	 * S'assure que l'objet conversation n'est pas null
+	 */
+	protected void makeSureConversationIsNotNull() {
+		if (conversation == null && conversation_id != -1) {
+			conversation = NetworkService.getListConversations().get(conversation_id);
+			Log.d(TAG, "Updated conversation object");
+		}
+	}
 
 	/**
 	 * 

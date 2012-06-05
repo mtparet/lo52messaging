@@ -266,10 +266,9 @@ public class NetworkService extends Service {
 			Log.d(TAG, "message à envoyer depuis client " + message.getClient_id() );
 			// on ajoute le message à la liste
 
-			// Fix : on ajoute le message à la conversation directement depuis le fragment car le broadcast arrive après que la vue du fragment
-			// soit rafraichie
-			//Message mess = new Message(message.getClient_id(), message.getMessage());
-			//listConversations.get(message.getConversation_id()).addMessage(mess);
+			// Fix, la conversation du fragment n'est pas une référence de la conversation dans le Networkservice, les deux sont indépendants
+			Message mess = new Message(message.getClient_id(), message.getMessage());
+			listConversations.get(message.getConversation_id()).addMessage(mess);
 
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();

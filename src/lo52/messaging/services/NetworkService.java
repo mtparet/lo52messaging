@@ -891,8 +891,14 @@ public class NetworkService extends Service {
 				listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 			}
 			
-			//Si on a des conversations avec lui, on lui renvoit... TODO
-			
+			//Si on a des conversations avec lui, on lui renvoit... 
+			for( Conversation convers : listConversations.values()){
+				for(int user_id : convers.getListIdUser()){
+					if(user_id == packetReceive.getUser_envoyeur().getId()){
+						convers.sendToNetworkService(getApplicationContext());
+					}
+				}
+			}
 
 		}else{
 			//on l'ajoute à la liste
@@ -958,7 +964,13 @@ public class NetworkService extends Service {
 					listIdUser.add(user.getId());
 
 					if(!listUsers.containsKey(user.getId()) && user.getId() != user_me.getId()){
+						//on considère alors le paquet comme aussi un paquet hello
 						listUsers.put(user.getId(), user);
+						// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
+						Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
+						Bundle bundle = new Bundle();
+						bundle.putString("new_user", packetReceive.getUser_envoyeur().getName());
+						broadcastIntent.putExtra("new_user", bundle);
 					}
 				}
 			}

@@ -322,41 +322,45 @@ public class NetworkService extends Service {
 			Bundle bundle = intent.getBundleExtra("conversation");
 			Conversation conversation = bundle.getParcelable("conversation");
 
-			ArrayList<User> users = new ArrayList<User>();
-			for(int id_user : conversation.getListIdUser()){
-				users.add(listUsers.get(id_user));
-			}
-
 			// on ajoute la conversation à la liste
 			listConversations.put(conversation.getConversation_id(), conversation);
 			Log.w(TAG, "AJOUT CONVERSATION LISTE GLOBALE, new size " + listConversations.size());
 
-			// XXX 2
-			// On recherche si user_me n'est pas dans la liste des users, sinon on l'ajoute
-			boolean user_me_found = false;
-
-			for (User u : users) {
-				if (u != null && u.getId() == user_me.getId()) user_me_found = true;
-			}
-			if (!user_me_found) users.add(user_me);
-
-			ContentNetwork content = new ContentNetwork(conversation.getConversation_id(), conversation.getConversation_name(), users);
-
-			for(User user_destinataire : users) {
-
-				// On évite de s'envoyer le paquet de création à soi même...
-				if (user_destinataire != null && user_destinataire.getId() != user_me.getId()) {
-
-					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
-
-					packet.setUser_envoyeur(user_me);
-
-					SendPacket(packet);
-				}
-			}
+			sendConversation(conversation);
 
 		}
 	};
+	
+	private void sendConversation(Conversation conversation){
+		
+		ArrayList<User> users = new ArrayList<User>();
+		for(int id_user : conversation.getListIdUser()){
+			users.add(listUsers.get(id_user));
+		}
+		// XXX 2
+		// On recherche si user_me n'est pas dans la liste des users, sinon on l'ajoute
+		boolean user_me_found = false;
+
+		for (User u : users) {
+			if (u != null && u.getId() == user_me.getId()) user_me_found = true;
+		}
+		if (!user_me_found) users.add(user_me);
+
+		ContentNetwork content = new ContentNetwork(conversation.getConversation_id(), conversation.getConversation_name(), users);
+
+		for(User user_destinataire : users) {
+
+			// On évite de s'envoyer le paquet de création à soi même...
+			if (user_destinataire != null && user_destinataire.getId() != user_me.getId()) {
+
+				PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.CREATION_GROUP);
+
+				packet.setUser_envoyeur(user_me);
+
+				SendPacket(packet);
+			}
+		}
+	}
 
 	/*
 	 * Recoit  les infos de localisation à enovoyer à tous les clients
@@ -895,7 +899,7 @@ public class NetworkService extends Service {
 			for( Conversation convers : listConversations.values()){
 				for(int user_id : convers.getListIdUser()){
 					if(user_id == packetReceive.getUser_envoyeur().getId()){
-						convers.sendToNetworkService(getApplicationContext());
+						sendConversation(convers);
 					}
 				}
 			}

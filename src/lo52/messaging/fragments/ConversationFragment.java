@@ -86,7 +86,7 @@ public class ConversationFragment extends Fragment {
 		public void onClick(View v) {
 			Log.d(TAG, "Click bouton media");
 
-			parentActivity.startFilePickerActivity();
+			parentActivity.startFilePickerActivity(getConversation_id());
 		}
 	};
 

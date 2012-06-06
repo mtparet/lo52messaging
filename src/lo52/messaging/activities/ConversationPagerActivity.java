@@ -269,10 +269,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	/**
 	 * Démarre l'activité pour choisir un fichier
 	 */
-	public void startFilePickerActivity() {
+	public void startFilePickerActivity(int conversation_id) {
 		// Démarrage de l'activité pour choisir un fichier			
 		Intent intent = new Intent(this, FilePickerActivity.class);
 		intent.putExtra(FilePickerActivity.START_PATH, "/sdcard");
+		intent.putExtra("conversation_id", conversation_id);
 		startActivityForResult(intent, FILE_PICKER_ACTIVITY_CODE);		
 	}
 
@@ -280,11 +281,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		String filePath = "";
+		int conversation_id = 0;
 		// Retour de l'activité de choix d'un fichier
 		if (requestCode == FILE_PICKER_ACTIVITY_CODE) {
 
 			if (resultCode == RESULT_OK) {
 				filePath = data.getStringExtra(FilePickerActivity.RESULT_PATH);
+				conversation_id = data.getIntExtra("conversation_id", 0);
 				Log.d(TAG, "Choix fichier: " + filePath);
 
 				// Extension
@@ -293,7 +296,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				Log.d(TAG, "Extension: " + extension);
 
 				// Vérification que l'extension de l'image est autorisée
-				boolean b1 = LibUtil.MEDIA_ALLOWED_EXTENSIONS.contains(extension);
+				//boolean b1 = LibUtil.MEDIA_ALLOWED_EXTENSIONS.contains(extension);
+				boolean b1 = true;
 
 				if (!b1) {
 					Toast.makeText(this, getString(R.string.filePicker_invalid_ext), Toast.LENGTH_LONG).show();
@@ -301,6 +305,12 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				else {
 					// TODO envoyer le fichier à tout les membres de la conversation
 					Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
+					
+					Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
+					MessageBroacast messageBroad = new MessageBroacast("fichier", conversation_id);
+					messageBroad.setClient_id(NetworkService.getUser_me().getId());
+					messageBroad.setLink_file(filePath);
+					messageBroad.sendToNetWorkService(getApplicationContext());
 				}
 			}
 		}

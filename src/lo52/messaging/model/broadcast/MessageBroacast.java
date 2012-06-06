@@ -15,14 +15,8 @@ public class MessageBroacast implements Parcelable {
 	
 	private String message;
 	
-	//lien vers une image
-	private String link_image;
-	
-	//lien vers une image
-	private String link_son;
-
-	//lien vers un autre image
-	private String link_file;
+	//éventuel lien vers un fichier
+	private String link_file = null;
 
 	private int client_id;
 	
@@ -56,7 +50,7 @@ public class MessageBroacast implements Parcelable {
 		this.message = in.readString();
 		this.client_id = in.readInt();
 		this.conversation_id = in.readInt();
-		this.link_image = in.readString();
+		this.link_file = in.readString();
 	}
 
 	public static final Parcelable.Creator<MessageBroacast> CREATOR= new Parcelable.Creator<MessageBroacast>() {
@@ -89,7 +83,7 @@ public class MessageBroacast implements Parcelable {
 		dest.writeString(message);
 		dest.writeInt(client_id);
 		dest.writeInt(conversation_id);
-		dest.writeString(link_image);
+		dest.writeString(link_file);
 
 	}
 
@@ -114,23 +108,6 @@ public class MessageBroacast implements Parcelable {
 		broadcastIntent.putExtra("message", bundle);
 
 		ctx.sendBroadcast(broadcastIntent);
-	}
-
-
-	public String getLink_image() {
-		return link_image;
-	}
-
-	public void setLink_image(String link_image) {
-		this.link_image = link_image;
-	}
-
-	public String getLink_son() {
-		return link_son;
-	}
-
-	public void setLink_son(String link_son) {
-		this.link_son = link_son;
 	}
 	
 	public String getLink_file() {

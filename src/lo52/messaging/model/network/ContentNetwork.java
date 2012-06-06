@@ -44,8 +44,13 @@ public class ContentNetwork implements Parcelable{
 	private float lat;
 	
 	//Sert à stocker du contenu de grande taille (image ou son ou autres fichiers), peut nécessité d'être réassemblé
-	@SerializedName("byte")
+	@SerializedName("byte_content")
 	private byte[] byte_content;
+	
+	
+	//Sert à stocker le nom du fichier envoyé
+	@SerializedName("file_name")
+	private String file_name;
 	
 	// List des utilisateur dans la conversation
 	private ArrayList<User> userList;
@@ -103,6 +108,25 @@ public class ContentNetwork implements Parcelable{
 
 	public ContentNetwork() {
 		// TODO Auto-generated constructor stub
+	}
+
+	public ContentNetwork(int conversation_id, String conversation_name,
+			String message, int client_id, float lon, float lat,
+			byte[] byte_content, ArrayList<User> userList, String file_name) {
+		super();
+		this.conversation_id = conversation_id;
+		this.conversation_name = conversation_name;
+		this.message = message;
+		this.client_id = client_id;
+		this.lon = lon;
+		this.lat = lat;
+		this.byte_content = byte_content;
+		this.userList = userList;
+		this.file_name = file_name;
+	}
+
+	public ContentNetwork(ContentNetwork content) {
+		this(content.conversation_id,content.conversation_name,content.message,content.client_id,content.lon,content.lat,content.byte_content,content.userList, content.file_name);
 	}
 
 	public static final Parcelable.Creator<ContentNetwork> CREATOR= new Parcelable.Creator<ContentNetwork>() {
@@ -190,6 +214,14 @@ public class ContentNetwork implements Parcelable{
 
 	public void setByte_content(byte[] byte_content) {
 		this.byte_content = byte_content;
+	}
+
+	public String getFile_name() {
+		return file_name;
+	}
+
+	public void setFile_name(String file_name) {
+		this.file_name = file_name;
 	}
 
 }

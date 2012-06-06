@@ -57,6 +57,8 @@ public class FilePickerActivity extends ListActivity {
 
 	private File selectedFile;
 	private HashMap<String, Integer> lastPositions = new HashMap<String, Integer>();
+	
+	private int conversation_id;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -78,6 +80,8 @@ public class FilePickerActivity extends ListActivity {
 			public void onClick(View v) {
 				if (selectedFile != null) {
 					getIntent().putExtra(RESULT_PATH, selectedFile.getPath());
+					getIntent().putExtra("conversation_id", conversation_id);
+
 					setResult(RESULT_OK, getIntent());
 					finish();
 				}
@@ -132,6 +136,8 @@ public class FilePickerActivity extends ListActivity {
 				}
 			}
 		});
+
+		conversation_id = getIntent().getIntExtra("conversation_id", 0);
 
 		String startPath = getIntent().getStringExtra(START_PATH);
 		if (startPath != null) {

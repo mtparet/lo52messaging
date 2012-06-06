@@ -16,6 +16,7 @@
  	
  	<uses-feature android:name="android.hardware.location" android:required="true" />
  	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
+ 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
  	
 
     <application

@@ -1,15 +1,19 @@
 package lo52.messaging.services;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -74,8 +79,13 @@ public class NetworkService extends Service {
 	// contient la liste des conversations
 	private static Hashtable<Integer,Conversation> listConversations = new Hashtable<Integer,Conversation>();
 
-	//liste des packets en attente d'ACK
+	//liste des packets en attente d'ACK, l'integer est le temps auquel on envoyé le paquet (en millisecondes)
 	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
+
+	private ArrayList<Integer> previousReceivedPacket = new ArrayList<Integer>();
+	
+	//liste des liste de paquets
+	private Hashtable<Integer,ArrayList<PacketNetwork>> listPaquetDivided = new Hashtable<Integer,ArrayList<PacketNetwork>>();
 
 	// Liste des IDs des conversations qui ont été créées par le service mais qui n'ont pas encore de fragment associés dans l'UI
 	private static ArrayList<Conversation> conversationsToCreateUI = new ArrayList<Conversation>();
@@ -197,6 +207,8 @@ public class NetworkService extends Service {
 		InetSocketAddress inetAddres = new InetSocketAddress(addres, PORT_LOCAL);
 
 		user_me.setInetSocketAddressLocal(inetAddres);
+		
+		
 
 		/*
 		 * on lance la socket d'écoute sur le réseau 
@@ -210,6 +222,9 @@ public class NetworkService extends Service {
 		 */
 		Timer timer = new Timer();
 		timer.schedule(new SendBroadcatsimeTask(), 200);
+		
+		Timer timer2 = new Timer();
+		timer2.schedule(new checkACKTask(), 10000, 10000);
 
 	}
 
@@ -273,12 +288,19 @@ public class NetworkService extends Service {
 			Conversation conversation = listConversations.get(message.getConversation_id());
 			ArrayList<Integer> listIdUser = conversation.getListIdUser();
 
+			ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage(), message.getClient_id());
+
+			if( message.getLink_file() != null ){
+				File file = new File(message.getLink_file());
+				content.setByte_content(LibUtil.getByte(file));
+				content.setFile_name(file.getName());
+			}
+
 			for(int id_user : listIdUser){
 				//ne pas s'envoyer à soit même le message
 				if(id_user != user_me.getId()){
 					User user_destinataire = listUsers.get(id_user);
 
-					ContentNetwork content = new ContentNetwork(message.getConversation_id(), message.getMessage(), message.getClient_id());
 					PacketNetwork packet = new PacketNetwork(content, user_destinataire, PacketNetwork.MESSAGE);
 
 					packet.setUser_envoyeur(user_me);
@@ -370,6 +392,9 @@ public class NetworkService extends Service {
 	 */
 	private void SendPacket(PacketNetwork packet){
 
+		packet.setNext_packet(0);
+		packet.setPrevious_packet(0);
+		
 		/**
 		 * Dans le cas de l'annonciation de l'arrivée dans le réseau (broadcast)
 		 */
@@ -459,33 +484,84 @@ public class NetworkService extends Service {
 
 			Gson gson = new Gson();
 
-			String json = gson.toJson(packet);
+			if(packet.getContent() != null && packet.getContent().getByte_content() != null && packet.getContent().getByte_content().length >= (BUFFER_SIZE)/2 - 2000){
+				Log.d(TAG, "Taille total du content:" + packet.getContent().getByte_content().length);
 
-			byte[] packet_byte = json.getBytes();
 
-			// non utilisé pour le moment, pour info
-			byte[] content_byte = gson.toJson(packet.getContent()).getBytes();
+				ArrayList<PacketNetwork> listPacket = PacketNetwork.division(packet);
 
-			DatagramPacket dataPacket = null;
-			try {
-				dataPacket = new DatagramPacket(packet_byte, packet_byte.length, inetAddres);
-				datagramSocket.send(dataPacket);
-				Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
-				Log.d(TAG, "Taille total du packet:" + packet_byte.length + "taille du contenu sans les en têtes " + content_byte.length);
+				//on boucle sur la liste des paquets pour l'envoyer
+				for(PacketNetwork packet1 : listPacket){
+					Log.d(TAG, "Taille après découpe du content:" + packet1.getContent().getByte_content().length);
+					String json1 = gson.toJson(packet1);
 
-				//on l'ajoute dans la liste des paquets envoyé
-				packetListACK.put(packet.getRamdom_identifiant(), packet);
+					byte[] packet_byte1 = null;
+					try {
+						packet_byte1 = LibUtil.compress(json1);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-			} catch (IOException e) {
-				e.printStackTrace();
+					if(sendFinalPacket(packet_byte1, inetAddres, datagramSocket)){
+						Log.d(TAG, "envoyé:" + json1 + "a : " + inetAddres.toString());
+						packet1.setDate_send((int) System.currentTimeMillis());
+						packetListACK.put(packet1.getRamdom_identifiant(), packet1);
+					}else{
+						Log.e(TAG, "échec envoit datagramsocket");
+					}
+				}
+
+				// sinon on envoit le packet seul
+			}else{
+
+				String json = gson.toJson(packet);
+
+				byte[] packet_byte = null;
+				try {
+					packet_byte = LibUtil.compress(json);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+								
+				if(sendFinalPacket(packet_byte, inetAddres, datagramSocket)){
+					Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
+					packet.setDate_send((int) System.currentTimeMillis());
+
+					// si ce n'est pas un ACK on le mets dans la liste des paquets en attente d'ACK
+					if(packet.type != PacketNetwork.ACK){
+						packetListACK.put(packet.getRamdom_identifiant(), packet);
+					}
+				}else{
+					Log.e(TAG, "échec envoit datagramsocket");
+				}
 			}
-
 			return null;
+
 		}
 
 		protected void onPostExecute(Long result) {
 			// TODO  
 		}
+	}
+
+	private boolean sendFinalPacket(byte[] packet_byte, InetSocketAddress inetAddres,DatagramSocket datagramSocket ){
+
+		DatagramPacket dataPacket = null;
+		try {
+			Log.d(TAG, "Taille total du packet:" + packet_byte.length);
+			dataPacket = new DatagramPacket(packet_byte, packet_byte.length, inetAddres);
+			datagramSocket.send(dataPacket);
+			return true;
+
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+
+		}
+
 	}
 
 
@@ -498,6 +574,13 @@ public class NetworkService extends Service {
 		protected Long doInBackground(PacketNetwork... packets) {
 
 			PacketNetwork packet = packets[0];
+
+			/*
+			 * on set par défault que c'est un paque isolé
+			 */
+
+			packet.setNext_packet(0);
+			packet.setPrevious_packet(0);
 
 			/*
 			 * Vérification du paquet
@@ -529,17 +612,20 @@ public class NetworkService extends Service {
 			Gson gson = new Gson();
 			String json = gson.toJson(packet);
 
-			byte[] buffer = json.getBytes();
+			byte[] buffer = null;
+			try {
+				buffer = LibUtil.compress(json);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			DatagramPacket dataPacket = null;
 			try {
 				dataPacket = new DatagramPacket(buffer, buffer.length, inetAddres);
 				datagramSocket.send(dataPacket);
 				Log.d(TAG, "envoyé:" + json + "a : " + inetAddres.toString());
-				Log.d(TAG, "Taille total du packet:" + buffer.length + "taille du contenu sans les en têtes " + gson.toJson(packet.getContent()).getBytes().length);
-
-				//on l'ajoute dans la liste des paquets envoyé
-				packetListACK.put( packet.getRamdom_identifiant(), packet);
+				Log.d(TAG, "Taille total du packet:" + buffer.length + "taille du contenu sans les en têtes " + gson.toJson(packet.getContent()).getBytes("UTF-8").length);
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -608,15 +694,19 @@ public class NetworkService extends Service {
 	 */
 	private void analysePacket(DatagramPacket dataPacket){
 
-		String json = new String(dataPacket.getData(), 0, dataPacket.getLength());  
+		String json = null;
+		try {
+			json = LibUtil.decompress(dataPacket.getData());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Log.d(TAG, "Analyse packet:" + json);
 
 		Gson gson = new Gson();
 		PacketNetwork packetReceive = gson.fromJson(json, PacketNetwork.class);
 
 		Log.d(TAG, "Packet recu de " + packetReceive.getUser_envoyeur().getName());
-
-
 
 
 		/**
@@ -633,7 +723,10 @@ public class NetworkService extends Service {
 
 		}
 
-		analysePacket(packetReceive);
+		if(packetReceive.type == PacketNetwork.ACK || !previousReceivedPacket.contains(packetReceive.getRamdom_identifiant())){
+			previousReceivedPacket.add(packetReceive.getRamdom_identifiant());
+			analysePacket(packetReceive);
+		}
 
 	}
 
@@ -646,34 +739,65 @@ public class NetworkService extends Service {
 	 * @param packet, contient un packet
 	 */
 	private void analysePacket(PacketNetwork packet){
+
 		/*
-		 * on exécute les traitement à faire au niveau de la couche réseau
+		 * En premier on vérifie que le paquet n'est pas contenu dans une liste de paquets à reconstituer
 		 */
-		switch (packet.type){
-		case PacketNetwork.ACK : paquetACK(packet);
-		break;
-		case PacketNetwork.CREATION_GROUP : paquetCreationGroup(packet);
-		break;
-		case PacketNetwork.DISCONNECTED : paquetDisconnecter(packet);
-		break;
-		case PacketNetwork.HELLO : paquetHello(packet);
-		break;
-		case PacketNetwork.MESSAGE : paquetMessage(packet);
-		break;
-		case PacketNetwork.LOCALISATION : paquetLocalisation(packet);
-		break;
-		case PacketNetwork.ALIVE : paquetAlive(packet);
-		break;
-		default: paquetInconnu(packet);
-		break;
+
+		if(packet.getRamdom_identifiant_groupe() != 0){
+			
+			if(packet.getNext_packet() == 0 && packet.getPrevious_packet() == 0){
+				Log.d(TAG, "error previous et next 0);");
+				return;
+			}
+				if(listPaquetDivided.containsKey(packet.getRamdom_identifiant_groupe())){
+					listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).add(packet);
+				}else{
+					ArrayList<PacketNetwork> al = new ArrayList<PacketNetwork>();
+					al.add(packet);
+					listPaquetDivided.put(packet.getRamdom_identifiant_groupe(), al);
+				}
+				Log.d(TAG, "Taille de la pile de packet :" + listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() + " taille attendue : " +packet.getNb_packet_groupe());
+
+				
+				if(packet.getNb_packet_groupe() == listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size()){
+					PacketNetwork packetFinal = PacketNetwork.reassemble(listPaquetDivided.get(packet.getRamdom_identifiant_groupe()));
+					analysePacket(packetFinal);
+				}
+				
+		}else{
+
+			/*
+			 * on exécute les traitement à faire au niveau de la couche réseau
+			 */
+			switch (packet.type){
+			case PacketNetwork.ACK : paquetACK(packet);
+			break;
+			case PacketNetwork.CREATION_GROUP : paquetCreationGroup(packet);
+			break;
+			case PacketNetwork.DISCONNECTED : paquetDisconnecter(packet);
+			break;
+			case PacketNetwork.HELLO : paquetHello(packet);
+			break;
+			case PacketNetwork.MESSAGE : paquetMessage(packet);
+			break;
+			case PacketNetwork.LOCALISATION : paquetLocalisation(packet);
+			break;
+			case PacketNetwork.ALIVE : paquetAlive(packet);
+			break;
+			default: paquetInconnu(packet);
+			break;
+
+			}
 
 		}
+
 	}
 
 	private void paquetAlive(PacketNetwork packet) {
 		// on le met à alive
 		listUsers.get(packet.getUser_envoyeur().getId()).setAlive(true);
-		
+
 	}
 
 	/**
@@ -709,9 +833,24 @@ public class NetworkService extends Service {
 
 			if(packetReceive.getUser_envoyeur() != user_me){
 				Intent broadcastIntent = new Intent(NetworkService.SendMessage);
+				
 				Bundle bundle = new Bundle();
 
 				MessageBroacast messageBroad = new MessageBroacast(message.getClient_id(), message.getMessage(), packetReceive.getContent().getConversation_id());
+				/*
+				 * On teste si il y a un lien
+				 */
+				Log.d(TAG, "fichier :" +packetReceive.getContent().getFile_name() );
+
+				if(packetReceive.getContent().getFile_name() != null && packetReceive.getContent().getFile_name() != ""){
+					File file = new File("/sdcard",packetReceive.getContent().getFile_name());
+					Log.d(TAG, "ecriture fichier :" +file.getAbsolutePath() );
+					LibUtil.writeFile(file, packetReceive.getContent().getByte_content());
+
+					messageBroad.setLink_file(file.getAbsolutePath());
+					
+				}
+
 				bundle.putParcelable("message", messageBroad);
 				broadcastIntent.putExtra(MessageBroacast.tag_parcelable, bundle);
 
@@ -751,6 +890,9 @@ public class NetworkService extends Service {
 				listUsers.remove(packetReceive.getUser_envoyeur().getId());
 				listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 			}
+			
+			//Si on a des conversations avec lui, on lui renvoit... TODO
+			
 
 		}else{
 			//on l'ajoute à la liste
@@ -759,7 +901,7 @@ public class NetworkService extends Service {
 
 
 		paquetAlive(packetReceive);
-		
+
 		// Envoi d'un broadcast à l'activité Lobby pour lui dire de rafraichir la vue de liste des utilisateurs
 		Intent broadcastIntent = new Intent(NetworkService.UserListUpdated);
 		Bundle bundle = new Bundle();
@@ -1013,4 +1155,35 @@ public class NetworkService extends Service {
 
 		return exists;
 	}
+	
+	/**
+	 * Pemet de vérifier que les messages ont bien été reçut
+	 * @author mtparet3
+	 *
+	 */
+	private class checkACKTask extends TimerTask {
+		   public void run() {
+			   for(PacketNetwork packet : packetListACK.values()){
+				   int now = (int) System.currentTimeMillis();
+				   
+					if(now > (packet.getDate_send() + 20000)){
+						Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
+
+						SendSocket sendSocket = new SendSocket();
+						PacketNetwork[] packets = new PacketNetwork[1];
+						packets[0] = packet;
+
+						//Exécution de l'asyncTask
+						sendSocket.execute(packets);
+						
+						packetListACK.remove(packet);
+					}
+				   
+			   }
+		   }
+	}
+
+
+	
+	
 }

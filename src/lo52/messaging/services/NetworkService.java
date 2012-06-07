@@ -108,7 +108,7 @@ public class NetworkService extends Service {
 	private int PORT_LOCAL = 5008;
 
 	//Taille du buffer en réception, en Byte
-	public static final int BUFFER_SIZE = 30000;
+	public static final int BUFFER_SIZE = 15000;
 
 	public NetworkService() {
 
@@ -847,7 +847,12 @@ public class NetworkService extends Service {
 				Log.d(TAG, "fichier :" +packetReceive.getContent().getFile_name() );
 
 				if(packetReceive.getContent().getFile_name() != null && packetReceive.getContent().getFile_name() != ""){
-					File file = new File("/sdcard",packetReceive.getContent().getFile_name());
+
+					// Créer le sous dossier lo52 s'il n'existe pas 
+					File receiveDir = new File("/sdcard/lo52/");
+					receiveDir.mkdirs();
+
+					File file = new File(receiveDir, packetReceive.getContent().getFile_name());
 					Log.d(TAG, "ecriture fichier :" +file.getAbsolutePath() );
 					LibUtil.writeFile(file, packetReceive.getContent().getByte_content());
 

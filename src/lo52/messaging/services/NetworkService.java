@@ -1179,6 +1179,8 @@ public class NetworkService extends Service {
 	 */
 	private class checkACKTask extends TimerTask {
 		   public void run() {
+			   
+			   while(true){
 			   for(PacketNetwork packet : packetListACK.values()){
 				   int now = (int) System.currentTimeMillis();
 				   
@@ -1207,6 +1209,8 @@ public class NetworkService extends Service {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		   }
+			   
 		   }
 	}
 

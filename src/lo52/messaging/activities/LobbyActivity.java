@@ -115,6 +115,10 @@ public class LobbyActivity extends TabActivity {
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
+		
+		IntentFilter filter3 = new IntentFilter();
+		filter3.addAction(NetworkService.FileBeingReceived);
+		registerReceiver(fileBeingReceived, filter3);
 
 		IntentFilter userListUpdatefilter = new IntentFilter();
 		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
@@ -126,6 +130,7 @@ public class LobbyActivity extends TabActivity {
 		unregisterReceiver(conversationReceiver);
 		unregisterReceiver(messageReceiver);
 		unregisterReceiver(UserlistUpdate_BrdcReceiver);
+		unregisterReceiver(fileBeingReceived);
 		super.onPause();
 	}
 
@@ -223,6 +228,19 @@ public class LobbyActivity extends TabActivity {
 					}
 				}
 			}
+		}
+	};
+	
+	
+	/**
+	 * Envoyé par le network service quand le premier paquet d'un fichier est reçu
+	 */
+	private BroadcastReceiver fileBeingReceived = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+			Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
 		}
 	};
 

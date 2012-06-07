@@ -305,7 +305,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				}
 				else {
 					// TODO envoyer le fichier à tout les membres de la conversation
-					Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.conversation_file_send_begin), Toast.LENGTH_LONG).show();
 					
 					Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 					MessageBroacast messageBroad = new MessageBroacast(MessageBroacast.MESSAGE_FILE_IDENTIFIER, conversation_id);
@@ -527,7 +527,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
 	};
-
+	
+	
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void onResume() {
@@ -542,7 +543,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
-
+		
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
 		// (coté broadcast receiver / personne qui *créé* la conversation)
 		ArrayList<Conversation> conversations = NetworkService.getLocalConversationsToCreate();

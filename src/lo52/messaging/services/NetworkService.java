@@ -98,6 +98,7 @@ public class NetworkService extends Service {
 	public static final String SendConversation 	= "NetworkService.send.Conversation";
 	public static final String Receivelocalisation 	= "NetworkService.receive.Localisation";
 	public static final String UserListUpdated		= "NetworkService.userlist.updated";
+	public static final String FileBeingReceived	= "NetworkService.file.Receive.Start";
 
 
 	private int PORT_DEST = 5008;
@@ -755,6 +756,11 @@ public class NetworkService extends Service {
 			}
 			Log.d(TAG, "Taille de la pile de packet :" + listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() + " taille attendue : " +packet.getNb_packet_groupe());
 
+			// Si on est sur le premier paquet on envoit un broadcast pour dire d'afficher un toast comme quoi on reçoit un fichier
+			if (listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() == 1) {
+				Intent broadcastIntent = new Intent(NetworkService.FileBeingReceived);
+				sendBroadcast(broadcastIntent);
+			}
 
 			if (packet.getNb_packet_groupe() == listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size()) {
 				PacketNetwork packetFinal = PacketNetwork.reassemble(listPaquetDivided.get(packet.getRamdom_identifiant_groupe()));

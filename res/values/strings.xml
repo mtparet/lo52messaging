@@ -39,6 +39,8 @@
     <string name="conversation_creation_toast_sing">vient de créer une conversation avec vous.</string>
     <string name="conversation_creation_toast_plur">viennent de créer une conversation avec vous.</string>
     <string name="conversation_user_received_message">vous a envoyé un message.</string>
+    <string name="conversation_file_send_begin">Envoi du fichier…</string>
+    <string name="conversation_file_receive_begin">Réception d\'un fichier…</string>
     
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences générales</string>

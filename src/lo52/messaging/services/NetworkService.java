@@ -224,7 +224,7 @@ public class NetworkService extends Service {
 		timer.schedule(new SendBroadcatsimeTask(), 200);
 		
 		Timer timer2 = new Timer();
-		timer2.schedule(new checkACKTask(), 10000);
+		timer2.schedule(new checkACKTask(), 10000, 20000);
 
 	}
 
@@ -1180,7 +1180,6 @@ public class NetworkService extends Service {
 	private class checkACKTask extends TimerTask {
 		   public void run() {
 			   
-			   while(true){
 			   for(PacketNetwork packet : packetListACK.values()){
 				   int now = (int) System.currentTimeMillis();
 				   
@@ -1203,13 +1202,6 @@ public class NetworkService extends Service {
 				   }
 			   }
 			   
-			   try {
-				wait(10000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		   }
 			   
 		   }
 	}

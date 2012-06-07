@@ -5,6 +5,7 @@ import lo52.messaging.activities.ConversationPagerActivity;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.Message;
 import lo52.messaging.services.NetworkService;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -49,7 +50,7 @@ public class ConversationFragment extends Fragment {
 
 		if (conversText_edit != null && conversation != null && parentActivity != null) {
 
-			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
+			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), null));
 		}
 	}
 
@@ -73,7 +74,7 @@ public class ConversationFragment extends Fragment {
 		// Initialise leur valeur
 		conversName_tv.setText(conversationName_str);
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
-		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext())));
+		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), null));
 
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
@@ -95,23 +96,23 @@ public class ConversationFragment extends Fragment {
 			String messageText = getConversUserText();
 
 			if (messageText.equals("")) return;
-			
+
 			makeSureConversationIsNotNull();
-			
+
 			// Ajout du message texte à la conversation locale
 			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
-			
+
 			/*Log.d(TAG, "Update convers");
 			updateConversationFromService();
 			Log.d(TAG, "Updated convers");*/
-			
+
 			// Mise à jour de l'UI
 			tryTextRefresh();
 
 			// Reset du champ d'entrée de texte			
 			EditText conversUserText_edit	= (EditText) fv.findViewById(R.id.conversation_usermessage);
 			conversUserText_edit.setText("");
-			
+
 			parentActivity.onFragmentSendButtonClick(messageText, getConversation_id());
 		}
 	};
@@ -250,7 +251,7 @@ public class ConversationFragment extends Fragment {
 		// Régénère le texte de la conversation
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
 		Log.d(TAG, "Texte mis à jour " + conversationText_str);
-		
+
 		// Essaye de rafraichir le textEdit
 		if (fv != null) {
 			EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);
@@ -260,7 +261,21 @@ public class ConversationFragment extends Fragment {
 		} else {
 			Log.d(TAG, "N'a pas pu refresh la vue");
 		}
-
 	}
+
+
+	/**
+	 *	Permet de convertir les tags <img> en image dans l'EditText de la conversation
+	 */
+	private class ImageGetter implements Html.ImageGetter {
+
+		public Drawable getDrawable(String source) {
+			
+			Drawable d = Drawable.createFromPath(source);
+			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+
+			return d;   
+		}
+	};
 
 }

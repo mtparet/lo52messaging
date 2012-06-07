@@ -3,11 +3,9 @@ package lo52.messaging.model.network;
 import java.util.ArrayList;
 
 import lo52.messaging.model.User;
-import lo52.messaging.services.NetworkService;
-
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**

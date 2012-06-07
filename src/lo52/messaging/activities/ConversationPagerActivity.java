@@ -12,6 +12,7 @@ import lo52.messaging.R;
 import lo52.messaging.fragments.ConversationFragment;
 import lo52.messaging.fragments.ConversationListFragment;
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.Message;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.util.LibUtil;
@@ -307,10 +308,15 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 					Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
 					
 					Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
-					MessageBroacast messageBroad = new MessageBroacast("fichier", conversation_id);
+					MessageBroacast messageBroad = new MessageBroacast(MessageBroacast.MESSAGE_FILE_IDENTIFIER, conversation_id);
 					messageBroad.setClient_id(NetworkService.getUser_me().getId());
 					messageBroad.setLink_file(filePath);
 					messageBroad.sendToNetWorkService(getApplicationContext());
+					
+					// Ajout du message à la conversation pour l'utilisateur local
+					// Message avec l'identificateur d'un message fichier + le chemin local du fichier
+					NetworkService.getListConversations().get(conversation_id).addMessage(new Message(NetworkService.getUser_me().getId(), MessageBroacast.MESSAGE_FILE_IDENTIFIER + ";" + filePath));
+					
 				}
 			}
 		}
@@ -483,9 +489,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			// On récupère le fragment correspondant à l'id de la conversatoin
 			ConversationFragment frag = getFragmentById(message.getConversation_id());
 			// Et on set le texte
-			// XXX doublon ?
-			//frag.getConversation().addMessage(new Message(message.getClient_id(), message.getMessage()));
-			//frag.setConversation(NetworkService.getListConversations().get(frag.getConversation().getConversation_id()));
 			frag.updateConversationFromService();
 
 			// On rafraichit la vue

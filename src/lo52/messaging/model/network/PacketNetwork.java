@@ -1,6 +1,5 @@
 package lo52.messaging.model.network;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,7 +8,6 @@ import lo52.messaging.services.NetworkService;
 import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 

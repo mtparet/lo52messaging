@@ -3,7 +3,6 @@ package lo52.messaging.model.broadcast;
 import lo52.messaging.services.NetworkService;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -23,6 +22,9 @@ public class MessageBroacast implements Parcelable {
 	private int conversation_id;
 	
 	public final static String tag_parcelable = "message";
+	
+	// Texte placé comme message permettant d'identifier qu'un message est un fichier
+	public final static String MESSAGE_FILE_IDENTIFIER = "78e731027d8fd50ed642340b7c9a63b3";
 
 	/**
 	 * Util pour la réception de message

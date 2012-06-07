@@ -1,10 +1,12 @@
 package lo52.messaging.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 
 import lo52.messaging.R;
+import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.util.LibUtil;
 import android.content.Context;
@@ -76,6 +78,7 @@ public class Conversation implements Parcelable {
 			this.listIdUser.add(NetworkService.getUser_me().getId());
 	}
 
+	@SuppressWarnings("unchecked")
 	public Conversation(Parcel in) {
 		conversation_id = in.readInt();
 		conversation_name = in.readString();
@@ -124,7 +127,6 @@ public class Conversation implements Parcelable {
 	}
 
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -219,7 +221,50 @@ public class Conversation implements Parcelable {
 		String name = "";
 
 		for (Message m : messages) {
-			if (!m.getMessage().equals("")) {	// Pour vérifier que le message est du texte
+			String message = m.getMessage();
+
+			// Traitement des messages faisant référence à un fichier
+			if (message.startsWith(MessageBroacast.MESSAGE_FILE_IDENTIFIER)) {
+
+				// Split de la chaine pour récupérer le chemin local
+				String filenameArray[] = message.split(";");
+
+				// Emetteur
+				User u  = users.get(m.getClient_id());
+
+				if ((new File(filenameArray[1])).exists()) {
+
+					if (m.getClient_id() == mySelf) {
+						color 	= ctx.getResources().getColor(R.color.conversation_myself);
+						name	= ctx.getString(R.string.conversations_myself);
+					} else {
+						color 	= getUserNameColor(ctx, u.getId());
+						name 	= u.getName();
+					}
+
+					// Cas où c'est une image
+					String filenameExt[] = filenameArray[1].split("\\.");
+					String extension = filenameExt[filenameExt.length-1];
+
+					/*
+					 * Images
+					 */
+					if (LibUtil.FILE_IMAGE_EXTENSIONS.contains(extension)) {
+						text += "<font color=\"" + color + "\">" + name + ":</font><br><img src=\""+filenameArray[1]+"\"></img><br>";
+					}
+					else {
+						text += "<font color=\"" + color + "\">" + name + ":</font> Fichier non pris en charge ("+extension+")<br>";
+					}
+
+				} else {
+					Log.e(TAG, "Fichier inexistant " + filenameArray[1]);
+				}
+
+			}
+
+			// Messages texte
+			else if (!m.getMessage().equals("")) {	// Pour vérifier que le message est du texte
+
 				User u  = users.get(m.getClient_id());
 				if (u != null) {
 
@@ -229,22 +274,8 @@ public class Conversation implements Parcelable {
 						name	= ctx.getString(R.string.conversations_myself);
 					}
 					else {
-						// Numéro en fonction du rang de l'user dans la liste des membres de la conversation
-						int rank = LibUtil.getValueRankInList(this.listIdUser, u.getId());
-
-						// Au cas où l'user n'a pas été trouvé
-						if (rank < 0) rank = 0;
-
-						// Modulo
-						rank = rank % 4;	// % nombre de couleurs différentes définies dans styles.xml
-
-						// Attribution couleur
-						if (rank == 0)		color = ctx.getResources().getColor(R.color.conversation_user1);
-						else if (rank == 1)	color = ctx.getResources().getColor(R.color.conversation_user2);
-						else if (rank == 2)	color = ctx.getResources().getColor(R.color.conversation_user3);
-						else if (rank == 3)	color = ctx.getResources().getColor(R.color.conversation_user4);
-
-						name = u.getName();
+						color 	= getUserNameColor(ctx, u.getId());
+						name 	= u.getName();
 					}
 
 					text += "<font color=\"" + color + "\">" + name + ":</font> " + m.getMessage() + "<br>";
@@ -266,6 +297,32 @@ public class Conversation implements Parcelable {
 
 	public int getMessageCount() {
 		return listMessage.size();
+	}
+
+	/**
+	 * Génère la couleur à utiliser pour le nom d'un utilisateur en fonction de sa place dans la liste des utilisateurs
+	 * @param ctx
+	 * @param userId
+	 * @return
+	 */
+	private int getUserNameColor(Context ctx, int userId) {
+		int color = 0;
+		// Numéro en fonction du rang de l'user dans la liste des membres de la conversation
+		int rank = LibUtil.getValueRankInList(this.listIdUser, userId);
+
+		// Au cas où l'user n'a pas été trouvé
+		if (rank < 0) rank = 0;
+
+		// Modulo
+		rank = rank % 4;	// % nombre de couleurs différentes définies dans styles.xml
+
+		// Attribution couleur
+		if (rank == 0)		color = ctx.getResources().getColor(R.color.conversation_user1);
+		else if (rank == 1)	color = ctx.getResources().getColor(R.color.conversation_user2);
+		else if (rank == 2)	color = ctx.getResources().getColor(R.color.conversation_user3);
+		else if (rank == 3)	color = ctx.getResources().getColor(R.color.conversation_user4);
+
+		return color;
 	}
 
 }

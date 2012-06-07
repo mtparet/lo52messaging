@@ -35,7 +35,9 @@ public class LibUtil {
 			new String[] {"jpg", "jpeg", "png", "avi"}
 			));
 
-
+	public static final Set<String> FILE_IMAGE_EXTENSIONS = new HashSet<String>(Arrays.asList(
+			new String[] {"jpg", "jpeg", "png"}
+			)); 
 
 	/********************************************************
 	 *
@@ -83,104 +85,96 @@ public class LibUtil {
 		}
 		return rank;
 	}
-	
+
 	public static byte[] getByte(File file){
-		 RandomAccessFile f;
+		RandomAccessFile f;
 		try {
 			f = new RandomAccessFile(file, "r");
-		
 
-	        try {
-	            // Get and check length
-	            long longlength = 0;
+
+			try {
+				// Get and check length
+				long longlength = 0;
 				try {
 					longlength = f.length();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	            int length = (int) longlength;
-	            if (length != longlength);
+				int length = (int) longlength;
+				if (length != longlength);
 
-	            // Read file and return data
-	            byte[] data = new byte[length];
-	            try {
+				// Read file and return data
+				byte[] data = new byte[length];
+				try {
 					f.readFully(data);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	            return data;
-	        }
-	        finally {
-	            try {
+				return data;
+			}
+			finally {
+				try {
 					f.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	        }
+			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
 	public static byte[] compress(String string) throws IOException {
-	    ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
-	    GZIPOutputStream gos = new GZIPOutputStream(os);
-	    gos.write(string.getBytes());
-	    gos.close();
-	    byte[] compressed = os.toByteArray();
-	    os.close();
-	    return compressed;
+		ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
+		GZIPOutputStream gos = new GZIPOutputStream(os);
+		gos.write(string.getBytes());
+		gos.close();
+		byte[] compressed = os.toByteArray();
+		os.close();
+		return compressed;
 	}
 
 	public static String decompress(byte[] compressed) throws IOException {
-	    final int BUFFER_SIZE = 32;
-	    ByteArrayInputStream is = new ByteArrayInputStream(compressed);
-	    GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
-	    StringBuilder string = new StringBuilder();
-	    byte[] data = new byte[BUFFER_SIZE];
-	    int bytesRead;
-	    while ((bytesRead = gis.read(data)) != -1) {
-	        string.append(new String(data, 0, bytesRead));
-	    }
-	    gis.close();
-	    is.close();
-	    return string.toString();
+		final int BUFFER_SIZE = 32;
+		ByteArrayInputStream is = new ByteArrayInputStream(compressed);
+		GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
+		StringBuilder string = new StringBuilder();
+		byte[] data = new byte[BUFFER_SIZE];
+		int bytesRead;
+		while ((bytesRead = gis.read(data)) != -1) {
+			string.append(new String(data, 0, bytesRead));
+		}
+		gis.close();
+		is.close();
+		return string.toString();
 	}
-	
+
 	public static void writeFile(File yourFile,byte[] fileBytes){
 		BufferedOutputStream bos = null;
 		try {
 			bos = new BufferedOutputStream(new FileOutputStream(yourFile));
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
 			bos.write(fileBytes);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			bos.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			bos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 
 }

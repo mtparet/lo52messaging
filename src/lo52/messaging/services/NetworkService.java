@@ -224,7 +224,7 @@ public class NetworkService extends Service {
 		timer.schedule(new SendBroadcatsimeTask(), 200);
 		
 		Timer timer2 = new Timer();
-		timer2.schedule(new checkACKTask(), 10000, 10000);
+		timer2.schedule(new checkACKTask(), 10000);
 
 	}
 
@@ -1182,20 +1182,31 @@ public class NetworkService extends Service {
 			   for(PacketNetwork packet : packetListACK.values()){
 				   int now = (int) System.currentTimeMillis();
 				   
-					if(now > (packet.getDate_send() + 20000)){
-						Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
+				   if(now > (packet.getDate_send() + 100000)){
+						Log.d(TAG, "paquet sans ACK détruit:" + packet.getRamdom_identifiant());
+					   packetListACK.remove(packet);
+				   }else{
+						if(now > (packet.getDate_send() + 20000)){
+							Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
 
-						SendSocket sendSocket = new SendSocket();
-						PacketNetwork[] packets = new PacketNetwork[1];
-						packets[0] = packet;
+							SendSocket sendSocket = new SendSocket();
+							PacketNetwork[] packets = new PacketNetwork[1];
+							packets[0] = packet;
 
-						//Exécution de l'asyncTask
-						sendSocket.execute(packets);
-						
-						packetListACK.remove(packet);
-					}
-				   
+							//Exécution de l'asyncTask
+							sendSocket.execute(packets);
+							
+							packetListACK.remove(packet);
+						}
+				   }
 			   }
+			   
+			   try {
+				wait(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		   }
 	}
 

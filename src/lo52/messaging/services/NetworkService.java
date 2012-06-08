@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -221,7 +223,7 @@ public class NetworkService extends Service {
 		timer.schedule(new SendBroadcatsimeTask(), 200);
 
 		Timer timer2 = new Timer();
-		timer2.schedule(new checkACKTask(), 10000, 20000);
+		timer2.schedule(new checkACKTask(), 20000);
 
 	}
 
@@ -501,6 +503,14 @@ public class NetworkService extends Service {
 					}
 
 					if (sendFinalPacket(packet_byte1, inetAddres, datagramSocket)) {
+						//on met une pause qui représente le temps de réception/décodage de l'autre device
+
+						try {
+							Thread.sleep(200);         
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+
 						Log.d(TAG, "envoyé:" + json1 + "a : " + inetAddres.toString());
 						packet1.setDate_send((int) System.currentTimeMillis());
 						packetListACK.put(packet1.getRamdom_identifiant(), packet1);
@@ -558,6 +568,7 @@ public class NetworkService extends Service {
 			return false;
 
 		}
+
 
 	}
 
@@ -1187,27 +1198,46 @@ public class NetworkService extends Service {
 	private class checkACKTask extends TimerTask {
 		public void run() {
 
-			for(PacketNetwork packet : packetListACK.values()) {
-				int now = (int) System.currentTimeMillis();
+			while(true){
+				Hashtable<Integer,PacketNetwork> cl = (Hashtable<Integer, PacketNetwork>) packetListACK.clone();
+				
+				for(PacketNetwork packet : cl.values()) {
+					int now = (int) System.currentTimeMillis();
 
-				if (now > (packet.getDate_send() + 100000)) {
-					Log.d(TAG, "paquet sans ACK détruit:" + packet.getRamdom_identifiant());
-					packetListACK.remove(packet);
-				} else {
-					if (now > (packet.getDate_send() + 20000)) {
-						Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
-
-						SendSocket sendSocket = new SendSocket();
-						PacketNetwork[] packets = new PacketNetwork[1];
-						packets[0] = packet;
-
-						//Exécution de l'asyncTask
-						sendSocket.execute(packets);
-
+					if (now > (packet.getDate_send() + 100000)) {
+						Log.d(TAG, "paquet sans ACK détruit:" + packet.getRamdom_identifiant());
 						packetListACK.remove(packet);
+					} else {
+						if (now > (packet.getDate_send() + 20000)) {
+							Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
+
+							SendSocket sendSocket = new SendSocket();
+							PacketNetwork[] packets = new PacketNetwork[1];
+							packets[0] = packet;
+
+							//Exécution de l'asyncTask
+							sendSocket.execute(packets);
+
+							packetListACK.remove(packet);
+							
+							try {
+								Thread.sleep(200);         
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
 					}
 				}
+				
+				try {
+					Thread.sleep(10000);         
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				
 			}
+
 		}
 	}
 

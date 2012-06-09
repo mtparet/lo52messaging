@@ -9,7 +9,7 @@
         android:id="@+id/mapview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:apiKey="0dXYnLPKXDlPgQnx_AXMOZbNnWBKt1gfnCypdRg"
+        android:apiKey="0nHV3RzNBnM-pjPYly76AmKxVEUwPvo2AVtIzWw"
         android:clickable="true" />
     <!-- Backup 0nHV3RzNBnM-pjPYly76AmKxVEUwPvo2AVtIzWw -->
 

@@ -16,9 +16,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
-import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibrary;
-
 
 /**
  * LO52Messaging
@@ -44,13 +41,6 @@ public class LO52Messaging extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
-		// Première initialisation de la library de géolocalisation
-		//LocationLibrary.initialiseLibrary(getBaseContext());
-		LocationLibrary.initialiseLibrary(getBaseContext(), 60000, 60000);
-		LocationInfo latestInfo = new LocationInfo(getBaseContext());
-		latestInfo.refresh(getApplicationContext());
-		Log.d(TAG, "Localization : latitude=" + latestInfo.lastLat + "longitude=" + latestInfo.lastLong);
 
 		// Récupération des préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);

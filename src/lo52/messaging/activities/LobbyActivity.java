@@ -6,6 +6,7 @@ import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
+import lo52.messaging.services.PosUpdateService;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 public class LobbyActivity extends TabActivity {
 
 	private Intent networkService;
+	private Intent posUpdateService;
 	private static final String TAG = "LobbyActivity";
 	private SharedPreferences preferences;
 
@@ -49,6 +51,10 @@ public class LobbyActivity extends TabActivity {
 		// Lancement du service Network
 		networkService = new Intent(LobbyActivity.this, NetworkService.class);
 		startService(networkService);
+		
+		// Lancement du service PosUpdate
+		posUpdateService = new Intent(LobbyActivity.this, PosUpdateService.class);
+		startService(posUpdateService);
 
 		// Initialisation préférences
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -96,6 +102,7 @@ public class LobbyActivity extends TabActivity {
 			try {
 				// Unregister du broadcastReceiver & arret du service
 				stopService(networkService);
+				stopService(posUpdateService);
 			} catch (Exception e) {
 				Log.e(TAG, "Service non arrêté");
 			}

@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
@@ -31,6 +32,8 @@ public class ConversationFragment extends Fragment {
 
 	int conversation_id = -1;
 	View fv;
+
+	int progressBarVisibility = View.GONE;
 
 	String conversationName_str = "";
 	String conversationText_str = "";
@@ -52,6 +55,13 @@ public class ConversationFragment extends Fragment {
 
 			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), null));
 		}
+
+		// Affiche ou cache la progressBar
+		ProgressBar pbar = (ProgressBar) fv.findViewById(R.id.conversation_progressBar);
+		if (pbar != null) {
+			pbar.setVisibility(progressBarVisibility);
+		}
+
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +88,11 @@ public class ConversationFragment extends Fragment {
 
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
+
+
+		// Affiche ou cache la progressBar
+		ProgressBar pbar = (ProgressBar) fv.findViewById(R.id.conversation_progressBar);
+		pbar.setVisibility(progressBarVisibility);
 
 		return fv;
 	}
@@ -265,12 +280,29 @@ public class ConversationFragment extends Fragment {
 
 
 	/**
+	 * Set la visiblité du spinner de chargement
+	 * @param visibility
+	 */
+	public void setProgressBarVisibility(int visibility) {
+		progressBarVisibility = visibility;
+
+		// Essaye de rafraichir la progressBar en direct
+		if (fv != null) {
+			ProgressBar pbar = (ProgressBar) fv.findViewById(R.id.conversation_progressBar);
+			if (pbar != null) {
+				pbar.setVisibility(progressBarVisibility);
+			}
+		}
+	}
+
+
+	/**
 	 *	Permet de convertir les tags <img> en image dans l'EditText de la conversation
 	 */
 	private class ImageGetter implements Html.ImageGetter {
 
 		public Drawable getDrawable(String source) {
-			
+
 			Drawable d = Drawable.createFromPath(source);
 			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 

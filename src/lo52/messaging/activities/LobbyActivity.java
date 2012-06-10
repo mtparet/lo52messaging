@@ -32,6 +32,10 @@ public class LobbyActivity extends TabActivity {
 
 	// Utilisé pour indiquer à l'activité ConversationPagerActivity qu'elle doit aller sur un fragment de conversation particulier
 	private ArrayList<Integer> switchToConversation;
+	
+	// Listes pour indiquer à l'activité ConversationPager qu'elle doit activer le spinner de chargement sur certaines conversations
+	ArrayList<Integer> fileTransferStarted;
+	ArrayList<Integer> fileTransferFinished;
 
 	// Tags pour les différents onglets de l'activité
 	public static final String	TAG_TAB_USERLIST 		= "tab1";
@@ -65,7 +69,10 @@ public class LobbyActivity extends TabActivity {
 		TabHost.TabSpec spec; 
 		Intent intent;
 
-		switchToConversation = new ArrayList<Integer>();
+		// Initialisations diverses
+		switchToConversation 	= new ArrayList<Integer>();
+		fileTransferStarted		= new ArrayList<Integer>();
+		fileTransferFinished	= new ArrayList<Integer>();
 
 		/**
 		 * Création du tab de la liste des users (UserListActivity)
@@ -124,8 +131,12 @@ public class LobbyActivity extends TabActivity {
 		registerReceiver(conversationReceiver, filter2);
 		
 		IntentFilter filter3 = new IntentFilter();
-		filter3.addAction(NetworkService.FileBeingReceived);
-		registerReceiver(fileBeingReceived, filter3);
+		filter3.addAction(NetworkService.FileTransferStart);
+		registerReceiver(fileTransferStart, filter3);
+		
+		IntentFilter filter4 = new IntentFilter();
+		filter4.addAction(NetworkService.FileTransferFinish);
+		registerReceiver(fileTransferFinish, filter4);
 
 		IntentFilter userListUpdatefilter = new IntentFilter();
 		userListUpdatefilter.addAction(NetworkService.UserListUpdated);
@@ -137,7 +148,8 @@ public class LobbyActivity extends TabActivity {
 		unregisterReceiver(conversationReceiver);
 		unregisterReceiver(messageReceiver);
 		unregisterReceiver(UserlistUpdate_BrdcReceiver);
-		unregisterReceiver(fileBeingReceived);
+		unregisterReceiver(fileTransferStart);
+		unregisterReceiver(fileTransferFinish);
 		super.onPause();
 	}
 
@@ -240,14 +252,35 @@ public class LobbyActivity extends TabActivity {
 	
 	
 	/**
-	 * Envoyé par le network service quand le premier paquet d'un fichier est reçu
+	 * Envoyé par le network service quand le premier paquet d'un fichier est reçu ou envoyé
 	 */
-	private BroadcastReceiver fileBeingReceived = new  BroadcastReceiver() {
+	private BroadcastReceiver fileTransferStart = new  BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int conv_id = intent.getIntExtra("conversation_id", 0);
+			Log.d(TAG, "Transfert début " + conv_id);
+			Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
+			
+			// Ajout de l'id de conversation à la liste de celles en cours de transfert
+			fileTransferStarted.add(conv_id);
+		}
+	};
+	
+	/**
+	 * Envoyé par le network service quand le dernier paquet d'un fichier est reçu ou envoyé
+	 */
+	private BroadcastReceiver fileTransferFinish = new  BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			
-			Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
+			int conv_id = intent.getIntExtra("conversation_id", 0);
+			Log.d(TAG, "Transfert terminé " + conv_id);
+			
+			// Ajout de l'id de conversation à la liste de celles en cours de transfert
+			fileTransferFinished.add(conv_id);
+			if (fileTransferStarted.contains(conv_id)) fileTransferStarted.remove(fileTransferStarted.indexOf(conv_id));
 		}
 	};
 
@@ -289,6 +322,29 @@ public class LobbyActivity extends TabActivity {
 
 		ArrayList<Integer> list = (ArrayList<Integer>) switchToConversation.clone();
 		switchToConversation.clear();
+		return list;
+	}
+	
+	
+	/**
+	 * Retourne la liste des conversations qui ont un transfert de fichier commencé
+	 * @return
+	 */
+	public ArrayList<Integer> getConversationsWithTransferStarted() {
+		@SuppressWarnings("unchecked")
+		ArrayList<Integer> list = (ArrayList<Integer>) fileTransferStarted.clone();
+		fileTransferStarted.clear();
+		return list;
+	}
+	
+	/**
+	 * Retourne la liste des conversations qui ont un transfert de fichier terminé
+	 * @return
+	 */
+	public ArrayList<Integer> getConversationsWithTransferFinished() {
+		@SuppressWarnings("unchecked")
+		ArrayList<Integer> list = (ArrayList<Integer>) fileTransferFinished.clone();
+		fileTransferFinished.clear();
 		return list;
 	}
 

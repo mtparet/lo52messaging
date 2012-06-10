@@ -378,7 +378,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 
 	/**
-	 * Retourne un fragment de conversation en fonction de son Id
+	 * Retourne un fragment de conversation en fonction de son Id de conversation
 	 * @param id	Id de la conversation
 	 * @return int ou null
 	 */
@@ -598,6 +598,29 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		
 		if(tab !=  null){
 			mTabHost.setCurrentTabByTag(tab);
+		}
+		
+		
+		// Mise à jour des spinners de chargement
+		ArrayList<Integer> transfer_s = parent.getConversationsWithTransferStarted();
+		for (int conv_id : transfer_s) {
+			Log.d(TAG, "Affiche spinner conv " + conv_id);
+			ConversationFragment frag = getFragmentById(conv_id);
+			
+			if (frag != null) {
+				frag.setProgressBarVisibility(View.VISIBLE);
+			} else Log.w(TAG, "Fragment null (1)");
+		}
+		
+		transfer_s.clear();
+		transfer_s = parent.getConversationsWithTransferFinished();
+		for (int conv_id : transfer_s) {
+			Log.d(TAG, "Cache spinner conv " + conv_id);
+			ConversationFragment frag = getFragmentById(conv_id);
+			
+			if (frag != null) {
+				frag.setProgressBarVisibility(View.GONE);
+			} else Log.w(TAG, "Fragment null (2)");
 		}
 
 	}

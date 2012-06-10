@@ -100,14 +100,15 @@ public class NetworkService extends Service {
 	public static final String SendConversation 	= "NetworkService.send.Conversation";
 	public static final String Receivelocalisation 	= "NetworkService.receive.Localisation";
 	public static final String UserListUpdated		= "NetworkService.userlist.updated";
-	public static final String FileBeingReceived	= "NetworkService.file.Receive.Start";
+	public static final String FileTransferStart	= "NetworkService.file.Receive.Start";
+	public static final String FileTransferFinish	= "NetworkService.file.Receive.Finish";
 
 
 	private int PORT_DEST = 5008;
 	private int PORT_LOCAL = 5008;
 
 	//Taille du buffer en réception, en Byte
-	public static final int BUFFER_SIZE = 30000;
+	public static final int BUFFER_SIZE = 15000;
 
 	public NetworkService() {
 
@@ -489,6 +490,13 @@ public class NetworkService extends Service {
 
 				ArrayList<PacketNetwork> listPacket = PacketNetwork.division(packet);
 
+
+				// Envoi d'un broadcast pour signier qu'on commence le transfert
+				Intent broadcastIntent = new Intent(NetworkService.FileTransferStart);
+				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
+				packet.getContent().getConversation_id();
+				sendBroadcast(broadcastIntent);
+				
 				//on boucle sur la liste des paquets pour l'envoyer
 				for(PacketNetwork packet1 : listPacket) {
 					Log.d(TAG, "Taille après découpe du content:" + packet1.getContent().getByte_content().length);
@@ -518,6 +526,12 @@ public class NetworkService extends Service {
 						Log.e(TAG, "échec envoit datagramsocket");
 					}
 				}
+				
+				// Intent pour signaler que le transfert est terminé
+				Intent broadcastIntent2 = new Intent(NetworkService.FileTransferFinish);
+				broadcastIntent2.putExtra("conversation_id", packet.getContent().getConversation_id());
+				packet.getContent().getConversation_id();
+				sendBroadcast(broadcastIntent2);
 
 				// sinon on envoit le packet seul
 			} else {
@@ -769,13 +783,21 @@ public class NetworkService extends Service {
 
 			// Si on est sur le premier paquet on envoit un broadcast pour dire d'afficher un toast comme quoi on reçoit un fichier
 			if (listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() == 1) {
-				Intent broadcastIntent = new Intent(NetworkService.FileBeingReceived);
+				Intent broadcastIntent = new Intent(NetworkService.FileTransferStart);
+				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
+				packet.getContent().getConversation_id();
 				sendBroadcast(broadcastIntent);
-			}
-
-			if (packet.getNb_packet_groupe() == listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size()) {
+			} 
+			// Dernie packet
+			else if (packet.getNb_packet_groupe() == listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size()) {
+				
 				PacketNetwork packetFinal = PacketNetwork.reassemble(listPaquetDivided.get(packet.getRamdom_identifiant_groupe()));
 				analysePacket(packetFinal);
+				
+				Intent broadcastIntent = new Intent(NetworkService.FileTransferFinish);
+				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
+				packet.getContent().getConversation_id();
+				sendBroadcast(broadcastIntent);
 			}
 
 		} else {

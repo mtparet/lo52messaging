@@ -126,28 +126,6 @@ public class PosUpdateService extends Service {
 	            	currentUser.setLocalisation(currentPosn);
 	        	    
 	            	
-	            	/*twg = (TwogetherApplication) getApplication();
-	        		// On récupère l'ID du client connecté
-	        		long id_u = twg.getCurrentUser().getUserId();
-	        		
-	        		// Mise à jour de la base locale avec la nouvelle position
-	        		twg.updatePositionToLocalDatabase(point.getLongitudeE6()/1E6, point.getLatitudeE6()/1E6);
-	        		
-	        		String query = TwogetherConfig.SERVER_QUERY_FILE + "?action=updateUserPosition&id_user="+id_u+"&latitude="+(point.getLatitudeE6()/1E6)+"&longitude="+(point.getLongitudeE6()/1E6);
-	        		try {
-	        			Log.d(TAG, "Envoi de la position au serveur par le service "+ query);
-	        			String Content;
-	        			HttpClient Client 	= new DefaultHttpClient();
-	        			HttpGet httpget = new HttpGet(query);
-	        			ResponseHandler<String> responseHandler = new BasicResponseHandler();
-	        			Content = Client.execute(httpget, responseHandler);
-	        			Log.d(TAG, "Resultat requete serveur: " + Content);
-	        		} catch (ClientProtocolException e) {
-	        			Log.e(TAG, e.getMessage());
-	        		} catch (IOException e) {
-	        			Log.e(TAG, e.getMessage());
-	        		}*/
-	            	
 	            	Log.d(TAG, "Updater ran");
 	            	Thread.sleep(DELAY);	// s'endormir entre chaque mise à jour
 	            } catch (InterruptedException e) {  

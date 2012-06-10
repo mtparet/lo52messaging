@@ -1,11 +1,6 @@
 package lo52.messaging.model;
 
-import lo52.messaging.model.broadcast.MessageBroacast;
-import lo52.messaging.services.NetworkService;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 

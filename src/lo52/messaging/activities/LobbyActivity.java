@@ -7,9 +7,11 @@ import lo52.messaging.model.Conversation;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.services.PosUpdateService;
+import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -32,7 +34,7 @@ public class LobbyActivity extends TabActivity {
 
 	// Utilisé pour indiquer à l'activité ConversationPagerActivity qu'elle doit aller sur un fragment de conversation particulier
 	private ArrayList<Integer> switchToConversation;
-	
+
 	// Listes pour indiquer à l'activité ConversationPager qu'elle doit activer le spinner de chargement sur certaines conversations
 	ArrayList<Integer> fileTransferStarted;
 	ArrayList<Integer> fileTransferFinished;
@@ -55,7 +57,7 @@ public class LobbyActivity extends TabActivity {
 		// Lancement du service Network
 		networkService = new Intent(LobbyActivity.this, NetworkService.class);
 		startService(networkService);
-		
+
 		// Lancement du service PosUpdate
 		posUpdateService = new Intent(LobbyActivity.this, PosUpdateService.class);
 		startService(posUpdateService);
@@ -129,11 +131,11 @@ public class LobbyActivity extends TabActivity {
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
-		
+
 		IntentFilter filter3 = new IntentFilter();
 		filter3.addAction(NetworkService.FileTransferStart);
 		registerReceiver(fileTransferStart, filter3);
-		
+
 		IntentFilter filter4 = new IntentFilter();
 		filter4.addAction(NetworkService.FileTransferFinish);
 		registerReceiver(fileTransferFinish, filter4);
@@ -153,7 +155,30 @@ public class LobbyActivity extends TabActivity {
 		super.onPause();
 	}
 
+	@Override
+	public void onBackPressed() {
 
+		if (preferences.getBoolean("prefs_confirmToQuit", true)) {
+			
+			// Demande à l'utilisateur s'il veut vraiment quitter
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
+			.setTitle(R.string.lobby_alert_quit)
+			.setMessage(R.string.lobby_alert_quit_msg)
+			.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO:
+					// Envoyer un paquet de déconnexion aux utilisateurs connus, pour qu'ils retirent cet user de leur liste
+
+					LobbyActivity.super.onBackPressed();
+				}
+			})
+			.setNegativeButton(R.string.generic_no, null)
+			.show();
+			
+		} else 
+			LobbyActivity.super.onBackPressed();
+	}
 
 
 	/**
@@ -187,7 +212,6 @@ public class LobbyActivity extends TabActivity {
 					Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 					vibrator.vibrate(VIBRATOR_NOTIFICATION_DURATION);
 				}
-
 			}
 		}
 	};
@@ -249,8 +273,8 @@ public class LobbyActivity extends TabActivity {
 			}
 		}
 	};
-	
-	
+
+
 	/**
 	 * Envoyé par le network service quand le premier paquet d'un fichier est reçu ou envoyé
 	 */
@@ -259,16 +283,16 @@ public class LobbyActivity extends TabActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-			
+
 			// On affiche le toast seulement si on est la personne qui reçoit le fichier
 			if (intent.getBooleanExtra("isReceiver", false))
 				Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
-			
+
 			// Ajout de l'id de conversation à la liste de celles en cours de transfert
 			fileTransferStarted.add(conv_id);
 		}
 	};
-	
+
 	/**
 	 * Envoyé par le network service quand le dernier paquet d'un fichier est reçu ou envoyé
 	 */
@@ -276,9 +300,9 @@ public class LobbyActivity extends TabActivity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
+
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-			
+
 			// Ajout de l'id de conversation à la liste de celles en cours de transfert
 			fileTransferFinished.add(conv_id);
 			if (fileTransferStarted.contains(conv_id)) fileTransferStarted.remove(fileTransferStarted.indexOf(conv_id));
@@ -325,8 +349,8 @@ public class LobbyActivity extends TabActivity {
 		switchToConversation.clear();
 		return list;
 	}
-	
-	
+
+
 	/**
 	 * Retourne la liste des conversations qui ont un transfert de fichier commencé
 	 * @return
@@ -337,7 +361,7 @@ public class LobbyActivity extends TabActivity {
 		fileTransferStarted.clear();
 		return list;
 	}
-	
+
 	/**
 	 * Retourne la liste des conversations qui ont un transfert de fichier terminé
 	 * @return

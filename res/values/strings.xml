@@ -16,6 +16,8 @@
     <string name="lobby_tab_users">Utilisateurs</string>
     <string name="lobby_tab_conversations">Conversations</string>
     <string name="lobby_tab_map">Carte</string>
+    <string name="lobby_alert_quit">Quitter l\'application</string>
+    <string name="lobby_alert_quit_msg">Etes-vous sûr de vouloir quitter ? Vous serez déconnecté.</string>
     
     <!-- USER LIST -->
     <string name="userlist_refresh_option">Rafraichir</string>
@@ -52,10 +54,12 @@
     <string name="preferencesServiceNetwork">Service réseau toujours allumé</string>
     <string name="preferencesServiceNetworkDesc">Garder le service réseau toujours allumé en quittant l\'appli.</string>
     <string name="preferencesNotifications">Notifications d\'évènements manqués</string>
-    <string name="preferencesNotifToast">Notification textuelle</string>
+    <string name="preferencesNotifToast">Notifications textuelles</string>
     <string name="preferencesNotifToastDesc">Afficher une notification pour les évènements manqués (nouveau message, …)</string>
-    <string name="preferencesNotifVibration">Vibration</string>
+    <string name="preferencesNotifVibration">Vibrations</string>
     <string name="preferencesNotifVibrationDesc">Faire vibrer le téléphone pour les évènements manqués (nouveau message, …)</string>
+    <string name="preferencesConfirmToQuit">Confirmation pour quitter</string>
+    <string name="preferencesConfirmToQuitDesc">Afficher une demande de confirmation avant de quitter l\'application.</string>
     
     <!-- FILE PICKER -->
     <string name="filePicker_invalid_ext">Extension de fichier invalide</string>
@@ -72,6 +76,9 @@
     
     <!-- AUTRES -->
     <string name="image_content_description"></string>
+    <string name="generic_yes">Oui</string>
+    <string name="generic_no">Non</string>
+    
     
 
 </resources>

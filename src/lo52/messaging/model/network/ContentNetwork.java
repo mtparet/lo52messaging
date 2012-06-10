@@ -19,9 +19,9 @@ import com.google.gson.annotations.SerializedName;
 public class ContentNetwork implements Parcelable{
 	
 	//Détermine le type du content si c'est un message
-	private static final int TEXT = 1;
-	private static final int JPEG = 2;
-	private static final int MP3 = 3;
+	public static final int TEXT = 1;
+	public static final int JPEG = 2;
+	public static final int MP3 = 3;
 
 	@SerializedName("conversation_id")
 	private int conversation_id;

@@ -8,8 +8,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -89,6 +87,10 @@ public class NetworkService extends Service {
 	private static ArrayList<Conversation> conversationsToCreateUI = new ArrayList<Conversation>();
 
 	private static User user_me;
+
+
+	// Socket d'écoute
+	ListenSocket listenSocket = null;
 
 	private static final String TAG = "NetworkService";
 
@@ -214,8 +216,8 @@ public class NetworkService extends Service {
 		 * on lance la socket d'écoute sur le réseau 
 		 */
 
-		ListenSocket listenSocket = new ListenSocket();
-		listenSocket.execute(null);
+		listenSocket = new ListenSocket();
+		listenSocket.execute((Integer)null);
 
 		/*
 		 * On s'annonce sur le réseau, utilisation d'un timer pour attendre que tout le reste soit en place
@@ -333,7 +335,6 @@ public class NetworkService extends Service {
 		for(int id_user : conversation.getListIdUser()) {
 			users.add(listUsers.get(id_user));
 		}
-		// XXX 2
 		// On recherche si user_me n'est pas dans la liste des users, sinon on l'ajoute
 		boolean user_me_found = false;
 
@@ -432,10 +433,17 @@ public class NetworkService extends Service {
 	@Override
 	public void onDestroy()
 	{
+
+		// Arrêter la socket
+		listenSocket.cancel(true);
+		listenSocket = null;
+
+		// Arrêter tous les broadcast receivers
 		unregisterReceiver(Conversation);
 		unregisterReceiver(Message);
 		unregisterReceiver(SendPacket);
 		unregisterReceiver(LocalisationUser);
+
 		super.onDestroy();
 	}
 
@@ -497,7 +505,7 @@ public class NetworkService extends Service {
 				broadcastIntent.putExtra("isReceiver", false);	// Pour signifier qu'on n'est pas la personne qui reçoit le fichier
 				packet.getContent().getConversation_id();
 				sendBroadcast(broadcastIntent);
-				
+
 				//on boucle sur la liste des paquets pour l'envoyer
 				for(PacketNetwork packet1 : listPacket) {
 					Log.d(TAG, "Taille après découpe du content:" + packet1.getContent().getByte_content().length);
@@ -507,7 +515,6 @@ public class NetworkService extends Service {
 					try {
 						packet_byte1 = LibUtil.compress(json1);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
@@ -527,7 +534,7 @@ public class NetworkService extends Service {
 						Log.e(TAG, "échec envoit datagramsocket");
 					}
 				}
-				
+
 				// Intent pour signaler que le transfert est terminé
 				Intent broadcastIntent2 = new Intent(NetworkService.FileTransferFinish);
 				broadcastIntent2.putExtra("conversation_id", packet.getContent().getConversation_id());
@@ -543,7 +550,6 @@ public class NetworkService extends Service {
 				try {
 					packet_byte = LibUtil.compress(json);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -564,7 +570,6 @@ public class NetworkService extends Service {
 		}
 
 		protected void onPostExecute(Long result) {
-			// TODO  
 		}
 	}
 
@@ -639,7 +644,6 @@ public class NetworkService extends Service {
 			try {
 				buffer = LibUtil.compress(json);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -659,7 +663,6 @@ public class NetworkService extends Service {
 		}
 
 		protected void onPostExecute(Long result) {
-			// TODO  
 		}
 	}
 
@@ -702,7 +705,6 @@ public class NetworkService extends Service {
 		}
 
 		protected void onPostExecute(Long result) {
-			// TODO envoyer le message 
 		}
 	}
 
@@ -721,8 +723,8 @@ public class NetworkService extends Service {
 		try {
 			json = LibUtil.decompress(dataPacket.getData());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage());
+
 		}
 		Log.d(TAG, "Analyse packet:" + json);
 
@@ -792,10 +794,10 @@ public class NetworkService extends Service {
 			} 
 			// Dernie packet
 			else if (packet.getNb_packet_groupe() == listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size()) {
-				
+
 				PacketNetwork packetFinal = PacketNetwork.reassemble(listPaquetDivided.get(packet.getRamdom_identifiant_groupe()));
 				analysePacket(packetFinal);
-				
+
 				Intent broadcastIntent = new Intent(NetworkService.FileTransferFinish);
 				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
 				packet.getContent().getConversation_id();
@@ -970,7 +972,6 @@ public class NetworkService extends Service {
 	 * @param packetReceive
 	 */
 	private void paquetDisconnecter(PacketNetwork packetReceive) {
-		// TODO Auto-generated method stub
 		if (packetReceive.getUser_envoyeur().getId() == user_me.getId()) {
 			return;
 		}
@@ -1005,7 +1006,6 @@ public class NetworkService extends Service {
 			ArrayList<Integer> listIdUser = new ArrayList<Integer>();
 			for(User user : packetReceive.getContent().getUserList()) {
 
-				// XXX 1
 				if (user != null) {
 					listIdUser.add(user.getId());
 
@@ -1072,7 +1072,6 @@ public class NetworkService extends Service {
 	 * @param packet
 	 */
 	private void paquetInconnu(PacketNetwork packet) {
-		// TODO Auto-generated method stub
 		Log.w(TAG, "Packet inconnu");
 	}
 
@@ -1134,40 +1133,6 @@ public class NetworkService extends Service {
 		return userId;
 	}
 
-	//public static void setUser_me(User user_me) {
-	//	NetworkService.user_me = user_me;
-	//}
-
-
-	//private void checkAddresseLocalPublic(DatagramPacket packetReceive) {
-	/*
-	 * si l'utilisateur n'a pas spécifié son adresse local et que l'adresse est local, on ajoute son adrresse publique avec le port par défault de l'application
-	 *
-		if (packetReceive.getUser_envoyeur().getInetSocketAddressLocal() == null ) {
-
-			//TODO à suprimer, on suppose que l'envoyeur à toujours spécifier la bonne addresse local
-			//User user_envoyeur  = packetReceive.getUser_envoyeur();
-			//user_envoyeur.setInetSocketAddressLocal(new InetSocketAddress(dataPacket.getAddress(), PORT));
-			//packetReceive.setUser_envoyeur(user_envoyeur);
-
-			/*
-	 * si l'utilisateur n'a pas d'adresse public mais une local, on va l'ajouter à la public on vérifie que ce n'est déjà pas la local
-	 *
-
-		}else if (packetReceive.getUser_envoyeur().getInetSocketAddressPublic() == null ) {
-			User user_envoyeur  = packetReceive.getUser_envoyeur();
-
-			InetSocketAddress inetSocket = new InetSocketAddress(dataPacket.getAddress(), dataPacket.getPort());
-
-			//si ce n'est pas la même adresse que son adresse local alors on l'ajoute dans public
-			if (inetSocket != user_envoyeur.getInetSocketAddressLocal()) {
-				user_envoyeur.setInetSocketAddressPublic(inetSocket);
-				packetReceive.setUser_envoyeur(user_envoyeur);
-			}
-		}*/
-	//}
-
-
 	/**
 	 * Ajoute la conversation qui a été créée par le service et dont le fragment doit être créé
 	 * Ajoute l'ID correspondant à la conversation qui a été créée par le service et dont le fragment correspondant doit être créé
@@ -1223,8 +1188,9 @@ public class NetworkService extends Service {
 		public void run() {
 
 			while(true){
+				@SuppressWarnings("unchecked")
 				Hashtable<Integer,PacketNetwork> cl = (Hashtable<Integer, PacketNetwork>) packetListACK.clone();
-				
+
 				for(PacketNetwork packet : cl.values()) {
 					int now = (int) System.currentTimeMillis();
 
@@ -1243,7 +1209,7 @@ public class NetworkService extends Service {
 							sendSocket.execute(packets);
 
 							packetListACK.remove(packet);
-							
+
 							try {
 								Thread.sleep(200);         
 							} catch (InterruptedException e) {
@@ -1252,16 +1218,13 @@ public class NetworkService extends Service {
 						}
 					}
 				}
-				
+
 				try {
 					Thread.sleep(10000);         
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				
 			}
-
 		}
 	}
 

@@ -117,8 +117,12 @@ public class UserListActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-
 		super.onDestroy();
+	}
+	
+	@Override
+	public void onBackPressed () {
+		this.getParent().onBackPressed();
 	}
 
 

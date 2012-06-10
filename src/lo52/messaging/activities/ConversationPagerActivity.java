@@ -687,6 +687,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	protected void onStop() {
 		super.onStop();
 	}
+	
+	@Override
+	public void onBackPressed () {
+		this.getParent().onBackPressed();
+	}
 
 
 

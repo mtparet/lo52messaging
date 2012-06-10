@@ -5,17 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import lo52.messaging.R;
-import android.graphics.drawable.Drawable;
 import lo52.messaging.model.Localisation;
+import lo52.messaging.model.User;
 import lo52.messaging.model.UserItemizedOverlay;
 import lo52.messaging.services.NetworkService;
-import lo52.messaging.model.User;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
-import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
@@ -76,5 +74,10 @@ public class LocalizationMapActivity extends MapActivity {
 	    	  }
 	      }
 	    }
+	}
+	
+	@Override
+	public void onBackPressed () {
+		this.getParent().onBackPressed();
 	}
 }

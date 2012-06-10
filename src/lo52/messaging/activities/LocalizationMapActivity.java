@@ -1,5 +1,7 @@
 package lo52.messaging.activities;
 
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import lo52.messaging.R;
@@ -44,18 +46,35 @@ public class LocalizationMapActivity extends MapActivity {
 	    User currentUser = NetworkService.getUser_me();
 	    Localisation lastPosition = currentUser.getLocalisation();
 	    
-	    //LocationInfo latestInfo = new LocationInfo(getBaseContext());
-		//latestInfo.refresh(getApplicationContext());
+	    // get User list
+	    Hashtable<Integer, User> userList =  NetworkService.getListUsers();
 		
 	    List<Overlay> mapOverlays = mapView.getOverlays();
 	    Drawable drawable = this.getResources().getDrawable(R.drawable.map_point);
 	    
-	    if (lastPosition != null) {
+	    // Add current user on the map
+	    if (lastPosition != null) { 
 	    	UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawable, this);
 	    	GeoPoint point = new GeoPoint((int)lastPosition.getLat(),(int)lastPosition.getLon());
-	    	OverlayItem overlayitem = new OverlayItem(point, "Moi", "Voici ma position");
+	    	OverlayItem overlayitem = new OverlayItem(point, currentUser.getName(), "");
 	    	itemizedoverlay.addOverlay(overlayitem);
 	    	mapOverlays.add(itemizedoverlay);
+	    }
+	    
+	    // Add other users on the map
+	    Iterator<User> itValue = userList.values().iterator();
+	    while(itValue.hasNext()){
+	      User mUser = (User)itValue.next();
+	      if (mUser.getId() != currentUser.getId()) { // Si ce n'est pas l'utilisateur actuel alors on l'ajoute sur la carte
+	    	  Localisation lastUserPosition = mUser.getLocalisation();
+	    	  if (lastUserPosition != null) { 
+	    		  UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawable, this);
+	    		  GeoPoint point = new GeoPoint((int)lastUserPosition.getLat(),(int)lastUserPosition.getLon());
+	    		  OverlayItem overlayitem = new OverlayItem(point, currentUser.getName(), "");
+	    		  itemizedoverlay.addOverlay(overlayitem);
+	    		  mapOverlays.add(itemizedoverlay);
+	    	  }
+	      }
 	    }
 	}
 }

@@ -306,17 +306,17 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				else {
 					// TODO envoyer le fichier à tout les membres de la conversation
 					Toast.makeText(this, getString(R.string.conversation_file_send_begin), Toast.LENGTH_LONG).show();
-					
+
 					Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());
 					MessageBroacast messageBroad = new MessageBroacast(MessageBroacast.MESSAGE_FILE_IDENTIFIER, conversation_id);
 					messageBroad.setClient_id(NetworkService.getUser_me().getId());
 					messageBroad.setLink_file(filePath);
 					messageBroad.sendToNetWorkService(getApplicationContext());
-					
+
 					// Ajout du message à la conversation pour l'utilisateur local
 					// Message avec l'identificateur d'un message fichier + le chemin local du fichier
 					NetworkService.getListConversations().get(conversation_id).addMessage(new Message(NetworkService.getUser_me().getId(), MessageBroacast.MESSAGE_FILE_IDENTIFIER + ";" + filePath));
-					
+
 				}
 			}
 		}
@@ -362,7 +362,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		}
 	}
 
-	
+
 	/**
 	 * Met à jour la visibilité de la liste des conversations et du panneau de fond
 	 */
@@ -527,8 +527,49 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			//lastFrag.setConversText("Bidule vient d'ouvrir une conversation avec vous.");
 		}
 	};
-	
-	
+
+
+	/**
+	 * Reçoit les notifications qu'un transfert a commencé (envoi ou réception)
+	 * Déclenche l'affichage du spinner de chargement si le fragment/vue est actif
+	 */
+	private BroadcastReceiver fileTransferStarted = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int conv_id = intent.getIntExtra("conversation_id", 0);
+			
+			Log.e(TAG, "RECU START TRANSFER " + conv_id);
+			
+
+			if (conv_id != 0) {
+				ConversationFragment frag = getFragmentById(conv_id);
+				frag.setProgressBarVisibility(View.VISIBLE);				
+			}
+		}
+	};
+
+
+	/**
+	 * Reçoit les notifications qu'un transfert est terminé (envoi ou réception)
+	 * Cache le spinner de chargement si le fragment/vue est actif
+	 */
+	private BroadcastReceiver fileTransferFinished = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int conv_id = intent.getIntExtra("conversation_id", 0);
+
+			Log.e(TAG, "RECU FIN TRANSFER " + conv_id);
+			
+			if (conv_id != 0) {
+				ConversationFragment frag = getFragmentById(conv_id);
+				frag.setProgressBarVisibility(View.GONE);
+			}
+		}
+	};
+
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void onResume() {
@@ -544,6 +585,14 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
 		
+		IntentFilter filter3 = new IntentFilter();
+		filter3.addAction(NetworkService.FileTransferStart);
+		registerReceiver(fileTransferStarted, filter3);
+		
+		IntentFilter filter4 = new IntentFilter();
+		filter4.addAction(NetworkService.FileTransferFinish);
+		registerReceiver(fileTransferFinished, filter4);
+
 		// Récupère la liste des conversations qui n'ont pas encore de fragment UI
 		// (coté broadcast receiver / personne qui *créé* la conversation)
 		ArrayList<Conversation> conversations = NetworkService.getLocalConversationsToCreate();
@@ -566,7 +615,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 					if (((ConversationFragment) fragment).getConversation_id() > 0) {
 
 						ArrayList<Integer> usersF = NetworkService.getListConversations().get(((ConversationFragment) fragment).getConversation_id()).getListIdUser();
-						
+
 						if (LibUtil.equalsListsOrderInsensitive(usersF, list)) {
 							goToConversationNumber(fragNumber);
 						}
@@ -593,31 +642,31 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 				}
 			}
 		}
-		
+
 		autoUpdateListVisibility();
-		
+
 		if(tab !=  null){
 			mTabHost.setCurrentTabByTag(tab);
 		}
-		
-		
+
+
 		// Mise à jour des spinners de chargement
 		ArrayList<Integer> transfer_s = parent.getConversationsWithTransferStarted();
 		for (int conv_id : transfer_s) {
 			Log.d(TAG, "Affiche spinner conv " + conv_id);
 			ConversationFragment frag = getFragmentById(conv_id);
-			
+
 			if (frag != null) {
 				frag.setProgressBarVisibility(View.VISIBLE);
 			} else Log.w(TAG, "Fragment null (1)");
 		}
-		
+
 		transfer_s.clear();
 		transfer_s = parent.getConversationsWithTransferFinished();
 		for (int conv_id : transfer_s) {
 			Log.d(TAG, "Cache spinner conv " + conv_id);
 			ConversationFragment frag = getFragmentById(conv_id);
-			
+
 			if (frag != null) {
 				frag.setProgressBarVisibility(View.GONE);
 			} else Log.w(TAG, "Fragment null (2)");
@@ -629,6 +678,8 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	protected void onPause() {
 		unregisterReceiver(messageReceiver);
 		unregisterReceiver(conversationReceiver);
+		unregisterReceiver(fileTransferStarted);
+		unregisterReceiver(fileTransferFinished);
 		super.onPause();
 	}
 

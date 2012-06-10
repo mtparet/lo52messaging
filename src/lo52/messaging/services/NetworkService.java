@@ -494,6 +494,7 @@ public class NetworkService extends Service {
 				// Envoi d'un broadcast pour signier qu'on commence le transfert
 				Intent broadcastIntent = new Intent(NetworkService.FileTransferStart);
 				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
+				broadcastIntent.putExtra("isReceiver", false);	// Pour signifier qu'on n'est pas la personne qui reçoit le fichier
 				packet.getContent().getConversation_id();
 				sendBroadcast(broadcastIntent);
 				
@@ -785,6 +786,7 @@ public class NetworkService extends Service {
 			if (listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() == 1) {
 				Intent broadcastIntent = new Intent(NetworkService.FileTransferStart);
 				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
+				broadcastIntent.putExtra("isReceiver", true);	// Pour signifier qu'on est la personne qui *reçoit* le fichier
 				packet.getContent().getConversation_id();
 				sendBroadcast(broadcastIntent);
 			} 

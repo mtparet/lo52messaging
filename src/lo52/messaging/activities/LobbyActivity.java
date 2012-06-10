@@ -259,8 +259,10 @@ public class LobbyActivity extends TabActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-			Log.d(TAG, "Transfert début " + conv_id);
-			Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
+			
+			// On affiche le toast seulement si on est la personne qui reçoit le fichier
+			if (intent.getBooleanExtra("isReceiver", false))
+				Toast.makeText(context, getString(R.string.conversation_file_receive_begin), Toast.LENGTH_SHORT).show();
 			
 			// Ajout de l'id de conversation à la liste de celles en cours de transfert
 			fileTransferStarted.add(conv_id);
@@ -276,7 +278,6 @@ public class LobbyActivity extends TabActivity {
 		public void onReceive(Context context, Intent intent) {
 			
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-			Log.d(TAG, "Transfert terminé " + conv_id);
 			
 			// Ajout de l'id de conversation à la liste de celles en cours de transfert
 			fileTransferFinished.add(conv_id);

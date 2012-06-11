@@ -120,6 +120,7 @@ public class PosUpdateService extends Service {
 					User currentUser = NetworkService.getUser_me();
 					Localisation currentPosn = new Localisation(point.getLatitudeE6(), point.getLongitudeE6());
 					currentUser.setLocalisation(currentPosn);
+					currentPosn.sendToNetworkService(getApplicationContext());
 
 
 					Log.d(TAG, "Updater ran");

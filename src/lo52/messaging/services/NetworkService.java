@@ -1081,9 +1081,9 @@ public class NetworkService extends Service {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
 
-	//public static Hashtable<Integer, User> getListUsersNoClone() {
-	//	return (Hashtable<Integer, User>) listUsers;
-	//}
+	public static Hashtable<Integer, User> getListUsersNoClone() {
+		return (Hashtable<Integer, User>) listUsers;
+	}
 
 	//public static void setListUsers(Hashtable<Integer, User> listUsersE) {
 	//	listUsers = listUsersE;

@@ -1,9 +1,12 @@
 package lo52.messaging.activities;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
+import lo52.messaging.model.Localisation;
+import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.services.PosUpdateService;
@@ -97,6 +100,25 @@ public class LobbyActivity extends TabActivity {
 		spec = tabHost.newTabSpec(TAG_TAB_MAP).setIndicator(getString(R.string.lobby_tab_map), getResources().getDrawable(R.drawable.icon_worldmap)).setContent(intent);
 		tabHost.addTab(spec);
 
+
+		/**
+		 * DEBUG MAP
+		 * 
+		 * Juste pour essayer la map
+		 */
+		Hashtable<Integer, User> l = NetworkService.getListUsersNoClone();
+		User u = new User("connard");
+		u.setId(1234);
+		u.setLocalisation(new Localisation(47638764,6852683));
+		l.put(1234, u);
+
+		User u2 = new User("connard2");
+		u2.setId(1235);
+		u2.setLocalisation(new Localisation(47635756,6869935));
+		l.put(1235, u2);
+		/**
+		 *  /DEBUG MAP
+		 */
 	}
 
 
@@ -159,7 +181,7 @@ public class LobbyActivity extends TabActivity {
 	public void onBackPressed() {
 
 		if (preferences.getBoolean("prefs_confirmToQuit", true)) {
-			
+
 			// Demande à l'utilisateur s'il veut vraiment quitter
 			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(R.string.lobby_alert_quit)
@@ -175,7 +197,7 @@ public class LobbyActivity extends TabActivity {
 			})
 			.setNegativeButton(R.string.generic_no, null)
 			.show();
-			
+
 		} else 
 			LobbyActivity.super.onBackPressed();
 	}

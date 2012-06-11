@@ -3,22 +3,22 @@
 
     <string name="hello">Hello World, LO52Messaging!</string>
     <string name="app_name">Another Android Instant Messenger</string>
-    
-    
+
     <!-- TRIER ACTIVITE PAR ACTIVITE -->
-    
+
+
     <!-- LAUNCHER (LO52Messaging) -->
     <string name="launcher_connexion_btn">Connexion</string>
     <string name="launcher_username_error_tv">Vous devez indiquer un nom d\'utilisateur dans les préférences avant de pouvoir vous connecter.</string>
     <string name="launcher_welcome">Bienvenue,</string>
-    
+
     <!-- LOBBY -->
     <string name="lobby_tab_users">Utilisateurs</string>
     <string name="lobby_tab_conversations">Conversations</string>
     <string name="lobby_tab_map">Carte</string>
     <string name="lobby_alert_quit">Quitter l\'application</string>
     <string name="lobby_alert_quit_msg">Etes-vous sûr de vouloir quitter ? Vous serez déconnecté.</string>
-    
+
     <!-- USER LIST -->
     <string name="userlist_refresh_option">Rafraichir</string>
     <string name="userlist_no_user">Aucun utilisateur n\'a été détecté.\n\nCette vue se mettra automatiquement à jour lorsqu\'un utilisateur se connectera.</string>
@@ -28,7 +28,7 @@
     <string name="userlist_multi_select_simple">Sélection unique</string>
     <string name="userlist_error_no_user">Vous devez spécifier au moins un utilisateur.</string>
     <string name="userlist_new_connection">vient de se connecter</string>
-    
+
     <!-- CONVERSATIONS -->
     <string name="conversations_tab_name">Conversations</string>
     <string name="conversations_none">Vous n\'avez aucune conversation en cours.</string>
@@ -43,7 +43,7 @@
     <string name="conversation_user_received_message">vous a envoyé un message.</string>
     <string name="conversation_file_send_begin">Envoi du fichier…</string>
     <string name="conversation_file_receive_begin">Réception d\'un fichier…</string>
-    
+
     <!-- PREFERENCES -->
     <string name="preferencesActivity">Préférences générales</string>
     <string name="preferencesUsername">Nom d\'utilisateur</string>
@@ -60,7 +60,7 @@
     <string name="preferencesNotifVibrationDesc">Faire vibrer le téléphone pour les évènements manqués (nouveau message, …)</string>
     <string name="preferencesConfirmToQuit">Confirmation pour quitter</string>
     <string name="preferencesConfirmToQuitDesc">Afficher une demande de confirmation avant de quitter l\'application.</string>
-    
+
     <!-- FILE PICKER -->
     <string name="filePicker_invalid_ext">Extension de fichier invalide</string>
     <string name="filePicker_cant_read">ne peut pas être ouvert en lecture</string>
@@ -70,15 +70,17 @@
     <string name="filePicker_cancel">Annuler</string>
     <string name="filePicker_save">Sauvegarder</string>
     <string name="filePicker_no_data">Aucune donnée</string>
-    
+
+    <!-- MAP ACTIVITY -->
+    <string name="maps_user_position">Vous êtes ici.</string>
+    <string name="maps_user_distance_from_user">Distance :</string>
+
     <!-- MENUS -->
     <string name="preferencesTitle">Préférences</string>
-    
+
     <!-- AUTRES -->
     <string name="image_content_description"></string>
     <string name="generic_yes">Oui</string>
     <string name="generic_no">Non</string>
-    
-    
 
 </resources>

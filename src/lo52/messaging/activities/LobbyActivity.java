@@ -100,31 +100,13 @@ public class LobbyActivity extends TabActivity {
 		spec = tabHost.newTabSpec(TAG_TAB_MAP).setIndicator(getString(R.string.lobby_tab_map), getResources().getDrawable(R.drawable.icon_worldmap)).setContent(intent);
 		tabHost.addTab(spec);
 
-
-		/**
-		 * DEBUG MAP
-		 * 
-		 * Juste pour essayer la map
-		 */
-		Hashtable<Integer, User> l = NetworkService.getListUsersNoClone();
-		User u = new User("connard");
-		u.setId(1234);
-		u.setLocalisation(new Localisation(47638764,6852683));
-		l.put(1234, u);
-
-		User u2 = new User("connard2");
-		u2.setId(1235);
-		u2.setLocalisation(new Localisation(47635756,6869935));
-		l.put(1235, u2);
-		/**
-		 *  /DEBUG MAP
-		 */
 	}
 
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+	protected void onStop(){
+		super.onStop();
+		
 
 		// Arrêt du service Network en fonction des préférences de l'utilisateur
 		if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
@@ -138,6 +120,12 @@ public class LobbyActivity extends TabActivity {
 				Log.e(TAG, "Service non arrêté");
 			}
 		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
 	}
 
 	@Override

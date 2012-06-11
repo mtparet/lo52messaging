@@ -1081,6 +1081,10 @@ public class NetworkService extends Service {
 		return (Hashtable<Integer, User>) listUsers.clone();
 	}
 
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public static Hashtable<Integer, User> getListUsersNoClone() {
 		return (Hashtable<Integer, User>) listUsers;
 	}

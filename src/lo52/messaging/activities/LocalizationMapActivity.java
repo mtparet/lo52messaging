@@ -14,6 +14,7 @@ import android.os.Bundle;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
@@ -24,6 +25,11 @@ import com.google.android.maps.OverlayItem;
  */
 public class LocalizationMapActivity extends MapActivity {
 
+	@SuppressWarnings("unused")
+	private static final String TAG = "LocalizationMapActivity";
+	private MapController mc;
+	
+	
 	@Override
 	protected boolean isRouteDisplayed() {
 	    return false;
@@ -37,8 +43,9 @@ public class LocalizationMapActivity extends MapActivity {
 	    MapView mapView = (MapView) findViewById(R.id.mapview);
 	    mapView.setBuiltInZoomControls(true);
 	    
-	    /*MapController mc = mapView.getController();
-	    mc.setZoom(17);*/
+	    // Augmente le zoom
+	    mc = mapView.getController();
+	    mc.setZoom(17);
 	    
 	    // get user location
 	    User currentUser = NetworkService.getUser_me();
@@ -48,15 +55,19 @@ public class LocalizationMapActivity extends MapActivity {
 	    Hashtable<Integer, User> userList =  NetworkService.getListUsers();
 		
 	    List<Overlay> mapOverlays = mapView.getOverlays();
-	    Drawable drawable = this.getResources().getDrawable(R.drawable.map_point);
+	    Drawable drawableMyself		= this.getResources().getDrawable(R.drawable.map_blue_dot);
+	    Drawable drawableOthers 	= this.getResources().getDrawable(R.drawable.map_red_dot);
 	    
 	    // Add current user on the map
 	    if (lastPosition != null) { 
-	    	UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawable, this);
+	    	UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawableMyself, this);
 	    	GeoPoint point = new GeoPoint((int)lastPosition.getLat(),(int)lastPosition.getLon());
 	    	OverlayItem overlayitem = new OverlayItem(point, currentUser.getName(), "");
 	    	itemizedoverlay.addOverlay(overlayitem);
 	    	mapOverlays.add(itemizedoverlay);
+	    	
+	    	// Centrage de la vue sur l'utilisateur
+	    	mc.animateTo(new GeoPoint((int)(lastPosition.getLat()), (int)(lastPosition.getLon())));
 	    }
 	    
 	    // Add other users on the map
@@ -66,7 +77,7 @@ public class LocalizationMapActivity extends MapActivity {
 	      if (mUser.getId() != currentUser.getId()) { // Si ce n'est pas l'utilisateur actuel alors on l'ajoute sur la carte
 	    	  Localisation lastUserPosition = mUser.getLocalisation();
 	    	  if (lastUserPosition != null) { 
-	    		  UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawable, this);
+	    		  UserItemizedOverlay itemizedoverlay = new UserItemizedOverlay(drawableOthers, this);
 	    		  GeoPoint point = new GeoPoint((int)lastUserPosition.getLat(),(int)lastUserPosition.getLon());
 	    		  OverlayItem overlayitem = new OverlayItem(point, currentUser.getName(), "");
 	    		  itemizedoverlay.addOverlay(overlayitem);

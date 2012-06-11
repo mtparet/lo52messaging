@@ -113,7 +113,7 @@ public class PosUpdateService extends Service {
 					}
 					else {
 						Log.d(TAG, "Nouvelle position par defaut");
-						point = new GeoPoint(45379100, -71929300);
+						point = new GeoPoint(47642256, 6845032);
 					}
 
 					// Envoyer les données au network service pour que les autres utilisateurs mettents à jour ma position

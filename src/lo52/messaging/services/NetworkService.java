@@ -433,10 +433,7 @@ public class NetworkService extends Service {
 	@Override
 	public void onDestroy()
 	{
-
-		// Arrêter la socket
-		listenSocket.cancel(true);
-		listenSocket = null;
+		prepareForClosure();
 
 		// Arrêter tous les broadcast receivers
 		unregisterReceiver(Conversation);
@@ -446,6 +443,22 @@ public class NetworkService extends Service {
 
 		super.onDestroy();
 	}
+
+
+	/**
+	 * Fait du nettoyage avant la fermeture du service
+	 */
+	private void prepareForClosure() {
+		// Arrêter l'AsyncTask  "socket"
+		listenSocket.cancel(true);
+		listenSocket = null;
+
+		listUsers.clear();
+		listConversations.clear();
+		conversationsToCreateUI.clear();
+		user_me = null;
+	}
+
 
 	/**
 	 * AsyncTask pour envoyer un message à un utilisateur.

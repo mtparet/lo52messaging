@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.google.android.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapview"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:apiKey="0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw"
+    android:clickable="true" />
+<!-- Backup 0nHV3RzNBnM-pjPYly76AmKxVEUwPvo2AVtIzWw -->
+<!-- matthieu_key_debug 0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw -->
 
-    <com.google.android.maps.MapView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/mapview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:apiKey="0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw"
-        android:clickable="true" />
-    <!-- Backup 0nHV3RzNBnM-pjPYly76AmKxVEUwPvo2AVtIzWw -->
-    <!--  matthieu_key_debug 0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw -->
-
-    <LinearLayout
-        android:id="@+id/zoom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
-</LinearLayout>

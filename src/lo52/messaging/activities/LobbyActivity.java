@@ -1,12 +1,9 @@
 package lo52.messaging.activities;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import lo52.messaging.R;
 import lo52.messaging.model.Conversation;
-import lo52.messaging.model.Localisation;
-import lo52.messaging.model.User;
 import lo52.messaging.model.broadcast.MessageBroacast;
 import lo52.messaging.services.NetworkService;
 import lo52.messaging.services.PosUpdateService;

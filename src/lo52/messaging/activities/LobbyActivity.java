@@ -103,8 +103,15 @@ public class LobbyActivity extends TabActivity {
 	@Override
 	protected void onStop(){
 		super.onStop();
-		
+	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		// Ne pas appeller dans onStop car l'activité est stoppée quand on lance l'activité pour choisir un fichier
+		// à envoyer !
+		
 		// Arrêt du service Network en fonction des préférences de l'utilisateur
 		if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
 			Log.d(TAG, "arret service network");
@@ -117,12 +124,6 @@ public class LobbyActivity extends TabActivity {
 				Log.e(TAG, "Service non arrêté");
 			}
 		}
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
 	}
 
 	@Override

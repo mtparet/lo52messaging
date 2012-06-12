@@ -433,6 +433,10 @@ public class NetworkService extends Service {
 	@Override
 	public void onDestroy()
 	{
+		Log.i(TAG, "====================");
+		Log.i(TAG, "onDestroy service");
+		Log.i(TAG, "====================");
+		
 		prepareForClosure();
 
 		// Arrêter tous les broadcast receivers
@@ -456,6 +460,9 @@ public class NetworkService extends Service {
 		listUsers.clear();
 		listConversations.clear();
 		conversationsToCreateUI.clear();
+		listUsers = null;
+		listConversations = null;
+		conversationsToCreateUI = null;
 		user_me = null;
 	}
 

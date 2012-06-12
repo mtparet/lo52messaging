@@ -82,5 +82,6 @@
     <string name="image_content_description"></string>
     <string name="generic_yes">Oui</string>
     <string name="generic_no">Non</string>
+    <string name="generic_error">Oops… Une erreur s\'est produite</string>
 
 </resources>

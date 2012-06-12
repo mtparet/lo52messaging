@@ -1,5 +1,7 @@
 package lo52.messaging.fragments;
 
+import java.io.File;
+
 import lo52.messaging.R;
 import lo52.messaging.activities.ConversationPagerActivity;
 import lo52.messaging.model.Conversation;
@@ -10,6 +12,9 @@ import org.xml.sax.XMLReader;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -27,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Contenu d'un "tab" (fragment) à l'intérieur de ConversationPagerActivity.
@@ -405,7 +411,30 @@ public class ConversationFragment extends Fragment {
 		@Override
 		public void onClick(View widget) {
 			Log.d(TAG, "click  " + soundUri);
-			// TODO lire son
+			
+			// Lecture du son
+			File file = new File(soundUri);
+			File file2 = new File("file://"+soundUri);
+			
+			Log.d(TAG, "FILEZ " + file.exists() + " ---- " + file2.exists());
+			
+			
+			if (file.exists()) {
+				Uri myUri = Uri.parse("file://"+soundUri);
+				MediaPlayer mediaPlayer = new MediaPlayer();
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+				try {
+					mediaPlayer.setDataSource(ctx, myUri);
+					mediaPlayer.prepare();
+					mediaPlayer.start();
+				} catch (Exception e) {
+					Log.e(TAG, e.getMessage());
+				}
+				
+			} else {
+				Toast.makeText(ctx, ctx.getString(R.string.generic_error), Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 

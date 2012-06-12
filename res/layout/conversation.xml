@@ -22,7 +22,7 @@
         android:layout_height="26dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
-    
+    
     <TextView
         android:id="@+id/conversation_content"
         android:layout_width="fill_parent"
@@ -31,6 +31,7 @@
         android:layout_alignLeft="@+id/conversation_name"
         android:layout_below="@+id/conversation_name"
         android:autoLink="all"
+        android:background="@color/conversation_textview_white"
         android:clickable="true"
         android:gravity="top|left" />
 

@@ -10,6 +10,8 @@
     <color name="conversation_system">#BBBBBB</color>	<!-- ~gris -->
     
     
+    <color name="conversation_textview_white">#22FFFFFF</color>
+    
     
     <!-- Styles pour le FilePicker -->
     

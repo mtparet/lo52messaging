@@ -9,7 +9,8 @@
     <color name="conversation_user4">#F0C654</color>	<!-- ~orange -->
     <color name="conversation_system">#BBBBBB</color>	<!-- ~gris -->
     
-    
+    <!-- Couleur du background du textview dans les fragments de conversation. Les 2 premiers 
+	caractères sont pour la transparence (00=transparent, FF=opaque) -->
     <color name="conversation_textview_white">#22FFFFFF</color>
     
     

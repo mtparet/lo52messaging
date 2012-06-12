@@ -69,10 +69,7 @@ public class ConversationFragment extends Fragment {
 		updateConversationFromService();
 
 		if (conversText_edit != null && conversation != null && parentActivity != null) {
-
-			Log.d(TAG, "== Update texte");
 			conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), new MediaGetter(parentActivity.getBaseContext())));
-			Log.d(TAG, "== Updated texte");
 		}
 
 		// Affiche ou cache la progressBar
@@ -80,7 +77,6 @@ public class ConversationFragment extends Fragment {
 		if (pbar != null) {
 			pbar.setVisibility(progressBarVisibility);
 		}
-
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -126,8 +122,6 @@ public class ConversationFragment extends Fragment {
 	// Création et assignation des onClickListerners
 	OnClickListener mediaButtonClickListener = new OnClickListener() {
 		public void onClick(View v) {
-			Log.d(TAG, "Click bouton media");
-
 			parentActivity.startFilePickerActivity(getConversation_id());
 		}
 	};
@@ -410,15 +404,9 @@ public class ConversationFragment extends Fragment {
 
 		@Override
 		public void onClick(View widget) {
-			Log.d(TAG, "click  " + soundUri);
-			
 			// Lecture du son
 			File file = new File(soundUri);
-			File file2 = new File("file://"+soundUri);
-			
-			Log.d(TAG, "FILEZ " + file.exists() + " ---- " + file2.exists());
-			
-			
+
 			if (file.exists()) {
 				Uri myUri = Uri.parse("file://"+soundUri);
 				MediaPlayer mediaPlayer = new MediaPlayer();
@@ -431,7 +419,7 @@ public class ConversationFragment extends Fragment {
 				} catch (Exception e) {
 					Log.e(TAG, e.getMessage());
 				}
-				
+
 			} else {
 				Toast.makeText(ctx, ctx.getString(R.string.generic_error), Toast.LENGTH_LONG).show();
 			}

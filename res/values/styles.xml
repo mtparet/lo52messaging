@@ -7,6 +7,7 @@
     <color name="conversation_user2">#519C74</color>	<!-- ~vert -->
     <color name="conversation_user3">#B85FC9</color>	<!-- ~violet -->
     <color name="conversation_user4">#F0C654</color>	<!-- ~orange -->
+    <color name="conversation_system">#BBBBBB</color>	<!-- ~gris -->
     
     
     

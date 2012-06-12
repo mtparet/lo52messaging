@@ -246,11 +246,21 @@ public class Conversation implements Parcelable {
 					String filenameExt[] = filenameArray[1].split("\\.");
 					String extension = filenameExt[filenameExt.length-1];
 
+					String filenameOnly[] = filenameArray[1].split("/");
+
 					/*
 					 * Images
 					 */
 					if (LibUtil.FILE_IMAGE_EXTENSIONS.contains(extension)) {
-						text += "<font color=\"" + color + "\">" + name + ":</font><br><img src=\""+filenameArray[1]+"\"></img><br>";
+						text += "<font color=\"" + color + "\">" + name + ":</font><br><img src=\""+filenameArray[1]+"\"></img><br>" +
+								"<font color=\""+ ctx.getResources().getColor(R.color.conversation_system) + "\"><small>" +  filenameOnly[filenameOnly.length-1] + "</small></font><br>";
+					}
+					/*
+					 * Fichiers audio
+					 */
+					else if (LibUtil.FILE_AUDIO_EXTENSIONS.contains(extension)) {
+						text += "<font color=\"" + color + "\">" + name + ":</font><br><sound>"+filenameArray[1]+"</sound><br>" +
+								"<font color=\""+ ctx.getResources().getColor(R.color.conversation_system) + "\"><small>" +  filenameOnly[filenameOnly.length-1] + "</small></font><br>";
 					}
 					else {
 						text += "<font color=\"" + color + "\">" + name + ":</font> Fichier non pris en charge ("+extension+")<br>";
@@ -259,7 +269,6 @@ public class Conversation implements Parcelable {
 				} else {
 					Log.e(TAG, "Fichier inexistant " + filenameArray[1]);
 				}
-
 			}
 
 			// Messages texte

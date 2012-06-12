@@ -17,6 +17,7 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,8 +48,6 @@ public class ConversationFragment extends Fragment {
 	String conversationText_str = "";
 
 	ConversationPagerActivity parentActivity;
-	
-	private String DEBUG_STRING = "<sound>soundlink_motherfucker</sound>";
 
 	@Override
 	public void onResume() {
@@ -70,10 +69,6 @@ public class ConversationFragment extends Fragment {
 			Log.d(TAG, "== Updated texte");
 		}
 
-
-		// DEBUG
-		conversText_edit.setText(Html.fromHtml(DEBUG_STRING, new ImageGetter(), new MediaGetter(parentActivity.getBaseContext())));
-
 		// Affiche ou cache la progressBar
 		ProgressBar pbar = (ProgressBar) fv.findViewById(R.id.conversation_progressBar);
 		if (pbar != null) {
@@ -89,12 +84,12 @@ public class ConversationFragment extends Fragment {
 		// Initialise les différents éléments du layout
 		TextView conversName_tv 		= (TextView) fv.findViewById(R.id.conversation_name);
 		//EditText conversText_edit		= (EditText) fv.findViewById(R.id.conversation_content);
-		
+
 		TextView conversText_edit		= (TextView) fv.findViewById(R.id.conversation_content);	// FIXME
 		//EditText conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);	// FIXME
 		conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
-		
-		
+
+
 		Button conversMedia_btn 	= (Button) fv.findViewById(R.id.conversation_media_button);
 		Button conversSend_btn 		= (Button) fv.findViewById(R.id.conversation_send_button);
 
@@ -112,13 +107,8 @@ public class ConversationFragment extends Fragment {
 		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), new MediaGetter(parentActivity.getBaseContext())));
 		Log.d(TAG, "== Updated texte");
 
-
-		// DEBUG
-		conversText_edit.setText(Html.fromHtml(DEBUG_STRING, new ImageGetter(), new MediaGetter(parentActivity.getBaseContext())));
-
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
-
 
 		// Affiche ou cache la progressBar
 		ProgressBar pbar = (ProgressBar) fv.findViewById(R.id.conversation_progressBar);
@@ -147,10 +137,6 @@ public class ConversationFragment extends Fragment {
 			// Ajout du message texte à la conversation locale
 			conversation.addMessage(new Message(NetworkService.getUser_me().getId(), messageText));
 
-			/*Log.d(TAG, "Update convers");
-			updateConversationFromService();
-			Log.d(TAG, "Updated convers");*/
-
 			// Mise à jour de l'UI
 			tryTextRefresh();
 
@@ -173,7 +159,6 @@ public class ConversationFragment extends Fragment {
 			makeSureConversationIsNotNull();
 	}
 
-
 	/**
 	 * S'assure que l'objet conversation n'est pas null
 	 */
@@ -183,6 +168,7 @@ public class ConversationFragment extends Fragment {
 			Log.d(TAG, "Updated conversation object");
 		}
 	}
+
 
 	/**
 	 * 
@@ -301,10 +287,11 @@ public class ConversationFragment extends Fragment {
 		if (fv != null) {
 			//EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);	// FIXME
 			TextView conversText_edit = (TextView) fv.findViewById(R.id.conversation_content);	// FIXME
-			conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
-			
-			if (conversText_edit != null)
+
+			if (conversText_edit != null) {
+				conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
 				conversText_edit.setText(Html.fromHtml(conversationText_str));
+			}
 			else Log.d(TAG, "Champ de texte null");
 		} else {
 			Log.d(TAG, "N'a pas pu refresh la vue");
@@ -344,6 +331,10 @@ public class ConversationFragment extends Fragment {
 	};
 
 
+	/**
+	 *	Permet d'interpréter les tags html non pris en charge de base. 
+	 *	Ici, on s'en sert pour interpréter <code>&lt;sound&gt;LinkToAudioFile&lt;/sound&gt;</code>
+	 */
 	private class MediaGetter implements Html.TagHandler {
 
 		Context ctx;
@@ -355,49 +346,51 @@ public class ConversationFragment extends Fragment {
 		@Override
 		public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
 
-			if (!opening && tag.equals("sound")) {
-				String soundURI = output.toString();
-
-				//output.setSpan(new ImageSpan(ctx, R.drawable.ic_launcher), 0, output.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-				
-				//output.setSpan(new SoundClickable(ctx, soundURI), 0, 5, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-				processSoundLink(opening, output, soundURI);
+			if (tag.equalsIgnoreCase("sound")) {
+				processSoundLink(opening, output);
 			}
 		}
-		
-		private void processSoundLink(boolean opening, Editable output, String soundURI) {
-	        int len = output.length();
-	        if(opening) {
-	            output.setSpan(new SoundClickable(ctx, soundURI), len, len, Spannable.SPAN_MARK_MARK);
-	        } else {
-	            Object obj = getLast(output, SoundClickable.class);
-	            int where = output.getSpanStart(obj);
 
-	            output.removeSpan(obj);
+		private void processSoundLink(boolean opening, Editable output) {
+			int len = output.length();
+			if(opening) {
+				output.setSpan(new ImageSpan(ctx, R.drawable.speaker_small), len, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				output.setSpan(new SoundClickable(ctx, ""), len, len, Spannable.SPAN_MARK_MARK);
+			} else {
+				Object obj = getLast(output, SoundClickable.class);
+				int where = output.getSpanStart(obj);
 
-	            if (where != len) {
-	                output.setSpan(new SoundClickable(ctx, soundURI), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	            }
-	        }
-	    }
+				output.removeSpan(obj);
 
-	    private Object getLast(Editable text, Class<?> kind) {
-	        Object[] objs = text.getSpans(0, text.length(), kind);
+				if (where != len) {
+					CharSequence uri = output.subSequence(where, len);
 
-	        if (objs.length == 0) {
-	            return null;
-	        } else {
-	            for(int i = objs.length;i>0;i--) {
-	                if(text.getSpanFlags(objs[i-1]) == Spannable.SPAN_MARK_MARK) {
-	                    return objs[i-1];
-	                }
-	            }
-	            return null;
-	        }
-	    }
+					output.setSpan(new ImageSpan(ctx, R.drawable.speaker_small), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					output.setSpan(new SoundClickable(ctx, uri.toString()), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				}
+			}
+		}
+
+		private Object getLast(Editable text, Class<?> kind) {
+			Object[] objs = text.getSpans(0, text.length(), kind);
+
+			if (objs.length == 0) {
+				return null;
+			} else {
+				for(int i = objs.length;i>0;i--) {
+					if(text.getSpanFlags(objs[i-1]) == Spannable.SPAN_MARK_MARK) {
+						return objs[i-1];
+					}
+				}
+				return null;
+			}
+		}
 	}
 
-	
+
+	/**
+	 * Permet d'interpréter les tags <sound>linkToAudioFile</sound>
+	 */
 	private class SoundClickable extends ClickableSpan {
 
 		Context ctx;

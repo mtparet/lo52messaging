@@ -37,6 +37,10 @@ public class LibUtil {
 
 	public static final Set<String> FILE_IMAGE_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"jpg", "jpeg", "png"}
+			));
+	
+	public static final Set<String> FILE_AUDIO_EXTENSIONS = new HashSet<String>(Arrays.asList(
+			new String[] {"mp3", "ogg"}
 			)); 
 
 	/********************************************************

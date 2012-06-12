@@ -123,7 +123,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// Intialision du ViewPager
 		this.intialiseViewPager();
-
+		
 	}
 
 	/** (non-Javadoc)
@@ -304,7 +304,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 					Toast.makeText(this, getString(R.string.filePicker_invalid_ext), Toast.LENGTH_LONG).show();
 				}
 				else {
-					// TODO envoyer le fichier à tout les membres de la conversation
 					Toast.makeText(this, getString(R.string.conversation_file_send_begin), Toast.LENGTH_LONG).show();
 
 					Log.d(TAG, "Envoi depuis fragment " + mTabHost.getCurrentTab());

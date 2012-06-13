@@ -343,7 +343,6 @@ public class ConversationFragment extends Fragment {
 			this.ctx = ctx;
 		}
 
-		@Override
 		public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
 
 			if (tag.equalsIgnoreCase("sound")) {

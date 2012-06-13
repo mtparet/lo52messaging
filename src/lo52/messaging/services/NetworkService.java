@@ -110,6 +110,7 @@ public class NetworkService extends Service {
 	private int PORT_LOCAL = 5008;
 
 	//Taille du buffer en réception, en Byte
+	//TODO : avant production de l'application final mettre à 30 000
 	public static final int BUFFER_SIZE = 15000;
 
 	public NetworkService() {

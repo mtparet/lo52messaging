@@ -123,7 +123,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		// Intialision du ViewPager
 		this.intialiseViewPager();
-		
+
 	}
 
 	/** (non-Javadoc)
@@ -215,15 +215,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 
-	/**
-	 * Création du menu d'options. Crafté à la main ici et non pas selon un .xml car le menu varie selon le nombre de conversations ouvertes
-	 */
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(1, 1, 1, "(Dev) Ajouter un tab");
-		return super.onCreateOptionsMenu(menu);
-	}
-
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// On supprime aussi l'option "Fermer la conversation courante" quand on est sur la liste des convers (premier tab)
@@ -244,24 +235,19 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		this.getParent().onMenuItemSelected(featureId, item);
 
-		if (item.getItemId() == 1) {
-
-			Log.d(TAG, "DESACTIVE");
-			//addFragment(0123456, false);
-
-			/**
-			 * MODIF D'UN FRAGMENT
-			 */
-			//MPagerAdapter mp = (MPagerAdapter) mViewPager.getAdapter();
-			//ConversationFragment f0 = (ConversationFragment) mp.getFragmentsList().get(0);
-			//f0.setTextViewText("modif du fragment 0");
-
-
-		} else if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
+		if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
 			// Suppression
 			removeFragmentAt(this.mTabHost.getCurrentTab());
+
+			/* FIXME faire une fermeture de conversation propre:
+				- envoyer notification aux membres de la conversation comme quoi on a quitté la convers
+				- femer le fragment
+				- rafraichir la liste des conversations
+			 */
+
 		}
 		return true;
 	}
@@ -537,9 +523,9 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-			
+
 			Log.e(TAG, "RECU START TRANSFER " + conv_id);
-			
+
 
 			if (conv_id != 0) {
 				ConversationFragment frag = getFragmentById(conv_id);
@@ -560,7 +546,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 			int conv_id = intent.getIntExtra("conversation_id", 0);
 
 			Log.e(TAG, "RECU FIN TRANSFER " + conv_id);
-			
+
 			if (conv_id != 0) {
 				ConversationFragment frag = getFragmentById(conv_id);
 				frag.setProgressBarVisibility(View.GONE);
@@ -583,11 +569,11 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		IntentFilter filter2 = new IntentFilter();
 		filter2.addAction(NetworkService.SendConversation);
 		registerReceiver(conversationReceiver, filter2);
-		
+
 		IntentFilter filter3 = new IntentFilter();
 		filter3.addAction(NetworkService.FileTransferStart);
 		registerReceiver(fileTransferStarted, filter3);
-		
+
 		IntentFilter filter4 = new IntentFilter();
 		filter4.addAction(NetworkService.FileTransferFinish);
 		registerReceiver(fileTransferFinished, filter4);
@@ -686,7 +672,7 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 	protected void onStop() {
 		super.onStop();
 	}
-	
+
 	@Override
 	public void onBackPressed () {
 		this.getParent().onBackPressed();

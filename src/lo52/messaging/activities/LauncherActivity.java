@@ -21,7 +21,7 @@ import android.widget.TextView;
  * LO52Messaging
  * Activité principale (launcher)
  */
-public class LO52Messaging extends Activity {
+public class LauncherActivity extends Activity {
 
 	/*
 	 * Attributs

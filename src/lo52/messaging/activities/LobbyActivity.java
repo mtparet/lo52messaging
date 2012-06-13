@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -46,6 +48,8 @@ public class LobbyActivity extends TabActivity {
 
 	// Durée de la vibration pour la notification de messages, en ms
 	public static final long VIBRATOR_NOTIFICATION_DURATION	= 300;
+
+	private static final int MENU_ABOUT_ITEM = 0xFF;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,9 +112,6 @@ public class LobbyActivity extends TabActivity {
 
 	@Override
 	protected void onDestroy() {
-		// TODO:
-		// Envoyer un paquet de déconnexion aux utilisateurs connus, pour qu'ils retirent cet user de leur liste
-		
 		// Arrêt du service Network en fonction des préférences de l'utilisateur
 		if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
 			Log.d(TAG, "arret service network");
@@ -222,6 +223,29 @@ public class LobbyActivity extends TabActivity {
 
 		}
 			
+	}
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		menu.add(MENU_ABOUT_ITEM, MENU_ABOUT_ITEM, 1, R.string.lobby_menu_about);
+		MenuItem about = menu.getItem(menu.size()-1);
+		about.setIcon(android.R.drawable.ic_dialog_info);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		Log.d(TAG, "MENU " + item.getItemId());
+
+		if (item.getItemId() == MENU_ABOUT_ITEM) {
+			startActivity(new Intent(this, AboutActivity.class));
+		}
+
+		return super.onMenuItemSelected(featureId, item);
 	}
 
 

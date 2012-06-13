@@ -12,6 +12,7 @@ import lo52.messaging.services.NetworkService;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -29,7 +30,6 @@ public class LocalizationMapActivity extends MapActivity {
 	@SuppressWarnings("unused")
 	private static final String TAG = "LocalizationMapActivity";
 	private MapController mc;
-
 
 	@Override
 	protected boolean isRouteDisplayed() {
@@ -106,5 +106,11 @@ public class LocalizationMapActivity extends MapActivity {
 	@Override
 	public void onBackPressed () {
 		this.getParent().onBackPressed();
+	}
+	
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		this.getParent().onMenuItemSelected(featureId, item);
+		return super.onMenuItemSelected(featureId, item);
 	}
 }

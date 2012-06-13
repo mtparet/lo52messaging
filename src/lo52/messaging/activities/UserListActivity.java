@@ -236,7 +236,10 @@ public class UserListActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.user_list_activity_menu, menu);
-
+		
+		// Création du menu sur le lobby
+		this.getParent().onCreateOptionsMenu(menu);
+		
 		return true;
 	}
 
@@ -268,6 +271,9 @@ public class UserListActivity extends Activity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		
+		this.getParent().onMenuItemSelected(featureId, item);
+		
 		int menuItemId = item.getItemId();
 		if (menuItemId == R.id.item_refresh) {
 			refreshUserList();

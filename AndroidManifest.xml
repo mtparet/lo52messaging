@@ -26,7 +26,7 @@
         <uses-library android:name="com.google.android.maps" />
         
         <activity
-            android:name=".activities.LO52Messaging"
+            android:name=".activities.LauncherActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
@@ -44,6 +44,7 @@
         <activity android:name=".activities.LocalizationMapActivity" android:label="@string/app_name" android:theme="@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".fragments.ConversationFragment"></activity>
         <activity android:name=".activities.FilePickerActivity"></activity>
+        <activity android:name=".activities.AboutActivity"></activity>
         
         <service android:name=".services.NetworkService"/>
         <service android:name=".services.PosUpdateService"/>

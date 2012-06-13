@@ -208,7 +208,7 @@ public class PacketNetwork implements Parcelable{
 	public static ArrayList<PacketNetwork> division(PacketNetwork packet){
 		/*   on va supposer que toute la partie "texte" n'occupe pas plus de 2000 bytes.
 		 */
-		int size_dispo = (NetworkService.BUFFER_SIZE)/2 - 2000;
+		int size_dispo = (NetworkService.BUFFER_SIZE)/2 - 4000;
 		int size_byte_content = packet.getContent().getByte_content().length;
 
 		int nb_packet = (size_byte_content / size_dispo) + 1;

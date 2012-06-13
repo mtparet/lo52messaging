@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -78,6 +79,7 @@ public class NetworkService extends Service {
 	//liste des packets en attente d'ACK, l'integer est le temps auquel on envoyé le paquet (en millisecondes)
 	private Hashtable<Integer,PacketNetwork> packetListACK = new Hashtable<Integer,PacketNetwork>();
 
+	//liste des paquets déjà reçut pour éviter les doublons
 	private ArrayList<Integer> previousReceivedPacket = new ArrayList<Integer>();
 
 	//liste des liste de paquets
@@ -86,11 +88,12 @@ public class NetworkService extends Service {
 	// Liste des IDs des conversations qui ont été créées par le service mais qui n'ont pas encore de fragment associés dans l'UI
 	private static ArrayList<Conversation> conversationsToCreateUI = new ArrayList<Conversation>();
 
-	private static User user_me;
+	private static User user_me;	
+	
+	private DatagramSocket datagramSocket;
 
-
-	// Socket d'écoute
-	ListenSocket listenSocket = null;
+	// Asyncktask d'écoute
+	private ListenSocket listenSocket = null;
 
 	private static final String TAG = "NetworkService";
 
@@ -111,7 +114,7 @@ public class NetworkService extends Service {
 
 	//Taille du buffer en réception, en Byte
 	//TODO : avant production de l'application final mettre à 30 000
-	public static final int BUFFER_SIZE = 15000;
+	public static final int BUFFER_SIZE = 30000;
 
 	public NetworkService() {
 
@@ -456,15 +459,13 @@ public class NetworkService extends Service {
 	private void prepareForClosure() {
 		// Arrêter l'AsyncTask  "socket"
 		listenSocket.cancel(true);
-		listenSocket = null;
 
 		listUsers.clear();
 		listConversations.clear();
+		listPaquetDivided.clear();
+		packetListACK.clear();
+		previousReceivedPacket.clear();
 		conversationsToCreateUI.clear();
-		listUsers = null;
-		listConversations = null;
-		conversationsToCreateUI = null;
-		user_me = null;
 	}
 
 
@@ -513,8 +514,8 @@ public class NetworkService extends Service {
 
 			Gson gson = new Gson();
 
-			if (packet.getContent() != null && packet.getContent().getByte_content() != null && packet.getContent().getByte_content().length >= (BUFFER_SIZE)/2 - 2000) {
-				Log.d(TAG, "Taille total du content:" + packet.getContent().getByte_content().length);
+			if (packet.getContent() != null && packet.getContent().getByte_content() != null && packet.getContent().getByte_content().length >= ((BUFFER_SIZE)/2 - 2000)) {
+				Log.d(TAG, "Taille total du content avant découpe:" + packet.getContent().getByte_content().length);
 
 
 				ArrayList<PacketNetwork> listPacket = PacketNetwork.division(packet);
@@ -592,6 +593,7 @@ public class NetworkService extends Service {
 
 		protected void onPostExecute(Long result) {
 		}
+		
 	}
 
 	private boolean sendFinalPacket(byte[] packet_byte, InetSocketAddress inetAddres,DatagramSocket datagramSocket ) {
@@ -694,11 +696,11 @@ public class NetworkService extends Service {
 	 *
 	 */
 	private class ListenSocket extends AsyncTask <Integer, Integer, Long> {
+
 		protected Long doInBackground(Integer... integers) {
 
 			/*
 			 *  initier et écouter sur la socket qui bind le port local et récupérer les données*/
-			DatagramSocket datagramSocket;
 			try {
 				datagramSocket = new DatagramSocket(PORT_LOCAL);
 				Log.d(TAG, "socket d'écoute sur " + datagramSocket.getLocalPort());
@@ -722,10 +724,16 @@ public class NetworkService extends Service {
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
+			
 			return null;
 		}
+		
 
 		protected void onPostExecute(Long result) {
+		}
+		
+		protected void onCancelled(Long result){
+			datagramSocket.close();
 		}
 	}
 
@@ -889,8 +897,6 @@ public class NetworkService extends Service {
 			Message message = new Message(packetReceive.getContent().getClient_id(),packetReceive.getContent().getMessage());
 			Log.d(TAG, "Network, ajout message avant " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 			Conversation conv = listConversations.get(packetReceive.getContent().getConversation_id());
-			conv.addMessage(message);
-			Log.d(TAG, "Network, ajout message apres " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
 
 			if (packetReceive.getUser_envoyeur() != user_me) {
 				Intent broadcastIntent = new Intent(NetworkService.SendMessage);
@@ -907,18 +913,36 @@ public class NetworkService extends Service {
 
 					// Créer le sous dossier lo52 s'il n'existe pas 
 					File receiveDir = new File("/sdcard/lo52/");
-					receiveDir.mkdirs();
+					if(!receiveDir.exists()){
+						receiveDir.mkdirs();
+					}
 
-					File file = new File(receiveDir, packetReceive.getContent().getFile_name());
-					Log.d(TAG, "ecriture fichier :" +file.getAbsolutePath());
+					File[] listFile = receiveDir.listFiles();
+					
+					//on rajoute des _i tant que le fichier existe
+					String filename = packetReceive.getContent().getFile_name();
+					int i = 1;
+					while( LibUtil.isInFileList(filename, listFile) ){
+						filename = "copy_" + i + "_" + packetReceive.getContent().getFile_name();
+						++i;
+					}
+					
+					File file = new File(receiveDir, filename);
+
+					
+					Log.d(TAG, "ecriture fichier :" + file.getAbsolutePath());
 					LibUtil.writeFile(file, packetReceive.getContent().getByte_content());
 
 					messageBroad.setLink_file(file.getAbsolutePath());
 
-					// On set le message avec le chemin vers le fichier, puisqu'on a pas accès aux MessageBroadcasts depuis une Conversation
-					conv.getListMessage().get(conv.getMessageCount()-1).setMessage(MessageBroacast.MESSAGE_FILE_IDENTIFIER + ";" + file.getAbsolutePath());
+					// on set le link dans le message
+					message.setMessage(MessageBroacast.MESSAGE_FILE_IDENTIFIER + ";" + file.getAbsolutePath());
 
 				}
+				
+				conv.addMessage(message);
+				Log.d(TAG, "Network, ajout message apres " + listConversations.get(packetReceive.getContent().getConversation_id()).getListMessage().size());
+
 
 				bundle.putParcelable("message", messageBroad);
 				broadcastIntent.putExtra(MessageBroacast.tag_parcelable, bundle);
@@ -1219,21 +1243,19 @@ public class NetworkService extends Service {
 				for(PacketNetwork packet : cl.values()) {
 					int now = (int) System.currentTimeMillis();
 
-					if (now > (packet.getDate_send() + 100000)) {
+					if (now > (packet.getDate_send() + 140000)) {
 						Log.d(TAG, "paquet sans ACK détruit:" + packet.getRamdom_identifiant());
 						packetListACK.remove(packet);
 					} else {
 						if (now > (packet.getDate_send() + 20000)) {
 							Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
-
+							packetListACK.remove(packet);
 							SendSocket sendSocket = new SendSocket();
 							PacketNetwork[] packets = new PacketNetwork[1];
 							packets[0] = packet;
 
 							//Exécution de l'asyncTask
 							sendSocket.execute(packets);
-
-							packetListACK.remove(packet);
 
 							try {
 								Thread.sleep(200);         

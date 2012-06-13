@@ -179,6 +179,17 @@ public class LibUtil {
 			e.printStackTrace();
 		}
 	}
+	
+	public static boolean isInFileList(String filename, File[] listFile){
+		
+		for(File file : listFile){
+			if(filename == file.getName()){
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 
 }

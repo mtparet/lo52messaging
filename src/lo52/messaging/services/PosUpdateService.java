@@ -29,6 +29,8 @@ public class PosUpdateService extends Service {
 
 	// thread séparé qui effectue la MAJ
 	private Updater updater;
+	
+	private GeoPoint previousLoca = new GeoPoint(0,0);;
 
 	public IBinder onBind(Intent intent) { // service lié
 		return null;                         // rendre un Binder sur le service
@@ -117,12 +119,14 @@ public class PosUpdateService extends Service {
 						
 					}
 
-					// Envoyer les données au network service pour que les autres utilisateurs mettents à jour ma position
-					User currentUser = NetworkService.getUser_me();
-					Localisation currentPosn = new Localisation(point.getLatitudeE6(), point.getLongitudeE6());
-					currentUser.setLocalisation(currentPosn);
-					currentPosn.sendToNetworkService(getApplicationContext());
-
+					// Envoyer les données au network service pour que les autres utilisateurs mettents à jour ma position seulement si elles ont changées
+					if(point.getLatitudeE6() != previousLoca.getLatitudeE6() || point.getLongitudeE6() != previousLoca.getLongitudeE6()){
+						previousLoca = point;
+						User currentUser = NetworkService.getUser_me();
+						Localisation currentPosn = new Localisation(point.getLatitudeE6(), point.getLongitudeE6());
+						currentUser.setLocalisation(currentPosn);
+						currentPosn.sendToNetworkService(getApplicationContext());
+					}
 
 					Log.d(TAG, "Updater ran");
 					Thread.sleep(DELAY);	// s'endormir entre chaque mise à jour

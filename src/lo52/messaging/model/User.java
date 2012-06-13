@@ -22,7 +22,14 @@ public class User implements  Parcelable{
 	private int id;
 	private Localisation localisation;
 
-
+	public User(User user){
+		inetSocketAddressLocal = user.inetSocketAddressLocal;
+		name = user.name;
+		id = user.id;
+		localisation = user.localisation;
+		inetSocketAddressPublic = user.inetSocketAddressPublic;
+	}
+	
 	/**
 	 * 
 	 * @param id

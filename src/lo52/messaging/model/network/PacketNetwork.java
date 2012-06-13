@@ -237,8 +237,15 @@ public class PacketNetwork implements Parcelable{
 		pn_base.setRamdom_identifiant(0);
 		pn_base.setRamdom_identifiant_groupe(rand.nextInt());
 		pn_base.type = packet.type;
-		pn_base.setUser_envoyeur(packet.user_envoyeur);
-		pn_base.setUser_destinataire(packet.user_destinataire);
+		
+		User userEnvoyeur = new User(packet.user_envoyeur);
+		userEnvoyeur.setLocalisation(null);
+		
+		User userDestinataire = new User(packet.user_destinataire);
+		userDestinataire.setLocalisation(null);
+		
+		pn_base.setUser_envoyeur(userEnvoyeur);
+		pn_base.setUser_destinataire(userDestinataire);
 		pn_base.setNb_packet_groupe(nb_packet);
 
 		for(int i = 0; i < nb_packet; i++){

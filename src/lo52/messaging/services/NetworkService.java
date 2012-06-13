@@ -88,12 +88,16 @@ public class NetworkService extends Service {
 	// Liste des IDs des conversations qui ont été créées par le service mais qui n'ont pas encore de fragment associés dans l'UI
 	private static ArrayList<Conversation> conversationsToCreateUI = new ArrayList<Conversation>();
 
+	//List des asynktask sendsocket lancé 
+	private ArrayList<SendSocket> listSendSocket = new ArrayList<NetworkService.SendSocket>();
 	private static User user_me;	
 	
 	private DatagramSocket datagramSocket;
 
 	// Asyncktask d'écoute
 	private ListenSocket listenSocket = null;
+	
+	private Timer timerCheckAck;
 
 	private static final String TAG = "NetworkService";
 
@@ -229,8 +233,8 @@ public class NetworkService extends Service {
 		Timer timer = new Timer();
 		timer.schedule(new SendBroadcatsimeTask(), 200);
 
-		Timer timer2 = new Timer();
-		timer2.schedule(new checkACKTask(), 20000);
+		timerCheckAck = new Timer();
+		timerCheckAck.schedule(new checkACKTask(), 20000);
 
 	}
 
@@ -418,6 +422,7 @@ public class NetworkService extends Service {
 			 */
 			//Création de l'asyncTask pour envoyer le packet
 			SendSocket sendSocket = new SendSocket();
+			listSendSocket.add(sendSocket);
 			PacketNetwork[] packets = new PacketNetwork[1];
 			packets[0] = packet;
 
@@ -459,6 +464,7 @@ public class NetworkService extends Service {
 	private void prepareForClosure() {
 		// Arrêter l'AsyncTask  "socket"
 		listenSocket.cancel(true);
+		datagramSocket.close();
 
 		listUsers.clear();
 		listConversations.clear();
@@ -466,6 +472,11 @@ public class NetworkService extends Service {
 		packetListACK.clear();
 		previousReceivedPacket.clear();
 		conversationsToCreateUI.clear();
+		timerCheckAck.cancel();
+		//on cancel tout les asyntask d'envoit de message
+		for(SendSocket socket : listSendSocket){
+			socket.cancel(true);
+		}
 	}
 
 
@@ -530,6 +541,10 @@ public class NetworkService extends Service {
 
 				//on boucle sur la liste des paquets pour l'envoyer
 				for(PacketNetwork packet1 : listPacket) {
+					if(isCancelled()){
+						return null;
+					}
+					
 					Log.d(TAG, "Taille après découpe du content:" + packet1.getContent().getByte_content().length);
 					String json1 = gson.toJson(packet1);
 
@@ -587,6 +602,8 @@ public class NetworkService extends Service {
 					Log.e(TAG, "échec envoit datagramsocket");
 				}
 			}
+			
+			listSendSocket.remove(SendSocket.this);
 			return null;
 
 		}
@@ -718,6 +735,9 @@ public class NetworkService extends Service {
 						e.printStackTrace();
 					}
 
+					if(isCancelled()){
+						return null;
+					}
 				}while(true);
 
 
@@ -732,9 +752,6 @@ public class NetworkService extends Service {
 		protected void onPostExecute(Long result) {
 		}
 		
-		protected void onCancelled(Long result){
-			datagramSocket.close();
-		}
 	}
 
 
@@ -770,8 +787,10 @@ public class NetworkService extends Service {
 
 			//On envoit un ACK
 			PacketNetwork packetSend = new PacketNetwork(packetReceive.getUser_envoyeur(), packetReceive.getRamdom_identifiant(),PacketNetwork.ACK);
+			User userMe = new User(user_me);
+			userMe.setLocalisation(null);
 
-			packetSend.setUser_envoyeur(user_me);
+			packetSend.setUser_envoyeur(userMe);
 
 			SendPacket(packetSend);
 
@@ -1237,10 +1256,12 @@ public class NetworkService extends Service {
 		public void run() {
 
 			while(true){
+
 				@SuppressWarnings("unchecked")
 				Hashtable<Integer,PacketNetwork> cl = (Hashtable<Integer, PacketNetwork>) packetListACK.clone();
 
 				for(PacketNetwork packet : cl.values()) {
+					
 					int now = (int) System.currentTimeMillis();
 
 					if (now > (packet.getDate_send() + 140000)) {
@@ -1251,6 +1272,7 @@ public class NetworkService extends Service {
 							Log.d(TAG, "paquet sans ACK renvoyé:" + packet.getRamdom_identifiant());
 							packetListACK.remove(packet);
 							SendSocket sendSocket = new SendSocket();
+							listSendSocket.add(sendSocket);
 							PacketNetwork[] packets = new PacketNetwork[1];
 							packets[0] = packet;
 

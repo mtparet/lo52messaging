@@ -3,14 +3,14 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <lo52.messaging.views.UserListView
+    <fr.utbm.lo52.messaging.views.UserListView
         android:id="@+id/listView1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="228dp" >
-    </lo52.messaging.views.UserListView>
+    </fr.utbm.lo52.messaging.views.UserListView>
 
     <TextView
         android:id="@+id/no_user"

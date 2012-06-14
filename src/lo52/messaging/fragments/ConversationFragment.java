@@ -41,6 +41,7 @@ public class ConversationFragment extends Fragment {
 
 	private static final String TAG = "ConversationFragment";
 	final ConversationFragment thisFrag = this;
+	private static final String CONVERSATION_NAME_PREFIX = "Conversation avec ";
 
 	// La conversation associée à ce fragment
 	private Conversation conversation = null;
@@ -60,9 +61,8 @@ public class ConversationFragment extends Fragment {
 		super.onResume();
 
 		// Rafraichit le texte
-		//EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);	// FIXME
-		TextView conversText_edit = (TextView) fv.findViewById(R.id.conversation_content);	// FIXME
-		conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
+		TextView conversText_edit = (TextView) fv.findViewById(R.id.conversation_content);
+		conversText_edit.setMovementMethod(LinkMovementMethod.getInstance());
 
 		// Met à jour la conversation en reprenant celle du service. Permet d'avoir un objet Conversation à jour,
 		// qui peut contenir des messages qui ont été reçus pendant que le fragment était onPause.
@@ -85,29 +85,22 @@ public class ConversationFragment extends Fragment {
 
 		// Initialise les différents éléments du layout
 		TextView conversName_tv 		= (TextView) fv.findViewById(R.id.conversation_name);
-		//EditText conversText_edit		= (EditText) fv.findViewById(R.id.conversation_content);
 
-		TextView conversText_edit		= (TextView) fv.findViewById(R.id.conversation_content);	// FIXME
-		//EditText conversUserText_edit	= (EditText) v.findViewById(R.id.conversation_usermessage);	// FIXME
-		conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
-
+		TextView conversText_edit		= (TextView) fv.findViewById(R.id.conversation_content);
+		conversText_edit.setMovementMethod(LinkMovementMethod.getInstance());
 
 		Button conversMedia_btn 	= (Button) fv.findViewById(R.id.conversation_media_button);
 		Button conversSend_btn 		= (Button) fv.findViewById(R.id.conversation_send_button);
 
-		// On rend le Text Edit de la convers non éditable
-		conversText_edit.setEnabled(true);
-		conversText_edit.setFocusable(true); // FIXME
+		// On rend le Text Edit de la convers clickable
 		conversText_edit.setClickable(true);
 
 		parentActivity = (ConversationPagerActivity) getActivity();
 
 		// Initialise leur valeur
-		conversName_tv.setText(conversationName_str);
+		conversName_tv.setText(CONVERSATION_NAME_PREFIX + conversationName_str);
 		conversationText_str = conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext());
-		Log.d(TAG, "== Update texte");
 		conversText_edit.setText(Html.fromHtml(conversation.generateUserFriendlyConversationText(parentActivity.getBaseContext()), new ImageGetter(), new MediaGetter(parentActivity.getBaseContext())));
-		Log.d(TAG, "== Updated texte");
 
 		conversMedia_btn.setOnClickListener(mediaButtonClickListener);
 		conversSend_btn.setOnClickListener(sendButtonClickListener);
@@ -201,8 +194,6 @@ public class ConversationFragment extends Fragment {
 	 * @param conversName
 	 */
 	public void setConversName(String conversName) {
-		// FIXME éventuellement, histoire de faire plus classe. Mais là ca crashe
-		//conversationName_str = getString(R.string.conversations_name_prefix);
 		conversationName_str = conversName;
 	}
 
@@ -285,11 +276,10 @@ public class ConversationFragment extends Fragment {
 
 		// Essaye de rafraichir le textEdit
 		if (fv != null) {
-			//EditText conversText_edit = (EditText) fv.findViewById(R.id.conversation_content);	// FIXME
-			TextView conversText_edit = (TextView) fv.findViewById(R.id.conversation_content);	// FIXME
+			TextView conversText_edit = (TextView) fv.findViewById(R.id.conversation_content);
 
 			if (conversText_edit != null) {
-				conversText_edit.setMovementMethod(LinkMovementMethod.getInstance()); 	// FIXME
+				conversText_edit.setMovementMethod(LinkMovementMethod.getInstance());
 				conversText_edit.setText(Html.fromHtml(conversationText_str));
 			}
 			else Log.d(TAG, "Champ de texte null");

@@ -47,7 +47,7 @@ public class ConversationListFragment extends ListFragment {
 
 		// Met à jour la liste des noms des conversations
 		updateLocalConversationsList();
-		
+
 		setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, conversationNames));
 
 		parentActivity = (ConversationPagerActivity) getActivity();
@@ -123,12 +123,8 @@ public class ConversationListFragment extends ListFragment {
 
 			conversationNames.add(conversationName);
 		}
-		
-		
-		//if (conversationNames.size() > 0) setVisibility(View.VISIBLE);
-		//else setVisibility(View.GONE);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -136,7 +132,7 @@ public class ConversationListFragment extends ListFragment {
 	public int getConversationsNumber() {
 		if (conversationsTable == null) 
 			return 0;
-		
+
 		else
 			return conversationsTable.size();
 	}

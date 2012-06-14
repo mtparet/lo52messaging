@@ -525,9 +525,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		public void onReceive(Context context, Intent intent) {
 			int conv_id = intent.getIntExtra("conversation_id", 0);
 
-			Log.e(TAG, "RECU START TRANSFER " + conv_id);
-
-
 			if (conv_id != 0) {
 				ConversationFragment frag = getFragmentById(conv_id);
 				frag.setProgressBarVisibility(View.VISIBLE);				
@@ -545,8 +542,6 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			int conv_id = intent.getIntExtra("conversation_id", 0);
-
-			Log.e(TAG, "RECU FIN TRANSFER " + conv_id);
 
 			if (conv_id != 0) {
 				ConversationFragment frag = getFragmentById(conv_id);

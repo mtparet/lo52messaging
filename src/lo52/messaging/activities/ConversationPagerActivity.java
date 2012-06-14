@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import lo52.messaging.R;
+import lo52.messaging.adapters.MPagerAdapter;
 import lo52.messaging.fragments.ConversationFragment;
 import lo52.messaging.fragments.ConversationListFragment;
 import lo52.messaging.model.Conversation;

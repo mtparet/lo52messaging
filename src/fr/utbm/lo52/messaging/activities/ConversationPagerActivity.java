@@ -241,13 +241,13 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		if (item.getItemId() == MENU_ITEM_CLOSE_CONV) {
 			// Suppression
-			removeFragmentAt(this.mTabHost.getCurrentTab());
 
 			/* FIXME faire une fermeture de conversation propre:
 				- envoyer notification aux membres de la conversation comme quoi on a quitté la convers
 				- femer le fragment
 				- rafraichir la liste des conversations
 			 */
+			removeFragmentAt(mTabHost.getCurrentTab());
 
 		}
 		return true;
@@ -394,7 +394,15 @@ public class ConversationPagerActivity extends FragmentActivity implements TabHo
 
 		if (mPagerAdapter.getFragmentsList().size() == 0) return;
 
-		// Supprimer le fragment de l'adapter
+		// 1) Supprimer la conversation du service
+		ConversationFragment frag = (ConversationFragment) mPagerAdapter.getItem(index);
+		if (frag != null) {
+			NetworkService.deleteConversationLocally(frag.getConversation_id());
+		} else {
+			Log.w(TAG, "Impossible de supprimer la conversation dans le NetworkService");
+		}
+
+		// 2) Supprimer le fragment de l'adapter, et de la liste des conversations
 		mPagerAdapter.getFragmentsList().remove(index);
 
 		if (this.mTabHost.getCurrentTab() == index) {

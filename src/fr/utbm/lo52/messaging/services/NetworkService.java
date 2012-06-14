@@ -1297,6 +1297,14 @@ public class NetworkService extends Service {
 		}
 	}
 
-
+	/**
+	 * Supprime une conversation de la liste locale
+	 * @param conversation_id
+	 */
+	public static void deleteConversationLocally(int conversation_id) {
+		if (listConversations.containsKey(conversation_id)) {
+			listConversations.remove(conversation_id);
+		}
+	}
 
 }

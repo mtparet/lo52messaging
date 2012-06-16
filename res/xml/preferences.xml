@@ -44,7 +44,7 @@
     </PreferenceCategory>
     
     
-    <PreferenceCategory android:title="@string/preferencesServiceTitle" >
+    <!--<PreferenceCategory android:title="@string/preferencesServiceTitle" >
         
         <CheckBoxPreference
             android:key="prefs_networkServiceKeepAlive"
@@ -52,7 +52,7 @@
             android:title="@string/preferencesServiceNetwork" >
         </CheckBoxPreference>
         
-    </PreferenceCategory>
+    </PreferenceCategory>-->
     
     
     <PreferenceCategory android:title="Options de dev" >

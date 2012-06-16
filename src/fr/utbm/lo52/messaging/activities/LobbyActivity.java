@@ -57,11 +57,11 @@ public class LobbyActivity extends TabActivity {
 		setContentView(R.layout.lobby);
 
 		Log.d(TAG, "Lancement activité lobby");
-		
+
 		// Lancement du service Network
 		networkService = new Intent(LobbyActivity.this, NetworkService.class);
 		startService(networkService);
-		
+
 		// Lancement du service PosUpdate
 		posUpdateService = new Intent(LobbyActivity.this, PosUpdateService.class);
 		startService(posUpdateService);
@@ -124,14 +124,14 @@ public class LobbyActivity extends TabActivity {
 				Log.e(TAG, "Service non arrêté ou déjà arrêté");
 			}
 		}
-		
+
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		//Enregistrement de l'intent filter
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
@@ -181,7 +181,7 @@ public class LobbyActivity extends TabActivity {
 					// Envoyer un paquet de déconnexion aux utilisateurs connus, pour qu'ils retirent cet user de leur liste
 					// Ne pas appeller dans onStop car l'activité est stoppée quand on lance l'activité pour choisir un fichier
 					// à envoyer !
-					
+
 					// Arrêt du service Network en fonction des préférences de l'utilisateur
 					if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
 						Log.d(TAG, "arret service network");
@@ -194,7 +194,7 @@ public class LobbyActivity extends TabActivity {
 							Log.e(TAG, "Service non arrêté");
 						}
 					}
-					
+
 					LobbyActivity.super.onBackPressed();
 				}
 			})
@@ -204,7 +204,7 @@ public class LobbyActivity extends TabActivity {
 		} else {
 			// Ne pas appeller dans onStop car l'activité est stoppée quand on lance l'activité pour choisir un fichier
 			// à envoyer !
-			
+
 			// Arrêt du service Network en fonction des préférences de l'utilisateur
 			if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
 				Log.d(TAG, "arret service network");
@@ -217,12 +217,12 @@ public class LobbyActivity extends TabActivity {
 					Log.e(TAG, "Service non arrêté");
 				}
 			}
-			
+
 			LobbyActivity.super.onBackPressed();
-			
+
 
 		}
-			
+
 	}
 
 

@@ -57,11 +57,11 @@ public class LobbyActivity extends TabActivity {
 		setContentView(R.layout.lobby);
 
 		Log.d(TAG, "Lancement activité lobby");
-
+		
 		// Lancement du service Network
 		networkService = new Intent(LobbyActivity.this, NetworkService.class);
 		startService(networkService);
-
+		
 		// Lancement du service PosUpdate
 		posUpdateService = new Intent(LobbyActivity.this, PosUpdateService.class);
 		startService(posUpdateService);
@@ -113,25 +113,25 @@ public class LobbyActivity extends TabActivity {
 	@Override
 	protected void onDestroy() {
 		// Arrêt du service Network en fonction des préférences de l'utilisateur
-		//if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
-		Log.d(TAG, "arret service network");
-		// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
-		try {
-			// Unregister du broadcastReceiver & arret du service
-			stopService(networkService);
-			stopService(posUpdateService);
-		} catch (Exception e) {
-			Log.e(TAG, "Service non arrêté ou déjà arrêté");
+		if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
+			Log.d(TAG, "arret service network");
+			// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
+			try {
+				// Unregister du broadcastReceiver & arret du service
+				stopService(networkService);
+				stopService(posUpdateService);
+			} catch (Exception e) {
+				Log.e(TAG, "Service non arrêté ou déjà arrêté");
+			}
 		}
-		//}
-
+		
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		
 		//Enregistrement de l'intent filter
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(NetworkService.SendMessage);
@@ -179,20 +179,22 @@ public class LobbyActivity extends TabActivity {
 				public void onClick(DialogInterface dialog, int which) {
 					// TODO:
 					// Envoyer un paquet de déconnexion aux utilisateurs connus, pour qu'ils retirent cet user de leur liste
-
+					// Ne pas appeller dans onStop car l'activité est stoppée quand on lance l'activité pour choisir un fichier
+					// à envoyer !
+					
 					// Arrêt du service Network en fonction des préférences de l'utilisateur
-					//if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
-					Log.d(TAG, "arret service network");
-					// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
-					try {
-						// Unregister du broadcastReceiver & arret du service
-						stopService(networkService);
-						stopService(posUpdateService);
-					} catch (Exception e) {
-						Log.e(TAG, "Service non arrêté");
+					if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
+						Log.d(TAG, "arret service network");
+						// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
+						try {
+							// Unregister du broadcastReceiver & arret du service
+							stopService(networkService);
+							stopService(posUpdateService);
+						} catch (Exception e) {
+							Log.e(TAG, "Service non arrêté");
+						}
 					}
-					//}
-
+					
 					LobbyActivity.super.onBackPressed();
 				}
 			})
@@ -202,25 +204,25 @@ public class LobbyActivity extends TabActivity {
 		} else {
 			// Ne pas appeller dans onStop car l'activité est stoppée quand on lance l'activité pour choisir un fichier
 			// à envoyer !
-
+			
 			// Arrêt du service Network en fonction des préférences de l'utilisateur
-			//if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
-			Log.d(TAG, "arret service network");
-			// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
-			try {
-				// Unregister du broadcastReceiver & arret du service
-				stopService(networkService);
-				stopService(posUpdateService);
-			} catch (Exception e) {
-				Log.e(TAG, "Service non arrêté");
+			if (!preferences.getBoolean("prefs_networkServiceKeepAlive", false)) {
+				Log.d(TAG, "arret service network");
+				// onPause est aussi appellée avant onDestroy ici donc le messageReceiver peut déjà avoir été dé-registered
+				try {
+					// Unregister du broadcastReceiver & arret du service
+					stopService(networkService);
+					stopService(posUpdateService);
+				} catch (Exception e) {
+					Log.e(TAG, "Service non arrêté");
+				}
 			}
-			//}
-
+			
 			LobbyActivity.super.onBackPressed();
-
+			
 
 		}
-
+			
 	}
 
 

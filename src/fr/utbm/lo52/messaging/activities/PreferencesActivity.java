@@ -7,7 +7,7 @@ import fr.utbm.lo52.messaging.R;
 
 /**
  *	Activité d'édition des préférences globale de l'application
- *	Construit automatiquement à partir de xml/preferences.xml 
+ *	Construite automatiquement à partir de xml/preferences.xml 
  */
 public class PreferencesActivity extends PreferenceActivity {
 	

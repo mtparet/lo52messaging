@@ -30,7 +30,8 @@ import fr.utbm.lo52.messaging.services.NetworkService;
 import fr.utbm.lo52.messaging.views.UserListView;
 
 /**
- *	Activité servant à lister les utilisateurs 
+ *	Activité servant à afficher les utilisateurs connus du système dans une liste,
+ *	et permet de démarrer une conversation avec eux. 
  */
 public class UserListActivity extends Activity {
 
@@ -41,7 +42,7 @@ public class UserListActivity extends Activity {
 	UserListView userListView;
 	Button startMultiConversBtn;
 	
-	private final int MENU_ITEM_SELECTION_MODE = 0x1;
+	private final int MENU_ITEM_SELECTION_MODE = 0x1A;
 
 	// Liste des users
 	Hashtable<Integer, User> userList;

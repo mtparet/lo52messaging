@@ -20,8 +20,22 @@ import fr.utbm.lo52.messaging.util.LibUtil;
 
 
 /**
- * LO52Messaging
- * Activité principale (launcher)
+ * 			LO52Messaging
+ * Projet de LO52 - UTBM - Printemps 2012
+ *
+ * Another Android Instant Messenger : application Android de messagerie sans serveur
+ * intérmédiaire, permettant à plusieurs utilisateurs de communiquer, s'échanger des fichiers
+ * et se localiser les uns par rapport aux autres.
+ * 
+ * 
+ * Activité launcher, démarrée en premier lors du lancement de l'application.
+ * 
+ * 
+ * @author Adrien Baud			adrien.baud@utbm.fr
+ * @author Francois Laithier	francois.laithier@utbm.fr
+ * @author Matthieu Paret		matthieu.paret@utbm.fr
+ *
+ * @version 1.0
  */
 public class LauncherActivity extends Activity {
 

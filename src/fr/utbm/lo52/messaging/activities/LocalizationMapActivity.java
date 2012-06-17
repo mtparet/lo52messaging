@@ -24,7 +24,6 @@ import fr.utbm.lo52.messaging.services.NetworkService;
 
 /**
  * Activité permettant de visualiser la position géographique des utilisateurs sur une carte
- * tutoriel : http://developer.android.com/resources/tutorials/views/hello-mapview.html
  */
 public class LocalizationMapActivity extends MapActivity {
 

@@ -11,6 +11,7 @@
     <string name="launcher_connexion_btn">Connexion</string>
     <string name="launcher_username_error_tv">Vous devez indiquer un nom d\'utilisateur dans les préférences avant de pouvoir vous connecter.</string>
     <string name="launcher_welcome">Bienvenue,</string>
+    <string name="launcher_wifi_warning">Vous devez être connecté à un réseau Wifi pour utiliser l\'application.</string>
 
     <!-- LOBBY -->
     <string name="lobby_tab_users">Utilisateurs</string>

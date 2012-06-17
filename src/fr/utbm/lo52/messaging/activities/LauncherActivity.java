@@ -14,7 +14,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.utbm.lo52.messaging.R;
+import fr.utbm.lo52.messaging.util.LibUtil;
 
 
 /**
@@ -49,8 +51,10 @@ public class LauncherActivity extends Activity {
 		// Initialisation des boutons, textviews...
 		connexionBtn 	= (Button) findViewById(R.id.launcher_connection_btn);
 		usernameErrorTv	= (TextView) findViewById(R.id.username_error_tv);
-
-		Log.d(TAG, "Lecture préférences : nom=" + preferences.getString("prefs_userName", "valeur_defaut") + " - connexion auto=" + preferences.getBoolean("prefs_autoLogin", false));
+		
+		// On vérifie si le wifi est actif
+		if (!LibUtil.isWifiActive(this))
+			Toast.makeText(this, getString(R.string.launcher_wifi_warning) , Toast.LENGTH_LONG).show();
 
 		// Ajout d'un onClickListener sur le bouton de connexion
 		connexionBtn.setOnClickListener(new OnClickListener() {
@@ -65,7 +69,7 @@ public class LauncherActivity extends Activity {
 			usernameErrorTv.setText(R.string.launcher_username_error_tv);
 			connexionBtn.setEnabled(false);
 		} else {
-			// On met un message de bienvenur
+			// On met un message de bienvenue
 			usernameErrorTv.setText(getString(R.string.launcher_welcome) + " " + preferences.getString("prefs_userName", "") + " !");
 
 			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby

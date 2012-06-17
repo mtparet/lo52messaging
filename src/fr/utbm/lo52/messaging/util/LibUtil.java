@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+
 
 /**
  * Libraire de méthodes utilitaires, pas forcément liées à Android
@@ -38,7 +41,7 @@ public class LibUtil {
 	public static final Set<String> FILE_IMAGE_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"jpg", "jpeg", "png"}
 			));
-	
+
 	public static final Set<String> FILE_AUDIO_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"mp3", "ogg"}
 			)); 
@@ -179,17 +182,33 @@ public class LibUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static boolean isInFileList(String filename, File[] listFile){
-		
 		for(File file : listFile){
 			if(filename == file.getName()){
 				return true;
 			}
 		}
-		
 		return false;
 	}
 
+	/**
+	 * Vérifie si le wifi est activé 
+	 * @param ctx
+	 * @return
+	 */
+	public static boolean isWifiActive(Context ctx) {
+		final ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		//final android.net.NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+		if(wifi.isAvailable())
+			return true;
+		
+		/*else if( mobile.isAvailable() ){
+		}*/
+
+		return false;
+	}
 
 }

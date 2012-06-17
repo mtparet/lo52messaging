@@ -29,11 +29,9 @@ public class LauncherActivity extends Activity {
 	 * Attributs
 	 */
 	private static final String TAG = "LO52MessagingActivity";
-
 	private SharedPreferences preferences;
 	private Button connexionBtn;
 	private TextView usernameErrorTv;
-
 
 	/*
 	 * Méthodes
@@ -68,10 +66,12 @@ public class LauncherActivity extends Activity {
 			Log.d(TAG, "not set");
 			usernameErrorTv.setText(R.string.launcher_username_error_tv);
 			connexionBtn.setEnabled(false);
+			usernameErrorTv.setOnClickListener(onNoUserNameClick);
 		} else {
 			// On met un message de bienvenue
 			usernameErrorTv.setText(getString(R.string.launcher_welcome) + " " + preferences.getString("prefs_userName", "") + " !");
-
+			usernameErrorTv.setOnClickListener(null);
+			
 			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby
 			if (preferences.getBoolean("prefs_autoLogin", false)) {
 				startLobbyActivity();
@@ -81,7 +81,6 @@ public class LauncherActivity extends Activity {
 		// On rend le logo un peu transparent
 		ImageView logo = (ImageView) findViewById(R.id.imageView1);
 		logo.setAlpha(220);	// Entre 0 et 255
-
 	}
 
 	/**
@@ -93,14 +92,11 @@ public class LauncherActivity extends Activity {
 		if (preferences.getString("prefs_userName", "").equals("")) {
 			usernameErrorTv.setText(R.string.launcher_username_error_tv);
 			connexionBtn.setEnabled(false);
+			usernameErrorTv.setOnClickListener(onNoUserNameClick);
 		} else {
 			usernameErrorTv.setText(getString(R.string.launcher_welcome) + " " + preferences.getString("prefs_userName", "") + " !");
 			connexionBtn.setEnabled(true);
-
-			// Si l'utilisateur a choisi la connexion auto, on lance l'activité Lobby
-			/*if (preferences.getBoolean("prefs_autoLogin", false)) {
-				startLobbyActivity();
-			}*/
+			usernameErrorTv.setOnClickListener(null);
 		}
 	}
 
@@ -123,15 +119,22 @@ public class LauncherActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.itemPreferences:
-			Log.d(TAG, "Démarrage activité préférences");
 			startActivity(new Intent(this, PreferencesActivity.class));
 			break;
 		default:
-			Log.e(TAG, "Choix non pris en charge");
+			Log.w(TAG, "Choix non pris en charge");
 			break;
 		}
 		return true;
 	}
+	
+	private OnClickListener onNoUserNameClick = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(LauncherActivity.this, PreferencesActivity.class));
+		}
+	};
 
 
 	/**

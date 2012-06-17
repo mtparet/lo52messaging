@@ -36,8 +36,8 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".activities.PreferencesActivity"></activity>
         <activity android:name=".activities.LobbyActivity" android:theme="@android:style/Theme.NoTitleBar" android:screenOrientation="portrait"></activity>
+        <activity android:name=".activities.PreferencesActivity" android:theme="@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.UserListActivity"></activity>
         <activity android:name=".activities.ConversationPagerActivity"></activity>

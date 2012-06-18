@@ -14,8 +14,6 @@ import fr.utbm.lo52.messaging.services.NetworkService;
 
 /**
  * Packet Réseau, contient l'envoyeur, le destinataire, le type de packet, et le content
- * @author Matthieu Paret
- *
  */
 public class PacketNetwork implements Parcelable{
 	final static public int MESSAGE = 1;

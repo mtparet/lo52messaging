@@ -9,6 +9,9 @@ import android.graphics.drawable.Drawable;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
+/**
+ * 	Elément "overlay" personnalisé affiché sur la carte géographique.
+ */
 @SuppressWarnings("rawtypes")
 public class UserItemizedOverlay extends ItemizedOverlay {
 	

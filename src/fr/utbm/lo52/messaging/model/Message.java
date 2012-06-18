@@ -5,9 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Contient un message dans un conversation, le client_id de l'�metteur et le corps du message
- * @author SYSTEMMOI
- *
+ * Contient un message dans un conversation, le client_id de l'émetteur et le corps du message
  */
 public class Message implements Parcelable{
 	

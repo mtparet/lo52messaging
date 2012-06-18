@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 /**
- * The <code>PagerAdapter</code> serves the fragments when paging.
+ * Adapter pour l'activité utilisant les fragments
  */
 public class MPagerAdapter extends FragmentPagerAdapter {
 

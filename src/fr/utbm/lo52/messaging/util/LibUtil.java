@@ -33,15 +33,22 @@ public class LibUtil {
 
 	/**
 	 * Extensions autorisées pour les fichiers envoyés dans les conversations
+	 * @deprecated
 	 */
 	public static final Set<String> MEDIA_ALLOWED_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"jpg", "jpeg", "png", "avi"}
 			));
 
+	/**
+	 * Extensions d'images gérées
+	 */
 	public static final Set<String> FILE_IMAGE_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"jpg", "jpeg", "png"}
 			));
 
+	/**
+	 * Extensions audio gérées
+	 */
 	public static final Set<String> FILE_AUDIO_EXTENSIONS = new HashSet<String>(Arrays.asList(
 			new String[] {"mp3", "ogg"}
 			)); 

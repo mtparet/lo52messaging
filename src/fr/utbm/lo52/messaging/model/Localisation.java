@@ -8,6 +8,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+/**
+ *	Classe implémentant Parcelable permettant de manipuler la position géographique d'un utilisateur 
+ */
 public class Localisation implements Parcelable {
 	private float lat;
 	private float lon;

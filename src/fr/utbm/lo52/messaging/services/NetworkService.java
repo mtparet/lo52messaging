@@ -40,13 +40,13 @@ import fr.utbm.lo52.messaging.util.LibUtil;
 import fr.utbm.lo52.messaging.util.Network;
 
 /**
- * Service qui gère les communcations réseau, stocke les différentes données,
- * reçoit des actions depuis les activity, leur ennvoit des messages/création de groupe,
- * met à disposition la liste des utilisateurs, conversations.
+ * Service qui gère les communications réseau, stocke les différentes données,
+ * reçoit des actions depuis les activity, leur envoie des messages/création de groupe,
+ * met à disposition la liste des utilisateurs, conversations, etc.
  * 
  * Principe de base:
  * 
- * *L'activity envoit:
+ * * L'activity envoi:
  * 
  * Hello
  * Creation group
@@ -54,19 +54,15 @@ import fr.utbm.lo52.messaging.util.Network;
  * Alive
  * Disconnected
  * 
- * *Le service envoit:
+ * * Le service envoi:
  * 
  * Message d'une conversation
  * 
- * *L'activity récupère:
+ * * L'activity récupère:
  * 
  * La liste des utilisateurs
  * La listes des conversations
  * 
- * 
- * 
- * @author SYSTEMMOI
- *
  */
 public class NetworkService extends Service {
 

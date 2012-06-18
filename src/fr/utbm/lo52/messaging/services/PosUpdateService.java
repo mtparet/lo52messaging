@@ -17,6 +17,10 @@ import com.google.android.maps.GeoPoint;
 import fr.utbm.lo52.messaging.model.Localisation;
 import fr.utbm.lo52.messaging.model.User;
 
+/**
+ * Service de mise à jour de la position. Permet de détecter les changements
+ * de position de l'utilisateur et d'en notifier les autres.
+ */
 public class PosUpdateService extends Service {
 
 	static final String TAG = "PosUpdateService";

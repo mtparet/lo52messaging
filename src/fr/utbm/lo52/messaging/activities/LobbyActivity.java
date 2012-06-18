@@ -28,9 +28,9 @@ import fr.utbm.lo52.messaging.services.PosUpdateService;
  *	Activité "lobby" regroupant plusieurs sous-activités au sein de différents onglets
  *
  *	Contient les trois onglets principaux de l'application, représentés par les activités:
- *	- {@link UserListActivity},
- *	- {@link ConversationPagerActivity},
- *	- {@link LocalizationMapActivity}
+ *	- UserListActivity,
+ *	- ConversationPagerActivity,
+ *	- LocalizationMapActivity
  */
 public class LobbyActivity extends TabActivity {
 

@@ -14,7 +14,6 @@ import fr.utbm.lo52.messaging.model.User;
  * type ACK, HELLO, DISCONNECTED, ALIVE => content == null
  * type MESSAGE : conversation_id + conversation_name + message
  * type CREATION_GROUP : conversation_id + conversation_name + userList
- * @author Matthieu Paret
  *
  */
 public class ContentNetwork implements Parcelable{

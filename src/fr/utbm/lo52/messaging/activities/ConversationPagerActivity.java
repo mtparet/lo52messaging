@@ -38,8 +38,6 @@ import fr.utbm.lo52.messaging.util.LibUtil;
 
 /**
  * Activité permettant de regrouper les conversations dans une vue en "fragments".
- * Pour ajouter/supprimer des fragments merci d'utiliser addFragment() / removeFragmentAt()
- * 
  */
 public class ConversationPagerActivity extends FragmentActivity implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
 

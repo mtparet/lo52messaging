@@ -9,6 +9,9 @@ import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.text.format.Formatter;
 
+/**
+ *	Classe utilitaire de fonctions liées au réseau. 
+ */
 public class Network {
 	
 	public static InetAddress getBroadcastAddress(Context mContext) throws IOException {

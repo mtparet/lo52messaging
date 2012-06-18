@@ -7,10 +7,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * D�crit un utilisateur. 
- * De base contient seulement un nom et un id g�n�r� pseudo al�atoirement
- * Son adresse ip local/public doit �tre mise � jour ensuite
- * @author Matthieu Paret
+ * Décrit un utilisateur. 
+ * De base contient seulement un nom et un id généré pseudo aléatoirement
+ * Son adresse ip local/public doit  être mise à jour ensuite
  *
  */
 public class User implements  Parcelable{

@@ -18,9 +18,6 @@ import fr.utbm.lo52.messaging.util.LibUtil;
 
 /**
  * Classe qui stocke une conversation: son id, name, et les différents Message
- * ATTENTION : la parcelablisation ne s'effectue pour le moment pas pour listMessage
- * @author SYSTEMMOI
- *
  */
 public class Conversation implements Parcelable {
 

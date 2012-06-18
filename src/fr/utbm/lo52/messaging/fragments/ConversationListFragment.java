@@ -19,7 +19,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
-
+/**
+ *	Fragment permettant de lister toutes les conversations en cours.
+ *	Unique et toujours placé en premier dans la liste des fragments.  
+ */
 public class ConversationListFragment extends ListFragment {
 
 	private static final String TAG = "ConversationListFragment";

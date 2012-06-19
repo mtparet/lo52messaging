@@ -2,7 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="@string/preferencesActivity" >
-        
         <EditTextPreference
             android:key="prefs_userName"
             android:summary="@string/preferencesUsernameDesc"
@@ -14,66 +13,50 @@
             android:summary="@string/preferencesUserAutoLoginDesc"
             android:title="@string/preferencesUserAutoLogin" >
         </CheckBoxPreference>
-        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="prefs_confirmToQuit"
             android:summary="@string/preferencesConfirmToQuitDesc"
             android:title="@string/preferencesConfirmToQuit" >
         </CheckBoxPreference>
-        
     </PreferenceCategory>
-    
-    
     <PreferenceCategory android:title="@string/preferencesNotifications" >
-        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="prefs_notifToast"
             android:summary="@string/preferencesNotifToastDesc"
             android:title="@string/preferencesNotifToast" >
         </CheckBoxPreference>
-        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="prefs_notifVibrator"
             android:summary="@string/preferencesNotifVibrationDesc"
             android:title="@string/preferencesNotifVibration" >
         </CheckBoxPreference>
-        
     </PreferenceCategory>
-    
-    
     <PreferenceCategory android:title="@string/preferencesServiceTitle" >
-        
         <CheckBoxPreference
             android:key="prefs_networkServiceKeepAlive"
             android:summary="@string/preferencesServiceNetworkDesc"
             android:title="@string/preferencesServiceNetwork" >
         </CheckBoxPreference>
-        
     </PreferenceCategory>
-    
-    
-    <PreferenceCategory android:title="Options de dev" >
+    <PreferenceCategory android:title="@string/preferencesDev" >
         <CheckBoxPreference
             android:key="dev_prefs_emulateur"
-            android:summary="Activer mode dev"
-            android:title="Emulateur" >
+            android:summary="@string/preferencesDev_emulatorDesc"
+            android:title="@string/preferencesDev_emulator" >
         </CheckBoxPreference>
 
         <EditTextPreference
             android:key="dev_prefs_port_entrant"
             android:numeric="integer"
-            android:summary="(Dev) Port entrant"
-            android:title="Port entrant" >
+            android:title="@string/preferencesDev_portLocal" >
         </EditTextPreference>
-        
         <EditTextPreference
             android:key="dev_prefs_port_distant"
             android:numeric="integer"
-            android:summary="(Dev) Port distant"
-            android:title="Port distant" >
+            android:title="@string/preferencesDev_portDistant" >
         </EditTextPreference>
     </PreferenceCategory>
 

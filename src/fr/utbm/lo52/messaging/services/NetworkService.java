@@ -1012,6 +1012,12 @@ public class NetworkService extends Service {
 			//on l'ajoute à la liste
 			listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 		}
+		
+		//on lui envoit notre localisation
+		Localisation location = user_me.getLocalisation();
+		if(location != null){
+			location.sendToNetworkService(getApplicationContext());
+		}
 
 
 		paquetAlive(packetReceive);

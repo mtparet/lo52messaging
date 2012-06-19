@@ -144,7 +144,6 @@ public class LauncherActivity extends Activity {
 	
 	private OnClickListener onNoUserNameClick = new OnClickListener() {
 		
-		@Override
 		public void onClick(View v) {
 			startActivity(new Intent(LauncherActivity.this, PreferencesActivity.class));
 		}

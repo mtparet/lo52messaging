@@ -98,6 +98,12 @@ public class PosUpdateService extends Service {
 
 		@Override
 		public void run() {                 // méthode invoquée pour démarrer le fil
+			try {
+				Thread.sleep(DELAY); //permet d'attendre que la connexion soit déjà effectué avec d'autres
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}	
+
 			PosUpdateService updaterService = PosUpdateService.this;  // réf. Sur le service
 			while (updaterService.runFlag) {  // MAJ via les méthode onStartCOmmand et onDestroy
 				Log.i(TAG, "Updater running");

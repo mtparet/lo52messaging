@@ -4,7 +4,7 @@
     android:id="@+id/mapview"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:apiKey="0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw"
+    android:apiKey="0SJC67-MWAgNdFZFgcSDnPjnXxLVJQCBnC3ebww"
     android:clickable="true" />
 <!-- Backup 0nHV3RzNBnM-pjPYly76AmKxVEUwPvo2AVtIzWw -->
 <!-- matthieu_key_debug 0SJC67-MWAgPRrMW4epICr9gdO0ecN0r8vkKjfw -->

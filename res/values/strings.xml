@@ -62,6 +62,11 @@
     <string name="preferencesNotifVibrationDesc">Faire vibrer le téléphone pour les évènements manqués (nouveau message, …)</string>
     <string name="preferencesConfirmToQuit">Confirmation pour quitter</string>
     <string name="preferencesConfirmToQuitDesc">Afficher une demande de confirmation avant de quitter l\'application.</string>
+    <string name="preferencesDev">Options de développement</string>
+    <string name="preferencesDev_emulator">Emulateur</string>
+    <string name="preferencesDev_emulatorDesc">Activer le mode de développement sur émulateur</string>
+    <string name="preferencesDev_portLocal">Port entrant</string>
+    <string name="preferencesDev_portDistant">Port distant</string>
 
     <!-- FILE PICKER -->
     <string name="filePicker_invalid_ext">Extension de fichier invalide</string>

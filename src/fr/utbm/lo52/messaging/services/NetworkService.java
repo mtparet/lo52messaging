@@ -113,8 +113,8 @@ public class NetworkService extends Service {
 	private int PORT_LOCAL = 5008;
 
 	//Taille du buffer en réception, en Byte
-	//TODO : avant production de l'application final mettre à 30 000
-	public static final int BUFFER_SIZE = 15000;
+	//TODO : avant production de l'application final mettre à 40 000
+	public static final int BUFFER_SIZE = 40000;
 
 	public NetworkService() {
 
@@ -392,7 +392,7 @@ public class NetworkService extends Service {
 
 
 	/**
-	 * Fonction qui finit la contruction du packet et l'envoit suivant son type
+	 * Fonction qui finit la contruction du packet et l'envoie suivant son type
 	 * @param packet
 	 */
 	private void SendPacket(PacketNetwork packet) {
@@ -414,7 +414,7 @@ public class NetworkService extends Service {
 
 		} else {
 			/**
-			 * Dans le cas de l'envoit d'un message
+			 * Dans le cas de l'envoi d'un message
 			 */
 			//Création de l'asyncTask pour envoyer le packet
 			SendSocket sendSocket = new SendSocket();
@@ -469,7 +469,7 @@ public class NetworkService extends Service {
 		previousReceivedPacket.clear();
 		conversationsToCreateUI.clear();
 		timerCheckAck.cancel();
-		//on cancel tout les asyntask d'envoit de message
+		//on cancel tout les asyntask d'envoi de message
 		for(SendSocket socket : listSendSocket){
 			socket.cancel(true);
 		}
@@ -479,7 +479,7 @@ public class NetworkService extends Service {
 	/**
 	 * AsyncTask pour envoyer un message à un utilisateur.
 	 * Socket qui reçoit un paquet déjà tout emballé
-	 * Dans ce paquet il prend le client, regarde dans table son adresse ip et lui envoit
+	 * Dans ce paquet il prend le client, regarde dans table son adresse ip et lui envoie
 	 */
 	private class SendSocket extends AsyncTask <PacketNetwork, Integer, Long> {
 
@@ -564,7 +564,7 @@ public class NetworkService extends Service {
 						packet1.setDate_send((int) System.currentTimeMillis());
 						packetListACK.put(packet1.getRamdom_identifiant(), packet1);
 					} else {
-						Log.e(TAG, "échec envoit datagramsocket");
+						Log.e(TAG, "échec envoi datagramsocket");
 					}
 				}
 
@@ -574,7 +574,7 @@ public class NetworkService extends Service {
 				packet.getContent().getConversation_id();
 				sendBroadcast(broadcastIntent2);
 
-				// sinon on envoit le packet seul
+				// sinon on envoie le packet seul
 			} else {
 
 				String json = gson.toJson(packet);
@@ -595,7 +595,7 @@ public class NetworkService extends Service {
 						packetListACK.put(packet.getRamdom_identifiant(), packet);
 					}
 				} else {
-					Log.e(TAG, "échec envoit datagramsocket");
+					Log.e(TAG, "échec envoi datagramsocket");
 				}
 			}
 			
@@ -720,7 +720,7 @@ public class NetworkService extends Service {
 
 
 				do{
-					byte[] buffer2 = new byte[BUFFER_SIZE]; //TODO vérifier à l'envoit que la taille du packet n'excède pas la taille du buffer
+					byte[] buffer2 = new byte[BUFFER_SIZE]; //TODO vérifier à l'envoi que la taille du packet n'excède pas la taille du buffer
 					DatagramPacket dataPacket = new DatagramPacket(buffer2, buffer2.length);
 					try {
 						datagramSocket.receive(dataPacket);
@@ -777,11 +777,11 @@ public class NetworkService extends Service {
 
 
 		/**
-		 * Si le packet n'est pas un ACK, on envoit un ACK
+		 * Si le packet n'est pas un ACK, on envoie un ACK
 		 */
 		if (packetReceive.type != PacketNetwork.ACK ) {
 
-			//On envoit un ACK
+			//On envoie un ACK
 			PacketNetwork packetSend = new PacketNetwork(packetReceive.getUser_envoyeur(), packetReceive.getRamdom_identifiant(),PacketNetwork.ACK);
 			User userMe = new User(user_me);
 			userMe.setLocalisation(null);
@@ -828,7 +828,7 @@ public class NetworkService extends Service {
 			}
 			Log.d(TAG, "Taille de la pile de packet :" + listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() + " taille attendue : " +packet.getNb_packet_groupe());
 
-			// Si on est sur le premier paquet on envoit un broadcast pour dire d'afficher un toast comme quoi on reçoit un fichier
+			// Si on est sur le premier paquet on envoie un broadcast pour dire d'afficher un toast comme quoi on reçoit un fichier
 			if (listPaquetDivided.get(packet.getRamdom_identifiant_groupe()).size() == 1) {
 				Intent broadcastIntent = new Intent(NetworkService.FileTransferStart);
 				broadcastIntent.putExtra("conversation_id", packet.getContent().getConversation_id());
@@ -999,7 +999,7 @@ public class NetworkService extends Service {
 				listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 			}
 
-			//Si on a des conversations avec lui, on lui renvoit... 
+			//Si on a des conversations avec lui, on lui renvoie... 
 			for( Conversation convers : listConversations.values()) {
 				for(int user_id : convers.getListIdUser()) {
 					if (user_id == packetReceive.getUser_envoyeur().getId()) {
@@ -1013,7 +1013,7 @@ public class NetworkService extends Service {
 			listUsers.put(packetReceive.getUser_envoyeur().getId(), packetReceive.getUser_envoyeur());
 		}
 		
-		//on lui envoit notre localisation
+		//on lui envoie notre localisation
 		Localisation location = user_me.getLocalisation();
 		if(location != null){
 			location.sendToNetworkService(getApplicationContext());
@@ -1115,7 +1115,7 @@ public class NetworkService extends Service {
 	/**
 	 * Traite un ACK
 	 * Retire le paquet de la liste des paquets en attente d'ACK
-	 * TODO: voir si on renvoit quelque chose à l'activity
+	 * TODO: voir si on renvoie quelque chose à l'activity
 	 * 
 	 * @param packetReceive
 	 */
